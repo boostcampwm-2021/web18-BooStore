@@ -5,7 +5,7 @@
 - [📚 Naming Convention](#-naming-convention)
 - [📝 Git Convention](#-git-convention)
 - [📅 스케쥴러](#-스케쥴러)
-- [🎨 와이어프레임](#-와이어프레임)
+- [🎨 와이어프레임 및 기획서](#-와이어프레임 및 )
 - [🧰 설계서](#-설계서)
 - [📖 회의록 목록](#-회의록-목록)
 
@@ -34,7 +34,7 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 ## 📅 스케쥴러
 [Annoying Potato Google Spreadsheets](https://docs.google.com/spreadsheets/d/1tfH_lMYltMyLQ0Xz10B3nNSc5ssL0hg87UrO0Hc-6Vo/edit?usp=sharing)
 
-## 🎨 와이어프레임
+## 🎨 와이어프레임 및 기획서
 [Annoying Potato Figma](https://www.figma.com/file/bPOYPsn7GjMZyiHddDoeeR/Annoying-Potato?node-id=0%3A1)
 
 ## 🧰 설계서
