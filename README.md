@@ -27,7 +27,7 @@
 
 ## ⏰ Ground Rule
 
-[Ground Rule Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/Ground-Rules)
+[Ground Rule Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%E2%8F%B0-Ground-Rules)
 
 ## 📚 Naming Convention
 
