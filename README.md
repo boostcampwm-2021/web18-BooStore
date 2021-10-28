@@ -5,7 +5,7 @@
 - [📚 Naming Convention](#-naming-convention)
 - [📝 Git Convention](#-git-convention)
 - [📅 스케쥴러](#-스케쥴러)
-- [🎨 와이어프레임 및 기획서](#-와이어프레임 및 )
+- [🎨 와이어프레임 및 기획서](#-와이어프레임)
 - [🧰 설계서](#-설계서)
 - [📖 회의록 목록](#-회의록-목록)
 
