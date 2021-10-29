@@ -23,7 +23,7 @@
 
 | [<img src="https://github.com/ChipmunkForLove.png" width="100px">](https://github.com/ChipmunkForLove) | [<img src="https://github.com/gidskql6671.png" width="100px">](https://github.com/gidskql6671) | [<img src="https://github.com/K-moovie.png" width="100px">](https://github.com/K-moovie) | [<img src="https://github.com/chaebum-kim.png" width="100px">](https://github.com/chaebum-kim) |
 | :----------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: |
-|                           [J010 권윤영](https://github.com/ChipmunkForLove)                            |                         [J022 김동환](https://github.com/gidskql6671)                          |                        [J041 김영화](https://github.com/K-moovie)                        |                         [J062 김채범](https://github.com/chaebum-kim)                          |
+|                           [J010 권윤영](https://github.com/ChipmunkForLove)                            |                         [J022 김동환](https://github.com/gidskql6671)                          |                        [J041 김영화](https://github.com/K-moovie)                        |             
 
 ## ⏰ Ground Rule
 
