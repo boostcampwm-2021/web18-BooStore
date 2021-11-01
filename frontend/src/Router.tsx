@@ -3,7 +3,7 @@ import { Switch, Redirect, Route, RouteComponentProps } from "react-router-dom";
 import Login from "./pages/Login";
 import Main from "./pages/Main";
 
-type hasUserProps = {
+export type hasUserProps = {
     name:string | null;
 }
 const Router: React.FC<hasUserProps> = ({name})=>{
