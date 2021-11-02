@@ -1,11 +1,18 @@
-import React from 'react';
-import LoginComponent from './component/LoginComponent';
-import LoginPage from './page/LoginPage';
-import SignupComponent from './component/SignupComponent';
-import SignupPage from './page/SignupPage';
+import React, { useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import Router from "./Router";
+import Header from "./component/Header";
 
-function App() {
-	return <div className="App"></div>;
+const App: React.FC = ()=>{
+	const [user, setUser] = useState<string |null>(null);
+	return (
+	<>
+    <Header name={user}/>
+	<BrowserRouter>
+      <Router name={user}/> 
+    </BrowserRouter>
+	</>
+	)
 }
 
 export default App;
