@@ -7,8 +7,8 @@ const App: React.FC = ()=>{
 	const [user, setUser] = useState<string |null>(null);
 	return (
 	<>
-    <Header name={user}/>
 	<BrowserRouter>
+	  <Header name={user}/>
       <Router name={user}/> 
     </BrowserRouter>
 	</>
