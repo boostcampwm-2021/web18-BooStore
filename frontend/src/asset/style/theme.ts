@@ -1,4 +1,4 @@
-import { DefaultTheme } from "styled-components";
+import { DefaultTheme } from 'styled-components';
 
 const defaultTheme: DefaultTheme = {
 	color: {
@@ -8,6 +8,6 @@ const defaultTheme: DefaultTheme = {
 		Line: '#D7D7D7',
 	},
 	HeaderHeight: '100px',
-}
+};
 
 export { defaultTheme };
