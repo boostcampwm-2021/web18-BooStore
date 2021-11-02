@@ -7,7 +7,7 @@ declare module 'styled-components' {
 			SecondaryBG: string;
 			Primary: string;
 			Line: string;
-		},
+		};
 		HeaderHeight: string;
 	}
 }
