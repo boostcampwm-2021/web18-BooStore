@@ -8,12 +8,12 @@ export type hasUserProps = {
 }
 const Router: React.FC<hasUserProps> = ({name})=>{
 
-    !{name}? <Redirect to="/Login"/> : <Redirect to="/"/>
     return (
         <div>
             <Switch>
-                <Route path="/" exact component={Main} />
                 <Route path="/Login" exact component={Login} />
+                { name || <Redirect to="/Login" /> }
+                <Route path="/" exact component={Main} />
                 <Redirect path="*" to="/" />
             </Switch>
         </div>
