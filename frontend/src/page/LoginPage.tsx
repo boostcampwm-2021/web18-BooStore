@@ -1,12 +1,17 @@
 import React, { Children } from 'react';
 import styled from 'styled-components';
+import LoginComponent from '../component/LoginComponent';
 
 type LoginPageProps = {
 	children: React.ReactNode;
 };
 
-function LoginPage({children}:LoginPageProps) {
-	return <LoginPageBackground>{children}</LoginPageBackground>;
+function LoginPage({ children }: LoginPageProps) {
+	return (
+		<LoginPageBackground>
+			<LoginComponent />
+		</LoginPageBackground>
+	);
 }
 
 const LoginPageBackground = styled.div`
