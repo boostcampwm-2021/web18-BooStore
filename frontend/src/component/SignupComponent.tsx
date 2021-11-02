@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import IconLeftArrow from '../asset/image/IconLeftArrow.svg';
 
-function SignupComponent() {
-	type Inputs = {
+interface Props {}
+
+const SignupComponent: React.FC<Props> = () => {
+	interface Inputs {
 		id: string;
 		password: string;
 		passwordCheck: string;
-	};
+	}
 
 	const [inputs, setInputs] = useState<Inputs>({
 		id: '',
@@ -81,7 +83,7 @@ function SignupComponent() {
 			</SignupContainer>
 		</SignupBackground>
 	);
-}
+};
 
 const SignupBackground = styled.div`
 	background-color: ${(props) => props.theme.color.PrimaryBG};

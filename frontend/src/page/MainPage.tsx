@@ -5,30 +5,9 @@ import FileList from '../component/FileList';
 import FileMenu from '../component/FileMenu';
 import Sidebar from '../component/Sidebar';
 
-const Container = styled.div`
-	display: flex;
-	height: calc(100vh - ${(props) => props.theme.HeaderHeight});
-`;
+interface Props {}
 
-const InnerContainer = styled.div`
-	background-color: ${(props) => props.theme.color.PrimaryBG};
-	padding: 25px 35px;
-	width: 100%;
-`;
-
-const Directory = styled.p`
-	font-size: 24px;
-	border-bottom: 2px solid ${(props) => props.theme.color.Line};
-
-	margin: 0;
-	padding-bottom: 20px;
-`;
-
-const Section = styled.section`
-	padding: 10px;
-`;
-
-function MainPage() {
+const MainPage: React.FC<Props> = () => {
 	const [files, setFiles] = useState([
 		{
 			id: '111',
@@ -65,6 +44,29 @@ function MainPage() {
 			</InnerContainer>
 		</Container>
 	);
-}
+};
+
+const Container = styled.div`
+	display: flex;
+	height: calc(100vh - ${(props) => props.theme.HeaderHeight});
+`;
+
+const InnerContainer = styled.div`
+	background-color: ${(props) => props.theme.color.PrimaryBG};
+	padding: 25px 35px;
+	width: 100%;
+`;
+
+const Directory = styled.p`
+	font-size: 24px;
+	border-bottom: 2px solid ${(props) => props.theme.color.Line};
+
+	margin: 0;
+	padding-bottom: 20px;
+`;
+
+const Section = styled.section`
+	padding: 10px;
+`;
 
 export default MainPage;

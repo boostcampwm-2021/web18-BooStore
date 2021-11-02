@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-function LoginComponent() {
-	type Inputs = {
+interface Props {}
+
+const LoginComponent: React.FC<Props> = () => {
+	interface Inputs {
 		id: string;
 		password: string;
-	};
+	}
 
 	const [inputs, setInputs] = useState<Inputs>({ id: '', password: '' });
 
@@ -55,7 +57,7 @@ function LoginComponent() {
 			</LoginContainer>
 		</LoginBackground>
 	);
-}
+};
 
 const LoginBackground = styled.div`
 	background-color: ${(props) => props.theme.color.PrimaryBG};
