@@ -2,17 +2,15 @@ import React, { Children } from 'react';
 import styled from 'styled-components';
 import LoginComponent from '../component/LoginComponent';
 
-type LoginPageProps = {
-	children: React.ReactNode;
-};
+interface Props {}
 
-function LoginPage({ children }: LoginPageProps) {
+const LoginPage: React.FC<Props> = () => {
 	return (
 		<LoginPageBackground>
 			<LoginComponent />
 		</LoginPageBackground>
 	);
-}
+};
 
 const LoginPageBackground = styled.div`
 	width: 100%;

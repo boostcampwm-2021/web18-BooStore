@@ -4,9 +4,7 @@ import styled from 'styled-components';
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
 
-
-const Container = styled.div`
-`;
+const Container = styled.div``;
 
 const gridTemplate = `
 	display: grid;
@@ -14,7 +12,7 @@ const gridTemplate = `
 `;
 
 const FileHeader = styled.div`
-	${gridTemplate}
+	${gridTemplate};
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 `;
 
@@ -29,10 +27,9 @@ const Files = styled.ul`
 `;
 
 const File = styled.li`
-	${gridTemplate}
+	${gridTemplate};
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 `;
-
 
 interface FileDTO {
 	id: string;
@@ -50,7 +47,6 @@ interface Props {
 }
 
 const FileList: React.FC<Props> = ({ files, setFiles }) => {
-	
 	return (
 		<Container>
 			<FileHeader>
