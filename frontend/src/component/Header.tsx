@@ -1,14 +1,18 @@
 import React from 'react';
 import logo from "../asset/image/logo.png";
 import profile from "../asset/image/profile.png";
-import { hasUserProps } from '../Router';
 import styled from "styled-components";
+import { User } from '../model';
 
-const Header: React.FC<hasUserProps> = ({name})=>{
+export type hasUserProps = {
+    user: User | null;
+}
+
+const Header: React.FC<hasUserProps> = ({ user })=>{
     return (
         <HeaderSection>
             <Logo src={logo}></Logo>
-            <Profile src={profile} style={{visibility: name ? 'visible' : 'hidden'}}></Profile>
+            <Profile src={profile} style={{visibility: user ? 'visible' : 'hidden'}}></Profile>
         </HeaderSection>
     )
 }

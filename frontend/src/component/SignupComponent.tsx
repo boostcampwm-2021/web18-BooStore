@@ -37,12 +37,12 @@ const SignupComponent: React.FC<Props> = () => {
 	}, [id, password, passwordCheck]);
 
 	const isRightIdRex = () => {
-		const pattern = /([a-zA-Z0-9]){4,13}/;
+		const pattern = /^([a-zA-Z0-9]){4,13}$/;
 		return pattern.test(id);
 	};
 
 	const isRightPasswordRex = () => {
-		const pattern = /([a-zA-Z0-9!@#$%^&*]){4,13}/;
+		const pattern = /^([a-zA-Z0-9!@#$%^&*]){4,13}$/;
 		return pattern.test(password);
 	};
 
@@ -52,8 +52,7 @@ const SignupComponent: React.FC<Props> = () => {
 	};
 
 	const onClickSignup = ()=>{
-		console.log(id, password,passwordCheck);
-		fetch("localhost:3001/signup",{
+		fetch(`${process.env.REACT_APP_SERVER}/signup`,{
 			method:"POST",
 			headers:{
 				"Content-type": "application/json"
@@ -66,8 +65,14 @@ const SignupComponent: React.FC<Props> = () => {
 					pathname: "/login",
 				})
 			}
-			else{
-				alert("회원가입 안됨");
+			else if (response.status === 400) {
+				alert('유효하지않은 아이디 & 비밀번호');
+			}
+			else if (response.status === 409) {
+				alert('중복된 아이디');
+			}
+			else {
+				alert('회원가입 안됨')
 			}
 		});
 	}

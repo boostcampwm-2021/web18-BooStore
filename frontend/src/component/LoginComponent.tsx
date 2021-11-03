@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
+import { User } from '../model';
 
-interface Props {}
+interface Props {
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
 
-const LoginComponent: React.FC<Props> = () => {
+const LoginComponent: React.FC<Props> = ({ setUser }) => {
 	interface Inputs {
 		id: string;
 		password: string;
@@ -32,8 +35,7 @@ const LoginComponent: React.FC<Props> = () => {
 	};
 
 	const onClickLogin = () => {
-		console.log(id, password);
-		fetch("localhost:3001/login",{
+		fetch(`${process.env.REACT_APP_SERVER}/login`,{
 			method:"POST",
 			headers:{
 				"Content-type": "application/json"
@@ -42,15 +44,22 @@ const LoginComponent: React.FC<Props> = () => {
 		})
 		.then((response) => {
 			if(response.ok){
-				history.push({
-					pathname: "/",
-					state : {userinfo: inputs}
-				})
+				return response.json();
 			}
 			else{
-				alert("로그인 안됨");
+				throw new Error(response.status.toString());
 			}
-		});
+		})
+		.then((data) => {
+			setUser({...data});
+			history.push({
+				pathname: "/",
+				state : {userinfo: data}
+			});
+		})
+		.catch((err) => {
+			alert('로그인 실패');
+		})
 		onReset();
 	};
 

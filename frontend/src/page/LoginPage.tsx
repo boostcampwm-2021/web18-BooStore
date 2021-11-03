@@ -1,13 +1,17 @@
 import React, { Children } from 'react';
 import styled from 'styled-components';
 import LoginComponent from '../component/LoginComponent';
+import { User } from '../model';
 
-interface Props {}
+interface Props {
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
 
-const LoginPage: React.FC<Props> = () => {
+
+const LoginPage: React.FC<Props> = ({ setUser }) => {
 	return (
 		<LoginPageBackground>
-			<LoginComponent />
+			<LoginComponent setUser={setUser} />
 		</LoginPageBackground>
 	);
 };
