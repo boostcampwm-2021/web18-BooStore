@@ -19,7 +19,7 @@ router.post('/signup', async (req, res) => {
 	if (!(validateId(id) && validatePassword(password))) {
 		return res.status(400).send();
 	}
-	if (isExistsUser({ loginId: id })) {
+	if (await isExistsUser({ loginId: id })) {
 		return res.status(409).send();
 	}
 	
