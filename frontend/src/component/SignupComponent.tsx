@@ -37,12 +37,12 @@ const SignupComponent: React.FC<Props> = () => {
 	}, [id, password, passwordCheck]);
 
 	const isRightIdRex = () => {
-		const pattern = /([a-zA-Z0-9]){4,13}/;
+		const pattern = /^([a-zA-Z0-9]){4,13}$/;
 		return pattern.test(id);
 	};
 
 	const isRightPasswordRex = () => {
-		const pattern = /([a-zA-Z0-9!@#$%^&*]){4,13}/;
+		const pattern = /^([a-zA-Z0-9!@#$%^&*]){4,13}$/;
 		return pattern.test(password);
 	};
 
@@ -53,7 +53,7 @@ const SignupComponent: React.FC<Props> = () => {
 
 	const onClickSignup = ()=>{
 		console.log(id, password,passwordCheck);
-		fetch("localhost:3001/signup",{
+		fetch(`${process.env.REACT_APP_SERVER}/signup`,{
 			method:"POST",
 			headers:{
 				"Content-type": "application/json"
