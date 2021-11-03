@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { User } from '../model';
+import Modal from 'react-modal';
+import {ModalButton} from './SignupComponent';
 
 interface Props {
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -16,6 +18,8 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 	const history = useHistory();
 
 	const [inputs, setInputs] = useState<Inputs>({ id: '', password: '' });
+	const [modalIsOpen, setModalIsOpen] = useState(false);
+	const [modalText, setModalText] = useState("유효하지 않은 아이디 또는 비밀번호 입니다.");
 
 	const { id, password } = inputs;
 
@@ -58,7 +62,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 			});
 		})
 		.catch((err) => {
-			alert('로그인 실패');
+			setModalIsOpen(true);
 		})
 		onReset();
 	};
@@ -90,6 +94,12 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 					<Button onClick={onClickLogin}>log in</Button>
 					<Button onClick={onClickSignup}>sign up</Button>
 				</FlexDiv>
+				<Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} ariaHideApp={false}>
+					{modalText}
+					<FlexDiv>
+						<ModalButton onClick={()=> setModalIsOpen(false)}>Modal Close</ModalButton>
+					</FlexDiv>
+				</Modal>
 			</LoginContainer>
 		</LoginBackground>
 	);
@@ -135,5 +145,7 @@ const Input = styled.input`
 	border-radius: 10px;
 	font-size: 20px;
 `;
+
+
 
 export default LoginComponent;

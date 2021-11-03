@@ -34,9 +34,6 @@ const SignupComponent: React.FC<Props> = () => {
 		});
 	};
 
-	useEffect(() => {
-	}, [id, password, passwordCheck]);
-
 	const isRightIdRex = () => {
 		const pattern = /^([a-zA-Z0-9]){4,13}$/;
 		return pattern.test(id);
@@ -116,12 +113,15 @@ const SignupComponent: React.FC<Props> = () => {
 					onChange={onChange}
 					type="password"
 				/>
+				<Warning>비밀번호가 일치하지 않습니다.</Warning>
 				<FlexDiv>
 					<Button onClick={onClickSignup} style={{ float: 'right' }}>sign up</Button>
 				</FlexDiv>
 				<Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} ariaHideApp={false}>
 					{modalText}
-					<button onClick={()=> setModalIsOpen(false)}>Modal Close</button>
+					<FlexDiv>
+						<ModalButton onClick={()=> setModalIsOpen(false)}>Modal Close</ModalButton>
+					</FlexDiv>
 				</Modal>
 			</SignupContainer>
 		</SignupBackground>
@@ -179,4 +179,41 @@ const Input = styled.input`
 	font-size: 20px;
 `;
 
+const Warning = styled.div`
+	color: #FF0000;
+	font-size: 12px;
+`;
+
+Modal.defaultStyles={
+	overlay: {
+		position: 'fixed',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(255, 255, 255, 0.75)'
+	},
+	content: {
+		position: 'absolute',
+		width: '400px',
+		height: '200px',
+		border: '1px solid #ccc',
+		background: '#fff',
+		overflow: 'auto',
+		WebkitOverflowScrolling: 'touch',
+		borderRadius: '4px',
+		outline: 'none',
+		padding: '20px'
+	}
+}
+
+export const ModalButton = styled.div`
+	width: 80px;
+	height: 25px;
+	background-color: ${(props) => props.theme.color.Primary};
+	border: none;
+	border-radius: 6px;
+	color: ${(props) => props.theme.color.PrimaryBG};
+	font-size: 12px;
+`;
 export default SignupComponent;
