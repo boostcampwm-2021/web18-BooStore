@@ -4,7 +4,11 @@
     "lib": ["ES6", "ES7", "ES2017", "ES2018", "ES2019", "ES2021"],
     "outDir": "build",
     "moduleResolution": "node",
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "typeRoots": [
+      "./nodemodules/@types",
+      "./src/@types"
+    ]
   },
   "include": [
     "src"
