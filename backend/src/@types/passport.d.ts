@@ -1,7 +1,7 @@
 export {};
 
 interface UserModel {
-	_id: string;
+	id: string;
 	loginId: string;
 	password: string;
 	directoryId: string;
