@@ -35,7 +35,6 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 	};
 
 	const onClickLogin = () => {
-		console.log(id, password);
 		fetch(`${process.env.REACT_APP_SERVER}/login`,{
 			method:"POST",
 			headers:{

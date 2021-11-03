@@ -52,7 +52,6 @@ const SignupComponent: React.FC<Props> = () => {
 	};
 
 	const onClickSignup = ()=>{
-		console.log(id, password,passwordCheck);
 		fetch(`${process.env.REACT_APP_SERVER}/signup`,{
 			method:"POST",
 			headers:{
