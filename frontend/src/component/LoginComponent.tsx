@@ -43,7 +43,7 @@ const LoginComponent: React.FC<Props> = () => {
 		.then((response) => {
 			if(response.ok){
 				history.push({
-					pathname: "/main",
+					pathname: "/",
 					state : {userinfo: inputs}
 				})
 			}
@@ -53,6 +53,12 @@ const LoginComponent: React.FC<Props> = () => {
 		});
 		onReset();
 	};
+
+	const onClickSignup = ()=>{
+		history.push({
+			pathname:"/signup"
+		})
+	} 
 
 	return (
 		<LoginBackground>
@@ -73,7 +79,7 @@ const LoginComponent: React.FC<Props> = () => {
 				/>
 				<FlexDiv>
 					<Button onClick={onClickLogin}>log in</Button>
-					<Button>sign up</Button>
+					<Button onClick={onClickSignup}>sign up</Button>
 				</FlexDiv>
 			</LoginContainer>
 		</LoginBackground>

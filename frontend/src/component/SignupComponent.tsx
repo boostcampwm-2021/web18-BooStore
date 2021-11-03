@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import IconLeftArrow from '../asset/image/IconLeftArrow.svg';
+import { useHistory } from 'react-router-dom';
 
 interface Props {}
 
@@ -10,6 +11,8 @@ const SignupComponent: React.FC<Props> = () => {
 		password: string;
 		passwordCheck: string;
 	}
+
+	const history = useHistory();
 
 	const [inputs, setInputs] = useState<Inputs>({
 		id: '',
@@ -48,6 +51,27 @@ const SignupComponent: React.FC<Props> = () => {
 		return password === passwordCheck;
 	};
 
+	const onClickSignup = ()=>{
+		console.log(id, password,passwordCheck);
+		fetch("localhost:3001/signup",{
+			method:"POST",
+			headers:{
+				"Content-type": "application/json"
+			},
+			body: JSON.stringify(inputs)
+		})
+		.then((response) => {
+			if(response.ok){
+				history.push({
+					pathname: "/login",
+				})
+			}
+			else{
+				alert("회원가입 안됨");
+			}
+		});
+	}
+
 	return (
 		<SignupBackground>
 			<div style={{ width: '90%' }}>
@@ -78,7 +102,7 @@ const SignupComponent: React.FC<Props> = () => {
 					type="password"
 				/>
 				<FlexDiv>
-					<Button style={{ float: 'right' }}>sign up</Button>
+					<Button onClick={onClickSignup} style={{ float: 'right' }}>sign up</Button>
 				</FlexDiv>
 			</SignupContainer>
 		</SignupBackground>
