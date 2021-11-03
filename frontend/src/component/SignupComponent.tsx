@@ -66,8 +66,14 @@ const SignupComponent: React.FC<Props> = () => {
 					pathname: "/login",
 				})
 			}
-			else{
-				alert("회원가입 안됨");
+			else if (response.status === 400) {
+				alert('유효하지않은 아이디 & 비밀번호');
+			}
+			else if (response.status === 409) {
+				alert('중복된 아이디');
+			}
+			else {
+				alert('회원가입 안됨')
 			}
 		});
 	}
