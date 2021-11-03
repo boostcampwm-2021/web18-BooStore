@@ -1,25 +1,7 @@
 import * as passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import * as bcrypt from 'bcrypt';
-// import User from '';
-
-// Mock Data
-const User = {
-	findOne: ({ loginId }) => {
-		return {
-			exec: async () => {
-				return {
-					id: '1234',
-					loginId,
-					password: '$2b$10$HXWgJY9wgh11rh6z4PFZn.I7bfoCZgP0.hG5/Y2pUabZitwY7z6x2',
-					directoryId: '123123',
-					maxCapacity: 1024 * 1024 * 1024,
-					currentCapacity: 1024 * 1024,
-				};
-			},
-		};
-	}
-};
+import { User } from '../model';
 
 const localLoginStrategy = new LocalStrategy(
 	{
@@ -50,12 +32,10 @@ const localLoginStrategy = new LocalStrategy(
 
 export default () => {
 	passport.serializeUser((user, done) => {
-		console.log('ser', user);
 		done(null, user);
 	});
 
 	passport.deserializeUser((user: any, done) => {
-		console.log('deser', user);
 		done(null, user);
 	});
 

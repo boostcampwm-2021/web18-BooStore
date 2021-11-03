@@ -1,37 +1,11 @@
 import * as bcrypt from 'bcrypt';
+import { User } from '../model';
 
-// Mock Data
-const User = {
-	findOne: ({ loginId }) => {
-		return {
-			exec: async () => {
-				return {
-					id: '1234',
-					loginId,
-					password: '$2b$10$HXWgJY9wgh11rh6z4PFZn.I7bfoCZgP0.hG5/Y2pUabZitwY7z6x2',
-					directoryId: '123123',
-					maxCapacity: 1024 * 1024 * 1024,
-					currentCapacity: 1024 * 1024,
-				};
-			},
-		};
-	},
-	create: async ({ loginId, password, maxCapacity, cloudId }) => {
-		return {
-			id: '1234',
-			loginId: loginId,
-			password: password,
-			cloudId: cloudId,
-			maxCapacity: maxCapacity,
-			currentCapacity: 0,
-		};;
-	},
-};
 // Mock Data
 const CloudService = {
 	create: async ({ osLink, name, size, ownerId, contentType}) => {
 		return {
-			id: '123123',
+			id: Math.floor(Math.random() * 1000000000).toString(),
 			children: [],
 			osLink: osLink,
 			name: name,
@@ -44,7 +18,7 @@ const CloudService = {
 	},
 	createRoot: async ({ loginId }) => {
 		return {
-			id: '123123',
+			id: Math.floor(Math.random() * 1000000000).toString(),
 			children: [],
 			osLink: null,
 			name: 'root',
@@ -73,7 +47,7 @@ export const createUser = async ({ loginId, password }) => {
 		loginId,
 		password: encryptPassword,
 		maxCapacity: MAX_CAPACITY,
-		cloudId: cloudRoot.id
+		directoryId: cloudRoot.id
 	});
 	
 	return newUser;
@@ -82,5 +56,5 @@ export const createUser = async ({ loginId, password }) => {
 export const isExistsUser = async ({ loginId }) => {
 	const existsUser = await User.findOne({ loginId }).exec();
 	
-	return existsUser ? true : false;
+	return existsUser !== null;
 }

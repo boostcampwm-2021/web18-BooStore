@@ -1,16 +1,7 @@
-export {};
-
-interface UserModel {
-	id: string;
-	loginId: string;
-	password: string;
-	directoryId: string;
-	maxCapacity: number;
-	currentCapacity: number;
-}
+import { IUser } from '../model';
 
 declare global {
 	namespace Express {
-		interface User extends UserModel {}
+		interface User extends IUser {}
 	}
 }
