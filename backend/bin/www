@@ -1,6 +1,7 @@
 const app = require('../build/app.js');
 const debug = require('debug')('backend:server');
 const http = require('http');
+const mongoose = require('mongoose');
 
 /**
  * Get port from environment and store in Express.
@@ -18,14 +19,17 @@ const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
+mongoose
+	.connect(process.env.MONGO_URI, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	})
+	.then(() => {
+		server.listen(port);
+	})
+	.catch((err) => {
+		console.log(err);
+	});
 
 function normalizePort(val) {
 	var port = parseInt(val, 10);
@@ -45,8 +49,7 @@ function normalizePort(val) {
 
 /**
  * Event listener for HTTP server "error" event.
- */
-
+ * */
 function onError(error) {
 	if (error.syscall !== 'listen') {
 		throw error;
