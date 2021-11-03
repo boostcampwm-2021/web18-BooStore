@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import IconLeftArrow from '../asset/image/IconLeftArrow.svg';
 import { useHistory } from 'react-router-dom';
+import Modal from 'react-modal';
 
 interface Props {}
 
@@ -20,6 +21,9 @@ const SignupComponent: React.FC<Props> = () => {
 		passwordCheck: '',
 	});
 
+	const [modalIsOpen, setModalIsOpen] = useState(false);
+	const [modalText, setModalText] = useState("유효하지 않은 아이디 또는 비밀번호 입니다.");
+
 	const { id, password, passwordCheck } = inputs;
 
 	const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,9 +35,6 @@ const SignupComponent: React.FC<Props> = () => {
 	};
 
 	useEffect(() => {
-		console.log('ID REX', isRightIdRex());
-		console.log('PW REX', isRightPasswordRex());
-		console.log('EQUAL PW', isEqualPassword());
 	}, [id, password, passwordCheck]);
 
 	const isRightIdRex = () => {
@@ -52,29 +53,38 @@ const SignupComponent: React.FC<Props> = () => {
 	};
 
 	const onClickSignup = ()=>{
-		fetch(`${process.env.REACT_APP_SERVER}/signup`,{
-			method:"POST",
-			headers:{
-				"Content-type": "application/json"
-			},
-			body: JSON.stringify(inputs)
-		})
-		.then((response) => {
-			if(response.ok){
-				history.push({
-					pathname: "/login",
-				})
-			}
-			else if (response.status === 400) {
-				alert('유효하지않은 아이디 & 비밀번호');
-			}
-			else if (response.status === 409) {
-				alert('중복된 아이디');
-			}
-			else {
-				alert('회원가입 안됨')
-			}
-		});
+		if(isRightIdRex() && isRightPasswordRex() && isEqualPassword()){
+			fetch(`${process.env.REACT_APP_SERVER}/signup`,{
+				method:"POST",
+				headers:{
+					"Content-type": "application/json"
+				},
+				body: JSON.stringify(inputs)
+			})
+			.then((response) => {
+				if(response.ok){
+					history.push({
+						pathname: "/login",
+					})
+				}
+				else if (response.status === 400) {
+					setModalText("유효하지 않은 아이디 또는 비밀번호 입니다.");
+					setModalIsOpen(true);				
+				}
+				else if (response.status === 409) {
+					setModalText("중복된 아이디 입니다.");
+					setModalIsOpen(true);	
+				}
+				else {
+					setModalText("회원가입 안됨");
+					setModalIsOpen(true);
+				}
+			});
+		}
+		else{
+			setModalText("유효하지 않은 아이디 또는 비밀번호 입니다.");
+			setModalIsOpen(true);
+		}
 	}
 
 	return (
@@ -109,6 +119,10 @@ const SignupComponent: React.FC<Props> = () => {
 				<FlexDiv>
 					<Button onClick={onClickSignup} style={{ float: 'right' }}>sign up</Button>
 				</FlexDiv>
+				<Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} ariaHideApp={false}>
+					{modalText}
+					<button onClick={()=> setModalIsOpen(false)}>Modal Close</button>
+				</Modal>
 			</SignupContainer>
 		</SignupBackground>
 	);

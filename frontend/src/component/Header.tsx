@@ -18,6 +18,8 @@ const Header: React.FC<hasUserProps> = ({ user })=>{
 }
 
 const HeaderSection = styled.div`
+    display: flex;
+    justify-content: space-between;
     width: 100%;
     height: 60px;
     background-color: #282828;
@@ -29,6 +31,8 @@ const Logo = styled.img`
     margin: 6px 10px 6px 10px;
 `;
 const Profile = styled.img`
+    width: auto;
+    height: 60%;
     margin: 6px 10px 6px 10px;
 `;
 export default Header;
