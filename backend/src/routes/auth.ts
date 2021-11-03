@@ -37,4 +37,11 @@ router.post('/login', passport.authenticate('local-login'), (req, res) => {
 	res.json(req.user);
 });
 
+router.post('/logout', (req, res) => {
+	req.logout();
+	req.session.save(() => {
+		res.status(200).send();
+	});
+})
+
 export default router;
