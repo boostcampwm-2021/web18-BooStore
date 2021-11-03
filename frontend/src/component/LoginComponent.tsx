@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 
 interface Props {}
 
@@ -8,6 +9,8 @@ const LoginComponent: React.FC<Props> = () => {
 		id: string;
 		password: string;
 	}
+
+	const history = useHistory();
 
 	const [inputs, setInputs] = useState<Inputs>({ id: '', password: '' });
 
@@ -30,6 +33,24 @@ const LoginComponent: React.FC<Props> = () => {
 
 	const onClickLogin = () => {
 		console.log(id, password);
+		fetch("localhost:3001/login",{
+			method:"POST",
+			headers:{
+				"Content-type": "application/json"
+			},
+			body: JSON.stringify(inputs)
+		})
+		.then((response) => {
+			if(response.ok){
+				history.push({
+					pathname: "/main",
+					state : {userinfo: inputs}
+				})
+			}
+			else{
+				alert("로그인 안됨");
+			}
+		});
 		onReset();
 	};
 
