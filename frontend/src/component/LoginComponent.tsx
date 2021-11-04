@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { User } from '../model';
 import Modal from 'react-modal';
-import {ModalButton} from './SignupComponent';
+import { ModalButton } from './SignupComponent';
 
 interface Props {
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const LoginComponent: React.FC<Props> = ({ setUser }) => {
@@ -19,7 +19,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 
 	const [inputs, setInputs] = useState<Inputs>({ id: '', password: '' });
 	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [modalText, setModalText] = useState("유효하지 않은 아이디 또는 비밀번호 입니다.");
+	const [modalText, setModalText] = useState('유효하지 않은 아이디 또는 비밀번호 입니다.');
 
 	const { id, password } = inputs;
 
@@ -39,39 +39,38 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 	};
 
 	const onClickLogin = () => {
-		fetch(`${process.env.REACT_APP_SERVER}/login`,{
-			method:"POST",
-			headers:{
-				"Content-type": "application/json"
+		fetch(`${process.env.REACT_APP_SERVER}/login`, {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json',
 			},
-			body: JSON.stringify(inputs)
+			body: JSON.stringify(inputs),
 		})
-		.then((response) => {
-			if(response.ok){
-				return response.json();
-			}
-			else{
-				throw new Error(response.status.toString());
-			}
-		})
-		.then((data) => {
-			setUser({...data});
-			history.push({
-				pathname: "/",
-				state : {userinfo: data}
+			.then((response) => {
+				if (response.ok) {
+					return response.json();
+				} else {
+					throw new Error(response.status.toString());
+				}
+			})
+			.then((data) => {
+				setUser({ ...data });
+				history.push({
+					pathname: '/',
+					state: { userinfo: data },
+				});
+			})
+			.catch((err) => {
+				setModalIsOpen(true);
 			});
-		})
-		.catch((err) => {
-			setModalIsOpen(true);
-		})
 		onReset();
 	};
 
-	const onClickSignup = ()=>{
+	const onClickSignup = () => {
 		history.push({
-			pathname:"/signup"
-		})
-	} 
+			pathname: '/signup',
+		});
+	};
 
 	return (
 		<LoginBackground>
@@ -94,11 +93,15 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 					<Button onClick={onClickLogin}>log in</Button>
 					<Button onClick={onClickSignup}>sign up</Button>
 				</FlexDiv>
-				<Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} ariaHideApp={false}>
+				<Modal
+					isOpen={modalIsOpen}
+					onRequestClose={() => setModalIsOpen(false)}
+					ariaHideApp={false}
+				>
 					{modalText}
-					<FlexDiv>
-						<ModalButton onClick={()=> setModalIsOpen(false)}>Modal Close</ModalButton>
-					</FlexDiv>
+					<FlexMiddleDiv>
+						<ModalButton onClick={() => setModalIsOpen(false)}>Modal Close</ModalButton>
+					</FlexMiddleDiv>
 				</Modal>
 			</LoginContainer>
 		</LoginBackground>
@@ -137,6 +140,12 @@ const FlexDiv = styled.div`
 	display: flex;
 	justify-content: space-evenly;
 `;
+const FlexMiddleDiv = styled.div`
+	display: flex;
+	justify-content: center;
+	
+	margin-top: 30px;
+`;
 
 const Input = styled.input`
 	width: 465px;
@@ -146,6 +155,33 @@ const Input = styled.input`
 	font-size: 20px;
 `;
 
-
+Modal.defaultStyles={
+	overlay: {
+		position: 'fixed',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(255, 255, 255, 0.75)'
+	},
+	content: {
+		top: '50%',
+		left: '50%',
+		right: 'auto',
+		bottom: 'auto',
+		marginRight: '-50%',
+		transform: 'translate(-50%, -50%)',
+		position: 'absolute',
+		width: '400px',
+		height: '200px',
+		border: '1px solid #ccc',
+		background: '#fff',
+		overflow: 'auto',
+		WebkitOverflowScrolling: 'touch',
+		borderRadius: '4px',
+		outline: 'none',
+		padding: '30px'
+	}
+}
 
 export default LoginComponent;

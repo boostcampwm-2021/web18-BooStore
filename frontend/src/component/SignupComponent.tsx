@@ -48,6 +48,10 @@ const SignupComponent: React.FC<Props> = () => {
 		if (password === '') return false;
 		return password === passwordCheck;
 	};
+	
+	const onClickBack = () => {
+		history.goBack();
+	}
 
 	const onClickSignup = ()=>{
 		if(isRightIdRex() && isRightPasswordRex() && isEqualPassword()){
@@ -87,7 +91,7 @@ const SignupComponent: React.FC<Props> = () => {
 	return (
 		<SignupBackground>
 			<div style={{ width: '90%' }}>
-				<PreviousPageButtonContainer>
+				<PreviousPageButtonContainer onClick={onClickBack}>
 					<img alt="leftArrow" src={IconLeftArrow} />
 				</PreviousPageButtonContainer>
 			</div>
@@ -119,9 +123,9 @@ const SignupComponent: React.FC<Props> = () => {
 				</FlexDiv>
 				<Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} ariaHideApp={false}>
 					{modalText}
-					<FlexDiv>
+					<FlexMiddleDiv>
 						<ModalButton onClick={()=> setModalIsOpen(false)}>Modal Close</ModalButton>
-					</FlexDiv>
+					</FlexMiddleDiv>
 				</Modal>
 			</SignupContainer>
 		</SignupBackground>
@@ -170,6 +174,12 @@ const FlexDiv = styled.div`
 	display: grid;
 	justify-items: end;
 `;
+const FlexMiddleDiv = styled.div`
+	display: flex;
+	justify-content: center;
+	
+	margin-top: 30px;
+`;
 
 const Input = styled.input`
 	width: 465px;
@@ -194,6 +204,12 @@ Modal.defaultStyles={
 		backgroundColor: 'rgba(255, 255, 255, 0.75)'
 	},
 	content: {
+		top: '50%',
+		left: '50%',
+		right: 'auto',
+		bottom: 'auto',
+		marginRight: '-50%',
+		transform: 'translate(-50%, -50%)',
 		position: 'absolute',
 		width: '400px',
 		height: '200px',
@@ -203,17 +219,16 @@ Modal.defaultStyles={
 		WebkitOverflowScrolling: 'touch',
 		borderRadius: '4px',
 		outline: 'none',
-		padding: '20px'
+		padding: '30px'
 	}
 }
 
 export const ModalButton = styled.div`
-	width: 80px;
-	height: 25px;
 	background-color: ${(props) => props.theme.color.Primary};
 	border: none;
 	border-radius: 6px;
 	color: ${(props) => props.theme.color.PrimaryBG};
 	font-size: 12px;
+	padding: 10px;
 `;
 export default SignupComponent;
