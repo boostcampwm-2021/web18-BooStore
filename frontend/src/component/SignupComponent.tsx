@@ -21,6 +21,7 @@ const SignupComponent: React.FC<Props> = () => {
 		passwordCheck: '',
 	});
 
+	const [isWarning,setIsWarning] = useState(false);
 	const [modalIsOpen, setModalIsOpen] = useState(false);
 	const [modalText, setModalText] = useState("유효하지 않은 아이디 또는 비밀번호 입니다.");
 
@@ -88,6 +89,15 @@ const SignupComponent: React.FC<Props> = () => {
 		}
 	}
 
+	useEffect(()=>{
+		if(isEqualPassword()){
+			setIsWarning(false);
+		}
+		else{
+			setIsWarning(true);
+		}
+	}	
+	,[isEqualPassword]);
 	return (
 		<SignupBackground>
 			<div style={{ width: '90%' }}>
@@ -117,7 +127,7 @@ const SignupComponent: React.FC<Props> = () => {
 					onChange={onChange}
 					type="password"
 				/>
-				<Warning>비밀번호가 일치하지 않습니다.</Warning>
+				{ isWarning? <Warning>비밀번호가 일치하지 않습니다.</Warning> :""}
 				<FlexDiv>
 					<Button onClick={onClickSignup} style={{ float: 'right' }}>sign up</Button>
 				</FlexDiv>
