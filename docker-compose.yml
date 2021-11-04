@@ -1,0 +1,16 @@
+version: "3"
+services:
+  boostore_blue:
+    build:
+      context: .
+
+  boostore_green:
+    build:
+      context: .
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
