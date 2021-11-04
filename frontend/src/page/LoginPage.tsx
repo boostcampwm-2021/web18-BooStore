@@ -1,13 +1,20 @@
 import React, { Children } from 'react';
 import styled from 'styled-components';
+import LoginComponent from '../component/LoginComponent';
+import { User } from '../model';
 
-type LoginPageProps = {
-	children: React.ReactNode;
-};
-
-function LoginPage({children}:LoginPageProps) {
-	return <LoginPageBackground>{children}</LoginPageBackground>;
+interface Props {
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
+
+
+const LoginPage: React.FC<Props> = ({ setUser }) => {
+	return (
+		<LoginPageBackground>
+			<LoginComponent setUser={setUser} />
+		</LoginPageBackground>
+	);
+};
 
 const LoginPageBackground = styled.div`
 	width: 100%;

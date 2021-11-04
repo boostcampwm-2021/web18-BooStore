@@ -1,13 +1,16 @@
 import React, { Children } from 'react';
 import styled from 'styled-components';
+import SignupComponent from '../component/SignupComponent';
 
-type Props = {
-	children: JSX.Element;
+interface Props {}
+
+const SignupPage: React.FC<Props> = () => {
+	return (
+		<SignupPageBackground>
+			<SignupComponent />
+		</SignupPageBackground>
+	);
 };
-
-function SignupPage({ children }: Props) {
-	return <SignupPageBackground>{children}</SignupPageBackground>;
-}
 
 const SignupPageBackground = styled.div`
 	width: 100%;
