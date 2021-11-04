@@ -52,3 +52,4 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 
 ## 📖 회의록 목록
 - [1주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/1%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
+- [2주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/2%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
