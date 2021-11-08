@@ -56,7 +56,7 @@ const SignupComponent: React.FC<Props> = () => {
 
 	const onClickSignup = ()=>{
 		if(isRightIdRex() && isRightPasswordRex() && isEqualPassword()){
-			fetch(`${process.env.REACT_APP_SERVER}/signup`,{
+			fetch(`/signup`,{
 				method:"POST",
 				headers:{
 					"Content-type": "application/json"
