@@ -7,7 +7,7 @@ import * as passport from 'passport';
 import passportConfig from './config/passport';
 import * as session from 'express-session';
 
-import { authRouter } from './routes/index';
+import { authRouter, userRouter } from './routes';
 
 const app = express();
 dotenv.config();
@@ -23,6 +23,7 @@ app.use(passport.session());
 passportConfig();
 
 app.use('/', authRouter);
+app.use('/user', userRouter);
 app.use('*', (req, res) => {
 	res.sendFile('index.html', {
 		root: path.join(__dirname, '../../frontend/build')
