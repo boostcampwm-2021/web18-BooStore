@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as passport from 'passport';
 import { createUser, isExistsUser } from '../service/user';
-import create_bucket from '../model/object-storage';
+import upload from '../model/object-storage';
 
 const router = express.Router();
 
@@ -46,8 +46,8 @@ router.post('/logout', (req, res) => {
 })
 
 router.get('/upload',async(req,res)=>{
-	await create_bucket();
-	res.send("create success????");
+	await upload();
+	res.send("upload success????");
 })
 
 export default router;
