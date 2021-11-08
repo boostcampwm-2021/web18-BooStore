@@ -8,7 +8,7 @@ import passportConfig from './config/passport';
 import * as session from 'express-session';
 import * as cors from 'cors';
 
-import { authRouter } from './routes/index';
+import { authRouter } from './route/index';
 
 const app = express();
 dotenv.config();
