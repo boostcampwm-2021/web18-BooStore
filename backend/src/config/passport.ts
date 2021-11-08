@@ -1,7 +1,7 @@
 import * as passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import * as bcrypt from 'bcrypt';
-import { User } from '../model';
+import { IUser, User } from '../model';
 
 const localLoginStrategy = new LocalStrategy(
 	{
@@ -31,11 +31,11 @@ const localLoginStrategy = new LocalStrategy(
 
 
 export default () => {
-	passport.serializeUser((user, done) => {
+	passport.serializeUser((user: IUser, done) => {
 		done(null, user);
 	});
 
-	passport.deserializeUser((user: any, done) => {
+	passport.deserializeUser((user: IUser, done) => {
 		done(null, user);
 	});
 
