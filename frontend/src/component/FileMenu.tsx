@@ -28,6 +28,13 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 		}
 	}, [selectedFile]);
 
+	useEffect(() => {
+		if (inputFileRef !== null) {
+			inputFileRef.current?.setAttribute('directory', '');
+			inputFileRef.current?.setAttribute('webkitdirectory', '');
+		}
+	}, [inputFileRef]);
+
 	const handleFileUpload = () => {
 		const formData = new FormData();
 		Array.prototype.forEach.call(selectedFile, (file) => {
