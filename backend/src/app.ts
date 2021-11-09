@@ -21,6 +21,7 @@ app.use(express.static(path.join(path.resolve(), '../frontend/build')));
 app.use(session({ secret: 'secret123123', resave: true, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+
 passportConfig();
 
 app.use('/', authRouter);
