@@ -29,7 +29,7 @@
 
 ## 💻 배포 링크
 
-[웹사이트](http://49.50.165.179)
+[http://www.boostore.co.kr](http://www.boostore.co.kr)
 
 ## ⏰ Ground Rule
 
