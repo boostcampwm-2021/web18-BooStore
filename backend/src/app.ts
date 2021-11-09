@@ -6,11 +6,12 @@ import * as dotenv from 'dotenv';
 import * as passport from 'passport';
 import passportConfig from './config/passport';
 import * as session from 'express-session';
+dotenv.config();
 
 import { authRouter, userRouter } from './routes';
 
 const app = express();
-dotenv.config();
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
