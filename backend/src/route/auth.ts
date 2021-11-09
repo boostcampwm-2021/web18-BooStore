@@ -52,9 +52,4 @@ router.post('/logout', (req, res) => {
 	});
 })
 
-router.get('/upload',async(req,res)=>{
-	await upload();
-	res.send("upload success????");
-})
-
 export default router;
