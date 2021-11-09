@@ -43,7 +43,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 		})
 			.then((response) => {
 				if (response.ok) {
-					return response.json();
+					return;
 				} else {
 					throw new Error(response.status.toString());
 				}
