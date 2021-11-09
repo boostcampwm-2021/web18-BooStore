@@ -1,29 +1,22 @@
 import * as express from 'express';
 import { ResponseUser } from '../DTO';
 import { getCapacity } from '../service/cloud';
+import { isAuthenticated } from '../middleware';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-	if (req.isAuthenticated()) {
-		const { loginId, directoryId } = req.user;
+router.get('/', isAuthenticated, (req, res) => {
+	const { loginId, directoryId } = req.user;
 
-		const data: ResponseUser = {
-			loginId,
-			directoryId
-		};
+	const data: ResponseUser = {
+		loginId,
+		directoryId
+	};
 
-		return res.json(data);
-	} else {
-		return res.status(401).send();
-	}
+	return res.json(data);
 });
 
-router.get('/capacity', async (req, res) => {
-	if (req.isUnauthenticated()) {
-		return res.status(401).send();
-	}
-
+router.get('/capacity', isAuthenticated, async (req, res) => {
 	/*
 	// 세션을 사용하는게 좋을까? 아니면 디비에 다시 접근하는게 좋을까...
 	// 고민해보자
