@@ -25,7 +25,7 @@ passportConfig();
 
 app.use('/', authRouter);
 app.use('/user', userRouter);
-app.use('/file', fileRouter);
+app.use('/cloud', fileRouter);
 app.use('*', (req, res) => {
 	res.sendFile('index.html', {
 		root: path.join(__dirname, '../../frontend/build')
