@@ -16,7 +16,11 @@ export const getCapacity = async ({ loginId }) => {
 	return data;
 };
 
-export const canIncreaseCurrentCapacity = async ({ loginId, value }) => {
+interface CCFunctionParameter {
+	loginId: string;
+	value: number;
+}
+export const canIncreaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
 	if (!user) {
 		return false;
@@ -26,7 +30,7 @@ export const canIncreaseCurrentCapacity = async ({ loginId, value }) => {
 	return currentCapacity + value <= maxCapacity;
 }
 
-export const canDecreaseCurrentCapacity = async ({ loginId, value }) => {
+export const canDecreaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
 	if (!user) {
 		return false;
@@ -36,7 +40,7 @@ export const canDecreaseCurrentCapacity = async ({ loginId, value }) => {
 	return currentCapacity - value >= 0;
 }
 
-export const increaseCurrentCapacity = async ({ loginId, value }) => {
+export const increaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
 	if (!user) {
 		throw new Error('Not Found User');
@@ -51,7 +55,7 @@ export const increaseCurrentCapacity = async ({ loginId, value }) => {
 	return true;
 };
 
-export const decreaseCurrentCapacity = async ({ loginId, value }) => {
+export const decreaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
 	if (!user) {
 		throw new Error('Not Found User');
