@@ -9,10 +9,9 @@ import * as session from 'express-session';
 import * as cors from 'cors';
 
 dotenv.config();
-import { authRouter } from './route/index';
+import { authRouter } from './routes/index';
 
 const app = express();
-app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
