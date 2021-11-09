@@ -5,7 +5,7 @@ import * as fs from 'fs/promises';
 
 const router = express.Router();
 
-router.post('/upload', isAuthenticated, upload.array('files'), async (req, res) => {
+router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req, res) => {
 	const files = req.files as Express.Multer.File[];
 	
 	// TODO 디비에 저장

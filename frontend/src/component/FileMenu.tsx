@@ -17,28 +17,28 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 	};
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		console.log(event.target.files ? event.target.files : null);
 		setSelectedFile(event.target.files ? event.target.files : null);
 	};
 
 	useEffect(() => {
-		if (selectedFile !== null) {
-			handleFileUpload();
+		if (selectedFile === null || selectedFile.length === 0){
+			return;
 		}
+		
+		handleFileUpload();
 	}, [selectedFile]);
 
 	const handleFileUpload = () => {
 		const formData = new FormData();
-		Array.prototype.forEach.call(selectedFile, (file) => {
-			formData.append('upload', file, file.name);
+		
+		const selectedFiles = [...(selectedFile as FileList)];
+		selectedFiles.forEach((file) => {
+			formData.append('uploadFiles', file, file.name);
 		});
 
 		fetch(`/cloud/upload`, {
 			method: 'POST',
 			credentials: 'include',
-			headers: {
-				'content-type': 'application/x-www-form-urlencoded',
-			},
 			body: formData,
 		})
 			.then((response) => {
@@ -63,7 +63,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 			<UploadInput
 				multiple
 				type="file"
-				name="singleFile"
+				name="uploadFiles"
 				ref={inputFileRef}
 				onChange={onChange}
 			/>
