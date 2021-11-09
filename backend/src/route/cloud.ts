@@ -10,7 +10,12 @@ const router = express.Router();
 
 router.get('/validate', isAuthenticated, async (req, res) =>{
 	const { size } = req.query;
-	!await canIncreaseCurrentCapacity( { loginId: req.user.loginId, value: size} ) ? 
+	const value = Number(size);
+	if (isNaN(value)) {
+		return res.status(400).send();
+	}
+	
+	!await canIncreaseCurrentCapacity( { loginId: req.user.loginId, value } ) ? 
 	res.status(409).send() : res.status(200).send();
 })
 

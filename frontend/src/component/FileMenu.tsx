@@ -2,14 +2,18 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 're
 import styled from 'styled-components';
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
+import { Capacity } from '../model';
 import ModalComponent from './ModalComponent';
 
 interface Props {
 	showShareButton?: boolean;
+	capacity: Capacity;
+	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
 }
 
-const FileMenu: React.FC<Props> = ({ showShareButton }) => {
+const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
+	const [modalText, setModalText] = useState('유효하지 않은 파일입니다.');
 	const [modalIsOpen, setModalIsOpen] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
 	const onClickUpload = () => {
@@ -21,26 +25,46 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 	};
 
 	useEffect(() => {
-		if (selectedFile === null || selectedFile.length === 0){
+		if (selectedFile === null || selectedFile.length === 0) {
 			return;
 		}
-		
+
 		handleFileUpload();
+		setSelectedFile(null);
 	}, [selectedFile]);
 
 	const handleFileUpload = () => {
 		const formData = new FormData();
-		
+		const { currentCapacity, maxCapacity } = capacity;
+
+		let totalSize = 0;
 		const selectedFiles = [...(selectedFile as FileList)];
+		inputFileRef.current!.value = '';
 		selectedFiles.forEach((file) => {
 			formData.append('uploadFiles', file, file.name);
+			totalSize += file.size;
 		});
 
-		fetch(`/cloud/upload`, {
-			method: 'POST',
+		if (currentCapacity + totalSize > maxCapacity) {
+			setModalText('용량 초과');
+			setModalIsOpen(true);
+			
+			return;
+		}
+
+		fetch(`/cloud/validate?size=${totalSize}`, {
 			credentials: 'include',
-			body: formData,
 		})
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error('용량 초과');
+				}
+				return fetch(`/cloud/upload`, {
+					method: 'POST',
+					credentials: 'include',
+					body: formData,
+				});
+			})
 			.then((response) => {
 				if (response.ok) {
 					return;
@@ -49,8 +73,8 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 				}
 			})
 			.catch((err) => {
-				console.log(err);
-				setModalIsOpen(true);
+				setModalText(err.message);
+				setModalIsOpen((prev) => !prev);
 			});
 	};
 
@@ -67,7 +91,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 				ref={inputFileRef}
 				onChange={onChange}
 			/>
-			<ModalComponent isOpen={modalIsOpen} modalText={'유효하지 않은 파일입니다.'} />
+			<ModalComponent isOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} modalText={modalText} />
 			{!showShareButton || <ShareButton> 공유하기 </ShareButton>}
 		</Container>
 	);
