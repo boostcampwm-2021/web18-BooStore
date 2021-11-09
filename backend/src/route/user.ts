@@ -5,13 +5,11 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
 	if (req.isAuthenticated()) {
-		const { loginId, directoryId, maxCapacity, currentCapacity } = req.user;
+		const { loginId, directoryId } = req.user;
 
 		const data: ResponseUser = {
 			loginId,
-			directoryId,
-			maxCapacity,
-			currentCapacity,
+			directoryId
 		};
 
 		return res.json(data);
