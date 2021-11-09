@@ -8,7 +8,7 @@ import passportConfig from './config/passport';
 import * as session from 'express-session';
 dotenv.config();
 
-import { authRouter, userRouter } from './routes';
+import { authRouter, userRouter } from './route';
 
 const app = express();
 
