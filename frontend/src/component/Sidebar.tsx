@@ -4,20 +4,36 @@ import styled from 'styled-components';
 import { ReactComponent as ExpandOnSvg } from '../asset/image/expand_more.svg';
 import { ReactComponent as ExpandOffSvg } from '../asset/image/chevron_left.svg';
 import { ReactComponent as StarSvg } from '../asset/image/star.svg';
+import { Capacity } from '../model/capacity';
+import { convertByteToGB, convertByteToMB, convertByteToKB } from '../util/capacity';
 
 interface Props {
-	currentCapacity: number;
-	maxCapacity: number;
+	capacity: Capacity;
 }
 
-const Sidebar: React.FC<Props> = ({ currentCapacity, maxCapacity }) => {
+const convertCapacityToString = (capacity: Capacity) => {
+	const { currentCapacity, maxCapacity } = capacity;
+	const maxCapacityGB = `${convertByteToGB(maxCapacity).toFixed(2)}GB`;
+	
+	if (currentCapacity < 1024 * 1024) {
+		return `${convertByteToKB(currentCapacity).toFixed(2)}KB / ${maxCapacityGB}`;
+	}
+	else if (currentCapacity < 1024 * 1024 * 1024) {
+		return `${convertByteToMB(currentCapacity).toFixed(2)}MB / ${maxCapacityGB}`;
+	}
+	return `${convertByteToGB(currentCapacity).toFixed(2)}GB / ${maxCapacityGB}`;
+}
+
+const Sidebar: React.FC<Props> = ({ capacity }) => {
+	const { currentCapacity, maxCapacity } = capacity;
+	
 	return (
 		<Container>
 			<CapacityContainer>
 				<ProgressBar>
 					<Progress percent={(currentCapacity / maxCapacity) * 100} />
 				</ProgressBar>
-				<ProgressValue>{`${currentCapacity}Byte / ${maxCapacity}Byte`}</ProgressValue>
+				<ProgressValue>{`${convertCapacityToString(capacity)}`}</ProgressValue>
 			</CapacityContainer>
 			<NavBar>
 				{/* 추후 Link로 변경하면 될듯 */}

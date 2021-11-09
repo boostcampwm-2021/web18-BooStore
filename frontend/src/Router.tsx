@@ -13,7 +13,9 @@ const Router: React.FC<hasUserProps> = ({ user, setUser }) => {
 	if (user) {
 		return (
 			<Switch>
-				<Route path="/" exact component={Main} />
+				<Route path="/" exact>
+					<Main user={user} />
+				</Route>
 				<Redirect to="/" />
 			</Switch>
 		);
