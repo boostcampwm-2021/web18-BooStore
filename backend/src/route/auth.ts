@@ -1,6 +1,8 @@
 import * as express from 'express';
 import * as passport from 'passport';
-import { createUser, isExistsUser } from '../service/user';
+import { createUser, isExistsUser } from '../service';
+import upload from '../model/object-storage';
+import { ResponseUser } from '../DTO';
 
 const router = express.Router();
 
@@ -34,7 +36,13 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/login', passport.authenticate('local-login'), (req, res) => {
-	res.json(req.user);
+	const { loginId, directoryId } = req.user;
+	const data: ResponseUser = {
+		loginId,
+		directoryId
+	}
+	
+	res.json(data);
 });
 
 router.post('/logout', (req, res) => {

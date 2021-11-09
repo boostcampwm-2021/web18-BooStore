@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FileList from '../component/FileList';
 
 import FileMenu from '../component/FileMenu';
 import Sidebar from '../component/Sidebar';
+import { User } from '../model';
+import { Capacity } from '../model/capacity';
 
-interface Props {}
+interface Props {
+	user: User
+}
 
 const MainPage: React.FC<Props> = () => {
 	const [files, setFiles] = useState([
@@ -29,10 +33,31 @@ const MainPage: React.FC<Props> = () => {
 		},
 	]);
 	const [currentDir, setCurrentDir] = useState('/');
+	const [capacity, setCapacity] = useState<Capacity>({currentCapacity: 0, maxCapacity: 1024});
+	
+	useEffect(() => {
+		fetch('/user/capacity', {
+			credentials: 'include',
+		})
+		.then((res) => {
+			if (res.ok) {
+				return res.json();
+			}
+			else {
+				throw new Error('something wrong');
+			}
+		})
+		.then((data) => {
+			setCapacity(data);
+		})
+		.catch((err) => {
+			console.error(err);
+		})
+	}, []);
 
 	return (
 		<Container>
-			<Sidebar currentCapacity={100} maxCapacity={1000} />
+			<Sidebar capacity={capacity} />
 			<InnerContainer>
 				<Directory>
 					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
