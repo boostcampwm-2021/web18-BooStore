@@ -1,8 +1,8 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import Modal from 'react-modal';
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
+import ModalComponent from './ModalComponent';
 
 interface Props {
 	showShareButton?: boolean;
@@ -10,9 +10,8 @@ interface Props {
 
 const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
-	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
 	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [modalText, setModalText] = useState('올바르지 않은 파일 입니다.');
+	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
 	const onClickUpload = () => {
 		inputFileRef.current?.click();
 	};
@@ -27,13 +26,6 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 			handleFileUpload();
 		}
 	}, [selectedFile]);
-
-	useEffect(() => {
-		if (inputFileRef !== null) {
-			inputFileRef.current?.setAttribute('directory', '');
-			inputFileRef.current?.setAttribute('webkitdirectory', '');
-		}
-	}, [inputFileRef]);
 
 	const handleFileUpload = () => {
 		const formData = new FormData();
@@ -75,16 +67,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton }) => {
 				ref={inputFileRef}
 				onChange={onChange}
 			/>
-			<Modal
-				isOpen={modalIsOpen}
-				onRequestClose={() => setModalIsOpen(false)}
-				ariaHideApp={false}
-			>
-				{modalText}
-				<FlexMiddleDiv>
-					<ModalButton onClick={() => setModalIsOpen(false)}>Modal Close</ModalButton>
-				</FlexMiddleDiv>
-			</Modal>
+			<ModalComponent isOpen={modalIsOpen} modalText={'유효하지 않은 파일입니다.'} />
 			{!showShareButton || <ShareButton> 공유하기 </ShareButton>}
 		</Container>
 	);
@@ -138,35 +121,6 @@ const FlexMiddleDiv = styled.div`
 
 	margin-top: 30px;
 `;
-
-Modal.defaultStyles = {
-	overlay: {
-		position: 'fixed',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(255, 255, 255, 0.75)',
-	},
-	content: {
-		top: '50%',
-		left: '50%',
-		right: 'auto',
-		bottom: 'auto',
-		marginRight: '-50%',
-		transform: 'translate(-50%, -50%)',
-		position: 'absolute',
-		width: '400px',
-		height: '200px',
-		border: '1px solid #ccc',
-		background: '#fff',
-		overflow: 'auto',
-		WebkitOverflowScrolling: 'touch',
-		borderRadius: '4px',
-		outline: 'none',
-		padding: '30px',
-	},
-};
 
 export const ModalButton = styled.div`
 	background-color: ${(props) => props.theme.color.Primary};
