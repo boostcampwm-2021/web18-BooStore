@@ -8,7 +8,7 @@ import passportConfig from './config/passport';
 import * as session from 'express-session';
 dotenv.config();
 
-import { authRouter, userRouter, fileRouter } from './route';
+import { authRouter, userRouter, cloudRouter } from './route';
 
 const app = express();
 
@@ -25,7 +25,7 @@ passportConfig();
 
 app.use('/', authRouter);
 app.use('/user', userRouter);
-app.use('/cloud', fileRouter);
+app.use('/cloud', cloudRouter);
 app.use('*', (req, res) => {
 	res.sendFile('index.html', {
 		root: path.join(__dirname, '../../frontend/build')

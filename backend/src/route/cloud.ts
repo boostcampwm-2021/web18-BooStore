@@ -1,9 +1,9 @@
 import * as express from 'express';
-import upload from '../model/object-storage';
+import { upload }  from '../service/cloud';
 
 const router = express.Router();
 
-router.get('cloud/upload',async(req,res)=>{
+router.get('/upload',async(req,res)=>{
 	await upload();
 	res.send("upload success????");
 })
