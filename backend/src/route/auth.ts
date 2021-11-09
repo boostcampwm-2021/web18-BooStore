@@ -1,6 +1,6 @@
 import * as express from 'express';
 import * as passport from 'passport';
-import { createUser, isExistsUser } from '../service/user';
+import { createUser, isExistsUser } from '../service';
 import upload from '../model/object-storage';
 
 const router = express.Router();
