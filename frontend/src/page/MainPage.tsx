@@ -63,7 +63,7 @@ const MainPage: React.FC<Props> = () => {
 					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
 				</Directory>
 				<Section>
-					<FileMenu showShareButton />
+					<FileMenu showShareButton capacity={capacity} setCapacity={setCapacity} />
 					<FileList files={files} setFiles={setFiles} />
 				</Section>
 			</InnerContainer>
