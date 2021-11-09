@@ -4,20 +4,21 @@ import Modal from 'react-modal';
 
 interface Props {
 	isOpen: boolean;
+	setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	modalText: string;
 }
 
-const ModalComponent: React.FC<Props> = ({ isOpen, modalText }) => {
-	const [modalIsOpen, setModalIsOpen] = useState(isOpen);
+const ModalComponent: React.FC<Props> = ({ isOpen, modalText, setModalIsOpen }) => {
 	return (
 		<Modal
-			isOpen={modalIsOpen}
+			isOpen={isOpen}
 			onRequestClose={() => setModalIsOpen(false)}
 			ariaHideApp={false}
 		>
-			{modalText}
+			<ModalContent> { modalText } </ModalContent>
+			
 			<FlexMiddleDiv>
-				<ModalButton onClick={() => setModalIsOpen(false)}>Modal Close</ModalButton>
+				<ModalButton onClick={() => setModalIsOpen(false)}>Close</ModalButton>
 			</FlexMiddleDiv>
 		</Modal>
 	);
@@ -26,8 +27,6 @@ const ModalComponent: React.FC<Props> = ({ isOpen, modalText }) => {
 const FlexMiddleDiv = styled.div`
 	display: flex;
 	justify-content: center;
-
-	margin-top: 30px;
 `;
 
 Modal.defaultStyles = {
@@ -48,7 +47,7 @@ Modal.defaultStyles = {
 		transform: 'translate(-50%, -50%)',
 		position: 'absolute',
 		width: '400px',
-		height: '200px',
+		minHeight: '200px',
 		border: '1px solid #ccc',
 		background: '#fff',
 		overflow: 'auto',
@@ -56,8 +55,16 @@ Modal.defaultStyles = {
 		borderRadius: '4px',
 		outline: 'none',
 		padding: '30px',
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'space-between'
 	},
 };
+
+const ModalContent = styled.p`
+	overflow-x: hidden;
+	word-break: break-all;
+`;
 
 const ModalButton = styled.div`
 	background-color: ${(props) => props.theme.color.Primary};
