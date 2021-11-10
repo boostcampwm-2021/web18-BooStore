@@ -39,16 +39,21 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 
 		let totalSize = 0;
 		const selectedFiles = [...(selectedFile as FileList)];
+		const metaData: any = {};
 		inputFileRef.current!.value = '';
 		selectedFiles.forEach((file) => {
 			formData.append('uploadFiles', file, file.name);
+			metaData[file.name] = file.webkitRelativePath;
 			totalSize += file.size;
 		});
+
+		formData.append('relativePath', JSON.stringify(metaData));
+		formData.append('rootDirectory', '/'); // 추후에는 클라우드상의 현재 디렉토리를 인자로 넣어준다.
 
 		if (currentCapacity + totalSize > maxCapacity) {
 			setModalText('용량 초과');
 			setModalIsOpen(true);
-			
+
 			return;
 		}
 
@@ -91,7 +96,11 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 				ref={inputFileRef}
 				onChange={onChange}
 			/>
-			<ModalComponent isOpen={modalIsOpen} setModalIsOpen={setModalIsOpen} modalText={modalText} />
+			<ModalComponent
+				isOpen={modalIsOpen}
+				setModalIsOpen={setModalIsOpen}
+				modalText={modalText}
+			/>
 			{!showShareButton || <ShareButton> 공유하기 </ShareButton>}
 		</Container>
 	);
