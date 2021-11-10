@@ -28,9 +28,9 @@ export const uploadFile = async ({
 	size,
 	userLoginId,
 }: UploadArg) => {
-	const objectStorageKey = path.join(userLoginId, fileName);
+	const objectStorageKey = path.join(userLoginId, fileName).split(/\\\\|\\/).join('/');
 	const diskFilePath = path.join(destination, fileName);
-	const cloudDirectory = path.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'));
+	const cloudDirectory = path.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/')).split(/\\\\|\\/).join('/');
 
 	await S3.upload({
 		Bucket: bucketName,
