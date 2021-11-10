@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { ResponseUser } from '../DTO';
-import { getCapacity } from '../service/cloud';
+import { getCapacity, getFileTree, PathArg } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
 
 const router = express.Router();
@@ -10,7 +10,7 @@ router.get('/', isAuthenticated, (req, res) => {
 
 	const data: ResponseUser = {
 		loginId,
-		directoryId
+		directoryId,
 	};
 
 	return res.json(data);
@@ -26,11 +26,23 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 		maxCapacity,
 	};
 	*/
-	
+
 	const { loginId } = req.user;
 	const data = await getCapacity({ loginId });
-	
+
 	return res.json(data);
 });
 
+router.get('/files', isAuthenticated, async (req, res) => {
+	const { path } = req.query;
+	const { loginId } = req.user;
+	console.log(path);
+
+	const pathArg: PathArg = {
+		loginId: loginId,
+		path: path as string,
+	};
+	const data = await getFileTree(pathArg);
+	return res.json(data);
+});
 export default router;
