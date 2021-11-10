@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
 
+import { FileDTO } from '../DTO';
+
 const Container = styled.div``;
 
 const gridTemplate = `
@@ -30,16 +32,6 @@ const File = styled.li`
 	${gridTemplate};
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 `;
-
-interface FileDTO {
-	id: string;
-	contentType: string;
-	name: string;
-	createdAt: string;
-	updatedAt: string;
-	size: number;
-	ownerId: string;
-}
 
 interface Props {
 	files: FileDTO[];
