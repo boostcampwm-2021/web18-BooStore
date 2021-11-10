@@ -10,55 +10,60 @@ import folderup from '../asset/image/folderup.svg';
 import { FileDTO } from '../DTO';
 
 interface Props {
-	user: User
+	user: User;
 }
 
 const MainPage: React.FC<Props> = () => {
+	const [currentDir, setCurrentDir] = useState('/depth0/depth1/depth2/depth3');
+	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
 
-	const [currentDir, setCurrentDir] = useState('/depth0');
-	const [capacity, setCapacity] = useState<Capacity>({currentCapacity: 0, maxCapacity: 1024});
-
-	const parentDir = ( currentDirectory: string)=>{
-		let parentDir = currentDirectory.split('/').slice(0,-1).join('/');
-		parentDir===''? parentDir='/':'';
+	const parentDir = (currentDirectory: string) => {
+		let parentDir = currentDirectory.split('/').slice(0, -1).join('/');
+		parentDir === '' ? (parentDir = '/') : '';
+		// console.log('parent: ', parentDir);
 		return parentDir;
-	}
-	
-	const getFiles = async ( directory: string ) =>{
-		return await fetch('/user/files?path='+directory,
-		{
+	};
+
+	const getFiles = async (directory: string) => {
+		// console.log('current :', currentDir);
+		return await fetch('/user/files?path=' + directory, {
 			credentials: 'include',
 		})
-		.then((res)=>{
-			return res.json();
-		})
-		.then((data)=>{
-			console.log(data);
-			setFiles(data);
-		})
-	}
+			.then((res) => {
+				return res.json();
+			})
+			.then((data) => {
+				console.log(data);
+				setFiles(data);
+			});
+	};
 
 	const getCapacity = async () => {
 		await fetch('/user/capacity', {
 			credentials: 'include',
 		})
-		.then((res) => {
-			if (res.ok) {
-				return res.json();
-			}
-			else {
-				throw new Error('something wrong');
-			}
-		})
-		.then((data) => {
-			setCapacity(data);
-		})
-		.catch((err) => {
-			console.error(err);
-		})
-	}
+			.then((res) => {
+				if (res.ok) {
+					return res.json();
+				} else {
+					throw new Error('something wrong');
+				}
+			})
+			.then((data) => {
+				setCapacity(data);
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	};
 
-	const [files, setFiles] = useState<FileDTO[]>(/*[
+	const onClickParentButton = () => {
+		getFiles(parentDir(currentDir));
+		setCurrentDir(parentDir(currentDir));
+	};
+
+	const [files, setFiles] = useState<FileDTO[]>(
+		/*[
 		{
 			id: '111',
 			contentType: 'image/jpeg',
@@ -77,14 +82,12 @@ const MainPage: React.FC<Props> = () => {
 			size: 512,
 			ownerId: 'test1',
 		},
-	]*/
-	[]
+	]*/ []
 	);
-	
+
 	useEffect(() => {
 		getFiles(currentDir);
 		getCapacity();
-
 	}, []);
 
 	return (
@@ -92,8 +95,11 @@ const MainPage: React.FC<Props> = () => {
 			<Sidebar capacity={capacity} />
 			<InnerContainer>
 				<Directory>
-					{currentDir==='/'? <ParentButton src={folderup} style={{opacity:0.5}}></ParentButton> :
-						<ParentButton src={folderup} onClick={()=>getFiles(parentDir(currentDir))}></ParentButton>}
+					{currentDir === '/' ? (
+						<ParentButton src={folderup} style={{ opacity: 0.5 }}></ParentButton>
+					) : (
+						<ParentButton src={folderup} onClick={onClickParentButton}></ParentButton>
+					)}
 					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
 				</Directory>
 				<Section>
