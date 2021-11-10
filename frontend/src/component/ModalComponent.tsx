@@ -1,27 +1,37 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import Modal from 'react-modal';
 
 interface Props {
 	isOpen: boolean;
-	setModalIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	modalText: string;
+	setToggleModal: React.Dispatch<React.SetStateAction<boolean>>;
+	onCloseButton?: boolean;
 }
 
-const ModalComponent: React.FC<Props> = ({ isOpen, modalText, setModalIsOpen }) => {
-	return (
-		<Modal
-			isOpen={isOpen}
-			onRequestClose={() => setModalIsOpen(false)}
-			ariaHideApp={false}
-		>
-			<ModalContent> { modalText } </ModalContent>
-			
-			<FlexMiddleDiv>
-				<ModalButton onClick={() => setModalIsOpen(false)}>Close</ModalButton>
-			</FlexMiddleDiv>
-		</Modal>
-	);
+const ModalComponent: React.FC<Props> = ({
+	onCloseButton = true,
+	isOpen,
+	setToggleModal,
+	children,
+}) => {
+
+	if (onCloseButton) {
+		return (
+			<Modal isOpen={isOpen} onRequestClose={() => setToggleModal(false)} ariaHideApp={false}>
+				<ModalContent> {children} </ModalContent>
+				<FlexMiddleDiv>
+					<ModalButton onClick={() => setToggleModal(false)}>Close</ModalButton>
+				</FlexMiddleDiv>
+			</Modal>
+			);
+	}
+	else {
+		return (
+			<Modal isOpen={isOpen} ariaHideApp={false}>
+				<ModalContent> {children} </ModalContent>
+			</Modal>
+		);
+	}
 };
 
 const FlexMiddleDiv = styled.div`
@@ -57,13 +67,12 @@ Modal.defaultStyles = {
 		padding: '30px',
 		display: 'flex',
 		flexDirection: 'column',
-		justifyContent: 'space-between'
+		justifyContent: 'space-between',
 	},
 };
 
-const ModalContent = styled.p`
+const ModalContent = styled.div`
 	overflow-x: hidden;
-	word-break: break-all;
 `;
 
 const ModalButton = styled.div`
