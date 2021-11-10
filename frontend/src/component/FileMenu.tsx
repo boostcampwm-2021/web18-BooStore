@@ -4,6 +4,8 @@ import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
 import { Capacity } from '../model';
 import ModalComponent from './ModalComponent';
+import ProgressBar from './ProgressBar';
+
 
 interface Props {
 	showShareButton?: boolean;
@@ -13,8 +15,13 @@ interface Props {
 
 const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
-	const [modalText, setModalText] = useState('유효하지 않은 파일입니다.');
-	const [modalIsOpen, setModalIsOpen] = useState(false);
+	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
+	const [toggleFailureModal, setToggleFailureModal] = useState(false);
+	const [isCompleteSend, setIsCompleteSend] = useState(true);
+	const [toggleProgressModal, setToggleProgressModal] = useState(false);
+	const [processedFileSize, setProcessedFileSize] = useState(0);
+	const [totalFileSize, setTotalFileSize] = useState(0);
+	const [progressModalText, setProgressModalText] = useState('Loading...');
 	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
 	const onClickUpload = () => {
 		inputFileRef.current?.click();
@@ -33,54 +40,83 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 		setSelectedFile(null);
 	}, [selectedFile]);
 
-	const handleFileUpload = () => {
-		const formData = new FormData();
+	const validateSize = async (totalSize: number) => {
 		const { currentCapacity, maxCapacity } = capacity;
-
-		let totalSize = 0;
-		const selectedFiles = [...(selectedFile as FileList)];
-		const metaData: any = {};
-		inputFileRef.current!.value = '';
-		selectedFiles.forEach((file) => {
-			formData.append('uploadFiles', file, file.name);
-			metaData[file.name] = file.webkitRelativePath;
-			totalSize += file.size;
-		});
-
-		formData.append('relativePath', JSON.stringify(metaData));
-		formData.append('rootDirectory', '/'); // 추후에는 클라우드상의 현재 디렉토리를 인자로 넣어준다.
-
 		if (currentCapacity + totalSize > maxCapacity) {
-			setModalText('용량 초과');
-			setModalIsOpen(true);
-
-			return;
+			return false;
 		}
-
-		fetch(`/cloud/validate?size=${totalSize}`, {
+		
+		const res = await fetch(`/cloud/validate?size=${totalSize}`, {
 			credentials: 'include',
-		})
-			.then((res) => {
-				if (!res.ok) {
-					throw new Error('용량 초과');
-				}
-				return fetch(`/cloud/upload`, {
+		});
+		
+		return res.ok;
+	}
+	
+	const sendFiles = async (selectedFiles: File[], totalSize: number) => {
+		const formData = new FormData();
+		
+		formData.append('rootDirectory', '/'); // 추후에는 클라우드상의 현재 디렉토리를 인자로 넣어준다.
+		let metaData: any = {};
+		let sectionSize = 0;
+		let processedSize = 0;
+		for (const file of selectedFiles) {
+			const { size, name } = file;
+			processedSize += size;
+			sectionSize += size;
+			
+			setProgressModalText(name);
+			setProcessedFileSize((prev) => prev + size);
+			formData.append('uploadFiles', file, name);
+			metaData[file.name] = file.webkitRelativePath;
+
+			// 1MB 단위로 보냄
+			if (sectionSize >= 1024 * 1024 || processedSize == totalSize) {
+				formData.append('relativePath', JSON.stringify(metaData));
+				
+				const res = await fetch(`/cloud/upload`, {
 					method: 'POST',
 					credentials: 'include',
 					body: formData,
 				});
-			})
-			.then((response) => {
-				if (response.ok) {
-					return;
-				} else {
-					throw new Error(response.status.toString());
+				if (!res.ok) {
+					throw new Error(res.status.toString());
 				}
-			})
-			.catch((err) => {
-				setModalText(err.message);
-				setModalIsOpen((prev) => !prev);
-			});
+				
+				formData.delete('uploadFiles');
+				formData.delete('relativePath');
+				metaData = {};
+				sectionSize = 0;
+			}
+		}
+	}
+	
+	
+	const handleFileUpload = async () => {
+		const selectedFiles = [...(selectedFile as FileList)];
+		const totalSize = selectedFiles.reduce((prev, file) => prev + file.size, 0);
+
+		try {
+			if (!await validateSize(totalSize)) {
+				throw new Error('용량 초과');
+			}
+			setTotalFileSize(totalSize);
+			setProcessedFileSize(0);
+			setProgressModalText('Loading...');
+			setIsCompleteSend(false);
+			setToggleProgressModal(true);
+			
+			await sendFiles(selectedFiles, totalSize);
+			
+			setProgressModalText('Complete!');
+			setIsCompleteSend(true);
+		}
+		catch(err) {
+			setFailureModalText((err as Error).message);
+			setToggleFailureModal(true);
+		}
+		
+		inputFileRef.current!.value = '';
 	};
 
 	return (
@@ -96,11 +132,22 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 				ref={inputFileRef}
 				onChange={onChange}
 			/>
-			<ModalComponent
-				isOpen={modalIsOpen}
-				setModalIsOpen={setModalIsOpen}
-				modalText={modalText}
-			/>
+			<FailureModal
+				isOpen={toggleFailureModal}
+				setToggleModal={setToggleFailureModal}
+			>
+				<p>{failureModalText}</p>
+			</FailureModal>
+			<ProgressModal
+				isOpen={toggleProgressModal}
+				onCloseButton={isCompleteSend}
+				setToggleModal={setToggleProgressModal}
+				>
+				<div>
+					<p> {progressModalText} </p>
+					<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
+				</div>
+			</ProgressModal>
 			{!showShareButton || <ShareButton> 공유하기 </ShareButton>}
 		</Container>
 	);
@@ -148,23 +195,7 @@ const UploadInput = styled.input`
 	display: none;
 `;
 
-const FlexMiddleDiv = styled.div`
-	display: flex;
-	justify-content: center;
-
-	margin-top: 30px;
-`;
-
-export const ModalButton = styled.div`
-	background-color: ${(props) => props.theme.color.Primary};
-	border: none;
-	border-radius: 6px;
-	color: ${(props) => props.theme.color.PrimaryBG};
-	font-size: 12px;
-	padding: 10px;
-`;
+const FailureModal = styled(ModalComponent)``;
+const ProgressModal = styled(ModalComponent)``;
 
 export default React.memo(FileMenu);
-function userEffect(arg0: () => void) {
-	throw new Error('Function not implemented.');
-}
