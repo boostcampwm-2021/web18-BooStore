@@ -5,9 +5,8 @@ import { Cloud } from '../../model';
 import { increaseCurrentCapacity } from '.';
 
 const bucketName = process.env.S3_BUCKET_NAME;
-const OBJECT_STORAGE_BASE = 'https://kr.object.ncloudstorage.com/';
+const OBJECT_STORAGE_BASE = 'https://kr.object.ncloudstorage.com';
 
-// metadata?
 export interface UploadArg {
 	originalName: string;
 	mimetype: string;
