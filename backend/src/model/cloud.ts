@@ -1,10 +1,10 @@
 import { Document, Schema, model } from 'mongoose';
 
 export interface ICloud {
-	children: ICloud[];
 	osLink: string;
 	name: string;
 	size: number;
+	directory: string;
 	ownerId: string;
 	contentType: string;
 	createdAt: string;
@@ -17,6 +17,11 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 	{
 		osLink: {
 			type: String,
+		},
+		directory: {
+			type: String,
+			require: true,
+			default: '/',
 		},
 		name: {
 			type: String,
@@ -40,9 +45,5 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 		timestamps: true,
 	}
 );
-
-cloudSchema.add({
-	children: [cloudSchema],
-});
 
 export const Cloud = model<ICloudDoc>('Cloud', cloudSchema);
