@@ -116,7 +116,7 @@ const UserName = styled.p`
 const LogoutButton = styled(Button)`
     background-color: ${(props) => props.theme.color.Primary};
     color: white;
-    width: auto;
+    width: '';
     padding: 10px 20px;
     border: none;
     border-radius: 10px;
