@@ -3,13 +3,13 @@ import { Cloud } from '../../model';
 export interface PathArg {
 	loginId: string;
 	path: string;
+	regex: string;
 }
 
-export const getFiles = async ({ loginId, path }: PathArg) => {
-	// ${path} 디렉토리의 파일들과 ${path}가 포함한 파일들
+export const getFiles = async ({ loginId, path, regex }: PathArg) => {
 	const files = Cloud.find(
 		{
-			directory: { $regex: `(^${path}$)|(^${path}\/([^/])+$)|(^\/([^/])+$)` },
+			directory: { $regex: regex },
 			ownerId: loginId,
 		},
 		{

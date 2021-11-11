@@ -46,21 +46,23 @@ router.get('/files', isAuthenticated, async (req, res) => {
 	const pathArg: PathArg = {
 		loginId: loginId,
 		path: path as string,
+		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
 	};
 
 	const tempFiles = await getFiles(pathArg);
 	const directories = [];
+	const splittedPath = path === '/' ? [''] : (path as string).split('/');
 	const files = [];
 	tempFiles.map((file) => {
 		if (file.directory === path) {
 			files.push(file);
 		} else {
-			if (directories.indexOf(file.directory) === -1) {
-				directories.push(file.directory);
-				const directory = file.directory.split('/');
+			const splittedDirectory = file.directory.split('/');
+			if (directories.indexOf(splittedDirectory[splittedPath.length]) === -1) {
+				directories.push(splittedDirectory[splittedPath.length]);
 				file.contentType = 'folder';
 				file.size = 0;
-				file.name = directory[directory.length - 1];
+				file.name = splittedDirectory[splittedPath.length];
 				files.push(file);
 			}
 		}
