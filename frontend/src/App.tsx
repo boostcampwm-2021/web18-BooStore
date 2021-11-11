@@ -31,7 +31,7 @@ const App: React.FC = () => {
 				setUser(null);
 				localStorage.removeItem('user');
 				
-				console.log(err);
+				console.error(err);
 			});
 	}, []);
 

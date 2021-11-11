@@ -40,7 +40,7 @@ const Header: React.FC<hasUserProps> = ({ user, setUser }) => {
 			throw new Error(res.status.toString());
 		})
 		.catch((err) => {
-			console.log(err);
+			console.error(err);
 		})
 	}
     

@@ -15,7 +15,7 @@ interface Props {
 }
 
 const MainPage: React.FC<Props> = () => {
-	const [currentDir, setCurrentDir] = useState('/depth0/depth1/depth2/depth3');
+	const [currentDir, setCurrentDir] = useState('/');
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
@@ -23,7 +23,6 @@ const MainPage: React.FC<Props> = () => {
 	const parentDir = (currentDirectory: string) => {
 		let parentDir = currentDirectory.split('/').slice(0, -1).join('/');
 		parentDir === '' ? (parentDir = '/') : '';
-		// console.log('parent: ', parentDir);
 		return parentDir;
 	};
 

@@ -28,7 +28,7 @@ mongoose
 		server.listen(port);
 	})
 	.catch((err) => {
-		console.log(err);
+		console.error(err);
 	});
 
 function normalizePort(val) {
