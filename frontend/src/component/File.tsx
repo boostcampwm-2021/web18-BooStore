@@ -49,12 +49,13 @@ const FileList: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurren
 	useEffect(() => {}, [isSelected]);
 
 	const childDir = currentDirectory==='/'? currentDirectory+name: currentDirectory+'/'+name;
+	const isFolder = contentType==='folder'
 
 	return (
 		<Container onClick={onClickFile} isSelected={isSelected}>
 			{isSelected ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			<TypeIcon type={contentType} />
-			<FileName onClick={()=>getChildrenFiles(contentType==='folder',childDir)}>{name}</FileName>
+			<FileName isFolder={isFolder} onClick={()=>getChildrenFiles( isFolder, childDir )}>{name}</FileName>
 			<p> {createdAt} </p>
 			<p> {updatedAt} </p>
 			<p> {size} </p>
@@ -72,11 +73,13 @@ const Container = styled.div<{ isSelected: boolean }>`
 	}
 `;
 
-const FileName = styled.div`
+const FileName = styled.div<{isFolder: boolean}>`
 	&:hover{
-		text-decoration: underline;
-		color: ${({theme}) => theme.color.Primary };
-	}
-`;
+		${({isFolder}) => `
+			text-decoration: underline;
+			color: #00008B`
+		}	
+	};
+`
 
 export default React.memo(FileList);
