@@ -48,11 +48,13 @@ const FileList: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurren
 
 	useEffect(() => {}, [isSelected]);
 
+	const childDir = currentDirectory==='/'? currentDirectory+name: currentDirectory+'/'+name;
+
 	return (
 		<Container onClick={onClickFile} isSelected={isSelected}>
 			{isSelected ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			<TypeIcon type={contentType} />
-			<FileName onClick={()=>getChildrenFiles(contentType==='folder',currentDirectory+'/'+name)}>{name}</FileName>
+			<FileName onClick={()=>getChildrenFiles(contentType==='folder',childDir)}>{name}</FileName>
 			<p> {createdAt} </p>
 			<p> {updatedAt} </p>
 			<p> {size} </p>
