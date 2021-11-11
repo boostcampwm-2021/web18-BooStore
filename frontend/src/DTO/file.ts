@@ -1,5 +1,5 @@
 export interface FileDTO {
-	id: string;
+	_id: string;
 	contentType: string;
 	name: string;
 	directory: string;

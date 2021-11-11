@@ -16,6 +16,8 @@ interface Props {
 const MainPage: React.FC<Props> = () => {
 	const [currentDir, setCurrentDir] = useState('/depth0/depth1/depth2/depth3');
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
+	const [files, setFiles] = useState<FileDTO[]>([]);
+	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 
 	const parentDir = (currentDirectory: string) => {
 		let parentDir = currentDirectory.split('/').slice(0, -1).join('/');
@@ -62,33 +64,12 @@ const MainPage: React.FC<Props> = () => {
 		setCurrentDir(parentDir(currentDir));
 	};
 
-	const [files, setFiles] = useState<FileDTO[]>(
-		/*[
-		{
-			id: '111',
-			contentType: 'image/jpeg',
-			name: 'testFileName',
-			createdAt: '2020.02.02',
-			updatedAt: '2021.02.03',
-			size: 1024,
-			ownerId: 'test1',
-		},
-		{
-			id: '132',
-			contentType: 'txt',
-			name: 'testFile22',
-			createdAt: '2020.02.03',
-			updatedAt: '2020.02.03',
-			size: 512,
-			ownerId: 'test1',
-		},
-	]*/ []
-	);
-
 	useEffect(() => {
 		getFiles(currentDir);
 		getCapacity();
 	}, []);
+	
+	useEffect(() => console.log('aa', selectedFiles), [selectedFiles]);
 
 	return (
 		<Container>
@@ -104,7 +85,7 @@ const MainPage: React.FC<Props> = () => {
 				</Directory>
 				<Section>
 					<FileMenu showShareButton capacity={capacity} setCapacity={setCapacity} />
-					<FileList files={files} setFiles={setFiles} />
+					<FileList files={files} setFiles={setFiles} setSelectedFiles={setSelectedFiles} />
 				</Section>
 			</InnerContainer>
 		</Container>
