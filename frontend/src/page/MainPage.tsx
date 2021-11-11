@@ -5,7 +5,7 @@ import FileList from '../component/FileList';
 import FileMenu from '../component/FileMenu';
 import Sidebar from '../component/Sidebar';
 import { User } from '../model';
-import { Capacity } from '../model/capacity';
+import { Capacity } from '../model';
 import folderup from '../asset/image/folderup.svg';
 import { FileDTO } from '../DTO';
 import { getFiles } from '../util';
@@ -19,6 +19,7 @@ const MainPage: React.FC<Props> = () => {
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
+	const [tempUpload, setTempUpload] = useState(false);
 
 	const parentDir = (currentDirectory: string) => {
 		let parentDir = currentDirectory.split('/').slice(0, -1).join('/');
@@ -57,7 +58,7 @@ const MainPage: React.FC<Props> = () => {
 		};
 		callFile();
 		getCapacity();
-	}, []);
+	}, [tempUpload]);
 
 	return (
 		<Container>
@@ -77,6 +78,8 @@ const MainPage: React.FC<Props> = () => {
 						capacity={capacity}
 						setCapacity={setCapacity}
 						selectedFiles={selectedFiles}
+						currentDir={currentDir}
+						setTempUpload={setTempUpload}
 					/>
 					<FileList
 						files={files}
