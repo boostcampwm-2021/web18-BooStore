@@ -85,7 +85,7 @@ const MainPage: React.FC<Props> = () => {
 				</Directory>
 				<Section>
 					<FileMenu showShareButton capacity={capacity} setCapacity={setCapacity} />
-					<FileList files={files} setFiles={setFiles} setSelectedFiles={setSelectedFiles} />
+					<FileList files={files} setSelectedFiles={setSelectedFiles} />
 				</Section>
 			</InnerContainer>
 		</Container>

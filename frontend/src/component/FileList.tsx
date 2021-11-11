@@ -9,12 +9,11 @@ import File from './File';
 
 interface Props {
 	files: FileDTO[];
-	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 }
 
 
-const FileList: React.FC<Props> = ({ files, setFiles, setSelectedFiles }) => {
+const FileList: React.FC<Props> = ({ files, setSelectedFiles }) => {
 	
 	return (
 		<Container>
