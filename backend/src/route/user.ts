@@ -35,6 +35,12 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 
 router.get('/files', isAuthenticated, async (req, res) => {
 	const { path } = req.query;
+	if (path === undefined) {
+		return res.status(400).send();
+	}
+	if (path === '') {
+		return res.status(400).send();
+	}
 	const { loginId } = req.user;
 	console.log(path);
 
@@ -43,6 +49,6 @@ router.get('/files', isAuthenticated, async (req, res) => {
 		path: path as string,
 	};
 	const data = await getFileTree(pathArg);
-	return res.json(data);
+	return res.status(200).json(data);
 });
 export default router;
