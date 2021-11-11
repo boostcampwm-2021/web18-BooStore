@@ -43,6 +43,7 @@ const FileList: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurren
 			const files = await getFiles(childDirectory);
 			setFiles(files);
 			setCurrentDir(childDirectory);
+			setSelectedFiles([]);
 		}
 	}
 
