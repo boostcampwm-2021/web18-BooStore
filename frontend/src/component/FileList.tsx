@@ -1,10 +1,37 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
 
 import { FileDTO } from '../DTO';
+import File from './File';
+
+interface Props {
+	files: FileDTO[];
+	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+}
+
+
+const FileList: React.FC<Props> = ({ files, setSelectedFiles }) => {
+	
+	return (
+		<Container>
+			<FileHeader>
+				<p></p>
+				<p> 종류 </p>
+				<p> 이름 </p>
+				<p> 올린 날짜 </p>
+				<p> 수정한 날짜 </p>
+				<p> 파일 크기 </p>
+			</FileHeader>
+			<Files>
+				{files.map((file, index) => <File key={index} file={file} setSelectedFiles={setSelectedFiles} />)}
+			</Files>
+		</Container>
+	);
+};
+
 
 const Container = styled.div``;
 
@@ -27,46 +54,5 @@ const Files = styled.ul`
 		margin: auto;
 	}
 `;
-
-const File = styled.li`
-	${gridTemplate};
-	border-bottom: 1px solid ${(props) => props.theme.color.Line};
-`;
-
-interface Props {
-	files: FileDTO[];
-	setFiles: Dispatch<SetStateAction<FileDTO[]>>;
-}
-
-const FileList: React.FC<Props> = ({ files, setFiles }) => {
-	return (
-		<Container>
-			<FileHeader>
-				<p></p>
-				<p> 종류 </p>
-				<p> 이름 </p>
-				<p> 올린 날짜 </p>
-				<p> 수정한 날짜 </p>
-				<p> 파일 크기 </p>
-			</FileHeader>
-			<Files>
-				{files.map((file, index) => {
-					const { id, contentType, name, createdAt, updatedAt, size } = file;
-
-					return (
-						<File key={index}>
-							<ToggleOffSvg />
-							<p> {contentType} </p>
-							<p> {name} </p>
-							<p> {createdAt} </p>
-							<p> {updatedAt} </p>
-							<p> {size} </p>
-						</File>
-					);
-				})}
-			</Files>
-		</Container>
-	);
-};
 
 export default React.memo(FileList);

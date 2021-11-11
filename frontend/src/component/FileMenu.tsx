@@ -2,18 +2,21 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
+import { FileDTO } from '../DTO';
 import { Capacity } from '../model';
 import DropBox, { DropBoxItem } from './DropBox';
 import ModalComponent from './ModalComponent';
 import ProgressBar from './ProgressBar';
+import Button from './Button';
 
 interface Props {
 	showShareButton?: boolean;
 	capacity: Capacity;
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
+	selectedFiles: FileDTO[];
 }
 
-const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) => {
+const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, selectedFiles }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
 	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
 	const [toggleFailureModal, setToggleFailureModal] = useState(false);
@@ -23,7 +26,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
 	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
-	
+
 	const onclickFileUploadButton = () => {
 		inputFileRef.current?.removeAttribute('webkitdirectory');
 
@@ -141,7 +144,12 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 			<SelectAllBtn>
 				<ToggleOffSvg />
 			</SelectAllBtn>
-			<DropBox nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
+			{selectedFiles.length > 0 ? (
+				<Button> 다운로드 </Button>
+			) : (
+				<DropBox nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
+			)}
+
 			<UploadInput
 				multiple
 				type="file"
