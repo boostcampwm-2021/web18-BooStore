@@ -5,10 +5,11 @@
 - [✨ 프로젝트 소개](#-프로젝트-소개)
 - [💻 배포 링크](#-배포-링크)
 - [⏰ Ground Rule](#-ground-rule)
-- [💾 Deploy Process](#-deploy-process)
 - [📚 Naming Convention](#-naming-convention)
 - [📝 Git Convention](#-git-convention)
 - [📜 API 문서](#-api-문서)
+- [💾 Deploy Process](#-deploy-process)
+- [📊 Upload Flow Chart](#-upload-flow-chart)
 - [📅 스케쥴러](#-스케쥴러)
 - [🎨 와이어프레임 및 기획서](#-와이어프레임-및-기획서)
 - [🧰 설계서](#-설계서)
@@ -36,10 +37,6 @@
 
 [Ground Rule Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%E2%8F%B0-Ground-Rules)
 
-## 💾 Deploy Process
-
-[Deploy Process Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%92%BE-Deploy-Process)
-
 ## 📚 Naming Convention
 
 [Naming Convention Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%93%9A-Naming-Convention)  
@@ -52,6 +49,12 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 
 ## 📜 API 문서
 [PostMan Docs](https://documenter.getpostman.com/view/13315664/UVC6j6rk)
+
+## 💾 Deploy Process
+[Deploy Process Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%92%BE-Deploy-Process)
+
+## 📊 Upload Flow Chart
+[Upload Flow Chart Link](https://github.com/boostcampwm-2021/web18-BooStore/wiki/Upload-Flow-Chart)
 
 ## 📅 스케쥴러
 [Annoying Potato Google Spreadsheets](https://docs.google.com/spreadsheets/d/1tfH_lMYltMyLQ0Xz10B3nNSc5ssL0hg87UrO0Hc-6Vo/edit?usp=sharing)
