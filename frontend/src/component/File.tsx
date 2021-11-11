@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { ThemeConsumer } from 'styled-components';
 
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
@@ -11,10 +11,12 @@ import { getFiles } from '../util';
 interface Props {
 	file: FileDTO;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory : string;
 }
 
-const FileList: React.FC<Props> = ({ file, setSelectedFiles, currentDirectory }) => {
+const FileList: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurrentDir, currentDirectory }) => {
 	const [isSelected, setSelected] = useState(false);
 
 	const { contentType, name, createdAt, updatedAt, size, _id } = file;
@@ -36,8 +38,11 @@ const FileList: React.FC<Props> = ({ file, setSelectedFiles, currentDirectory })
 		});
 	};
 
-	const callFile = ( isFolder: boolean, currentDirectory: string) =>{
+	const getChildrenFiles = async( isFolder: boolean, childDirectory: string) =>{
 		if(isFolder){
+			const files = await getFiles(childDirectory);
+			setFiles(files);
+			setCurrentDir(childDirectory);
 		}
 	}
 
@@ -47,7 +52,7 @@ const FileList: React.FC<Props> = ({ file, setSelectedFiles, currentDirectory })
 		<Container onClick={onClickFile} isSelected={isSelected}>
 			{isSelected ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			<TypeIcon type={contentType} />
-			<FileName onClick={()=>callFile(contentType==='folder',currentDirectory)}>{name}</FileName>
+			<FileName onClick={()=>getChildrenFiles(contentType==='folder',currentDirectory+'/'+name)}>{name}</FileName>
 			<p> {createdAt} </p>
 			<p> {updatedAt} </p>
 			<p> {size} </p>
@@ -66,6 +71,10 @@ const Container = styled.div<{ isSelected: boolean }>`
 `;
 
 const FileName = styled.div`
+	&:hover{
+		text-decoration: underline;
+		color: ${({theme}) => theme.color.Primary };
+	}
 `;
 
 export default React.memo(FileList);
