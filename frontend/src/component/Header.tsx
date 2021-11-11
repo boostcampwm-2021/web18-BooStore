@@ -21,7 +21,7 @@ const HeaderSection = styled.div`
     display: flex;
     justify-content: space-between;
     width: 100%;
-    height: 60px;
+    height: ${(props) => props.theme.HeaderHeight};
     background-color: #282828;
 `;
 

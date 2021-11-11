@@ -7,7 +7,7 @@ const defaultTheme: DefaultTheme = {
 		Primary: '#3500D3',
 		Line: '#D7D7D7',
 	},
-	HeaderHeight: '100px',
+	HeaderHeight: '60px',
 };
 
 export { defaultTheme };
