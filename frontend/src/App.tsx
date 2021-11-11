@@ -38,7 +38,7 @@ const App: React.FC = () => {
 	return (
 		<>
 			<BrowserRouter>
-				<Header user={user} />
+				<Header user={user} setUser={setUser} />
 				<Router user={user} setUser={setUser} />
 			</BrowserRouter>
 		</>

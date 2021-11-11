@@ -1,6 +1,12 @@
 import * as express from 'express';
 import { ResponseUser } from '../DTO';
-import { getCapacity, getFiles, PathArg } from '../service/cloud';
+import {
+	getCapacity,
+	getFiles,
+	getFilteredFiles,
+	FilesArg,
+	FilteredFilesArg,
+} from '../service/cloud';
 import { isAuthenticated } from '../middleware';
 
 const router = express.Router();
@@ -43,28 +49,20 @@ router.get('/files', isAuthenticated, async (req, res) => {
 		return res.status(400).send();
 	}
 
-	const pathArg: PathArg = {
+	const filesArg: FilesArg = {
 		loginId: loginId,
 		path: path as string,
+		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
 	};
 
-	const tempFiles = await getFiles(pathArg);
-	const directories = [];
-	const files = [];
-	tempFiles.map((file) => {
-		if (file.directory === path) {
-			files.push(file);
-		} else {
-			if (directories.indexOf(file.directory) === -1) {
-				directories.push(file.directory);
-				const directory = file.directory.split('/');
-				file.contentType = 'folder';
-				file.size = 0;
-				file.name = directory[directory.length - 1];
-				files.push(file);
-			}
-		}
-	});
+	const tempFiles = await getFiles(filesArg);
+
+	const filteredFilesArg: FilteredFilesArg = {
+		path: path as string,
+		originFiles: tempFiles,
+	};
+
+	const files = getFilteredFiles(filteredFilesArg);
 	return res.status(200).json(files);
 });
 export default router;

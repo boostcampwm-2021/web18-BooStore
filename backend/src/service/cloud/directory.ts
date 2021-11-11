@@ -1,15 +1,20 @@
-import { Cloud } from '../../model';
+import { Cloud, ICloud } from '../../model';
 
-export interface PathArg {
+export interface FilesArg {
 	loginId: string;
 	path: string;
+	regex: string;
 }
 
-export const getFiles = async ({ loginId, path }: PathArg) => {
-	// ${path} 디렉토리의 파일들과 ${path}가 포함한 파일들
+export interface FilteredFilesArg {
+	path: string;
+	originFiles: ICloud[];
+}
+
+export const getFiles = async ({ loginId, path, regex }: FilesArg) => {
 	const files = Cloud.find(
 		{
-			directory: { $regex: `(^${path}$)|(^${path}\/([^/])+$)|(^\/([^/])+$)` },
+			directory: { $regex: regex },
 			ownerId: loginId,
 		},
 		{
@@ -23,4 +28,25 @@ export const getFiles = async ({ loginId, path }: PathArg) => {
 		}
 	).exec();
 	return files;
+};
+
+export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
+	const directories = [];
+	const splittedPath = path === '/' ? [''] : (path as string).split('/');
+	const filteredFiles = [];
+	originFiles.map((file) => {
+		if (file.directory === path) {
+			filteredFiles.push(file);
+		} else {
+			const splittedDirectory = file.directory.split('/');
+			if (directories.indexOf(splittedDirectory[splittedPath.length]) === -1) {
+				directories.push(splittedDirectory[splittedPath.length]);
+				file.contentType = 'folder';
+				file.size = 0;
+				file.name = splittedDirectory[splittedPath.length];
+				filteredFiles.push(file);
+			}
+		}
+	});
+	return filteredFiles;
 };
