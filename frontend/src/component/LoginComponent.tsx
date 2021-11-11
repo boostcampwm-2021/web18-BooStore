@@ -39,7 +39,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 	};
 
 	const onClickLogin = () => {
-		fetch(`${process.env.REACT_APP_SERVER}/login`, {
+		fetch(`/login`, {
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json',
@@ -54,6 +54,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 				}
 			})
 			.then((data) => {
+				localStorage.setItem('user', JSON.stringify(data));
 				setUser({ ...data });
 				history.push({
 					pathname: '/',

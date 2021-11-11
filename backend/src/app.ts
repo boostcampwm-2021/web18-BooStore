@@ -6,13 +6,12 @@ import * as dotenv from 'dotenv';
 import * as passport from 'passport';
 import passportConfig from './config/passport';
 import * as session from 'express-session';
-import * as cors from 'cors';
+dotenv.config();
 
-import { authRouter } from './routes/index';
+import { authRouter, userRouter, cloudRouter } from './route';
 
 const app = express();
-dotenv.config();
-app.use(cors());
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -22,9 +21,12 @@ app.use(express.static(path.join(path.resolve(), '../frontend/build')));
 app.use(session({ secret: 'secret123123', resave: true, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+
 passportConfig();
 
 app.use('/', authRouter);
+app.use('/user', userRouter);
+app.use('/cloud', cloudRouter);
 app.use('*', (req, res) => {
 	res.sendFile('index.html', {
 		root: path.join(__dirname, '../../frontend/build')

@@ -1,5 +1,5 @@
 
-export interface User {
+export interface ResponseUser {
 	loginId: string;
 	directoryId: string;
 }

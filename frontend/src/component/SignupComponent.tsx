@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import IconLeftArrow from '../asset/image/IconLeftArrow.svg';
+import IconLeftArrow from '../asset/image/icon_left_arrow.svg';
 import { useHistory } from 'react-router-dom';
 import Modal from 'react-modal';
 
@@ -21,9 +21,9 @@ const SignupComponent: React.FC<Props> = () => {
 		passwordCheck: '',
 	});
 
-	const [isWarning,setIsWarning] = useState(false);
+	const [isWarning, setIsWarning] = useState(false);
 	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [modalText, setModalText] = useState("유효하지 않은 아이디 또는 비밀번호 입니다.");
+	const [modalText, setModalText] = useState('유효하지 않은 아이디 또는 비밀번호 입니다.');
 
 	const { id, password, passwordCheck } = inputs;
 
@@ -49,55 +49,48 @@ const SignupComponent: React.FC<Props> = () => {
 		if (password === '') return false;
 		return password === passwordCheck;
 	};
-	
+
 	const onClickBack = () => {
 		history.goBack();
-	}
+	};
 
-	const onClickSignup = ()=>{
-		if(isRightIdRex() && isRightPasswordRex() && isEqualPassword()){
-			fetch(`${process.env.REACT_APP_SERVER}/signup`,{
-				method:"POST",
-				headers:{
-					"Content-type": "application/json"
+	const onClickSignup = () => {
+		if (isRightIdRex() && isRightPasswordRex() && isEqualPassword()) {
+			fetch(`/signup`, {
+				method: 'POST',
+				headers: {
+					'Content-type': 'application/json',
 				},
-				body: JSON.stringify(inputs)
-			})
-			.then((response) => {
-				if(response.ok){
+				body: JSON.stringify(inputs),
+			}).then((response) => {
+				if (response.ok) {
 					history.push({
-						pathname: "/login",
-					})
-				}
-				else if (response.status === 400) {
-					setModalText("유효하지 않은 아이디 또는 비밀번호 입니다.");
-					setModalIsOpen(true);				
-				}
-				else if (response.status === 409) {
-					setModalText("중복된 아이디 입니다.");
-					setModalIsOpen(true);	
-				}
-				else {
-					setModalText("회원가입 안됨");
+						pathname: '/login',
+					});
+				} else if (response.status === 400) {
+					setModalText('유효하지 않은 아이디 또는 비밀번호 입니다.');
+					setModalIsOpen(true);
+				} else if (response.status === 409) {
+					setModalText('중복된 아이디 입니다.');
+					setModalIsOpen(true);
+				} else {
+					setModalText('회원가입 안됨');
 					setModalIsOpen(true);
 				}
 			});
-		}
-		else{
-			setModalText("유효하지 않은 아이디 또는 비밀번호 입니다.");
+		} else {
+			setModalText('유효하지 않은 아이디 또는 비밀번호 입니다.');
 			setModalIsOpen(true);
 		}
-	}
+	};
 
-	useEffect(()=>{
-		if(isEqualPassword()){
+	useEffect(() => {
+		if (isEqualPassword()) {
 			setIsWarning(false);
-		}
-		else{
+		} else {
 			setIsWarning(true);
 		}
-	}	
-	,[isEqualPassword]);
+	}, [isEqualPassword]);
 	return (
 		<SignupBackground>
 			<div style={{ width: '90%' }}>
@@ -127,14 +120,20 @@ const SignupComponent: React.FC<Props> = () => {
 					onChange={onChange}
 					type="password"
 				/>
-				{ isWarning? <Warning>비밀번호가 일치하지 않습니다.</Warning> :""}
+				{isWarning ? <Warning>비밀번호가 일치하지 않습니다.</Warning> : ''}
 				<FlexDiv>
-					<Button onClick={onClickSignup} style={{ float: 'right' }}>sign up</Button>
+					<Button onClick={onClickSignup} style={{ float: 'right' }}>
+						sign up
+					</Button>
 				</FlexDiv>
-				<Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)} ariaHideApp={false}>
+				<Modal
+					isOpen={modalIsOpen}
+					onRequestClose={() => setModalIsOpen(false)}
+					ariaHideApp={false}
+				>
 					{modalText}
 					<FlexMiddleDiv>
-						<ModalButton onClick={()=> setModalIsOpen(false)}>Modal Close</ModalButton>
+						<ModalButton onClick={() => setModalIsOpen(false)}>Modal Close</ModalButton>
 					</FlexMiddleDiv>
 				</Modal>
 			</SignupContainer>
@@ -187,7 +186,7 @@ const FlexDiv = styled.div`
 const FlexMiddleDiv = styled.div`
 	display: flex;
 	justify-content: center;
-	
+
 	margin-top: 30px;
 `;
 
@@ -200,18 +199,18 @@ const Input = styled.input`
 `;
 
 const Warning = styled.div`
-	color: #FF0000;
+	color: #ff0000;
 	font-size: 12px;
 `;
 
-Modal.defaultStyles={
+Modal.defaultStyles = {
 	overlay: {
 		position: 'fixed',
 		top: 0,
 		left: 0,
 		right: 0,
 		bottom: 0,
-		backgroundColor: 'rgba(255, 255, 255, 0.75)'
+		backgroundColor: 'rgba(255, 255, 255, 0.75)',
 	},
 	content: {
 		top: '50%',
@@ -229,9 +228,9 @@ Modal.defaultStyles={
 		WebkitOverflowScrolling: 'touch',
 		borderRadius: '4px',
 		outline: 'none',
-		padding: '30px'
-	}
-}
+		padding: '30px',
+	},
+};
 
 export const ModalButton = styled.div`
 	background-color: ${(props) => props.theme.color.Primary};

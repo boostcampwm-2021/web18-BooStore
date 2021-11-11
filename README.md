@@ -3,9 +3,12 @@
 ## 목차
 
 - [✨ 프로젝트 소개](#-프로젝트-소개)
+- [💻 배포 링크](#-배포-링크)
 - [⏰ Ground Rule](#-ground-rule)
+- [💾 Deploy Process](#-deploy-process)
 - [📚 Naming Convention](#-naming-convention)
 - [📝 Git Convention](#-git-convention)
+- [📜 API 문서](#-api-문서)
 - [📅 스케쥴러](#-스케쥴러)
 - [🎨 와이어프레임 및 기획서](#-와이어프레임-및-기획서)
 - [🧰 설계서](#-설계서)
@@ -21,13 +24,21 @@
 
 ### 팀구성원 소개
 
-| [<img src="https://github.com/ChipmunkForLove.png" width="100px">](https://github.com/ChipmunkForLove) | [<img src="https://github.com/gidskql6671.png" width="100px">](https://github.com/gidskql6671) | [<img src="https://github.com/K-moovie.png" width="100px">](https://github.com/K-moovie) 
+| [<img src="https://github.com/ChipmunkForLove.png" width="100px">](https://github.com/ChipmunkForLove) | [<img src="https://github.com/gidskql6671.png" width="100px">](https://github.com/gidskql6671) | [<img src="https://github.com/K-moovie.png" width="100px">](https://github.com/K-moovie) |
 | :----------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------: |
-|                           [J010 권윤영](https://github.com/ChipmunkForLove)                            |                         [J022 김동환](https://github.com/gidskql6671)                          |                        [J041 김영화](https://github.com/K-moovie)                        |             
+|                           [J010 권윤영](https://github.com/ChipmunkForLove)                            |                         [J022 김동환](https://github.com/gidskql6671)                          |                        [J041 김영화](https://github.com/K-moovie)                        |
+
+## 💻 배포 링크
+
+[http://www.boostore.co.kr](http://www.boostore.co.kr)
 
 ## ⏰ Ground Rule
 
 [Ground Rule Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%E2%8F%B0-Ground-Rules)
+
+## 💾 Deploy Process
+
+[Deploy Process Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%92%BE-Deploy-Process)
 
 ## 📚 Naming Convention
 
@@ -39,16 +50,19 @@
 [Git Convention Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%93%9D-Git-Convention)  
 Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 
-## 📅 스케쥴러
+## 📜 API 문서
+[PostMan Docs](https://documenter.getpostman.com/view/13315664/UVC6j6rk)
 
+## 📅 스케쥴러
 [Annoying Potato Google Spreadsheets](https://docs.google.com/spreadsheets/d/1tfH_lMYltMyLQ0Xz10B3nNSc5ssL0hg87UrO0Hc-6Vo/edit?usp=sharing)
 
 ## 🎨 와이어프레임 및 기획서
 [Annoying Potato Figma](https://www.figma.com/file/bPOYPsn7GjMZyiHddDoeeR/Annoying-Potato?node-id=0%3A1)
 
 ## 🧰 설계서
-
 [Project Desing Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%A7%B0-Project-Design)
 
 ## 📖 회의록 목록
 - [1주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/1%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
+- [2주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/2%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
+- [3주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/3%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
