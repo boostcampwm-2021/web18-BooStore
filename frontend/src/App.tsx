@@ -16,23 +16,23 @@ const App: React.FC = () => {
 			.then((response) => {
 				if (response.ok) {
 					return response.json();
-				} else if (response.status === 401) {
-					return null;
 				} else {
 					throw new Error(response.status.toString());
 				}
 			})
 			.then((data) => {
 				if (!data) {
-					setUser(null);
-					localStorage.removeItem('user');
-					return;
 				}
-				
+
 				localStorage.setItem('user', JSON.stringify(data));
 				setUser({ ...data });
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => {
+				setUser(null);
+				localStorage.removeItem('user');
+				
+				console.log(err);
+			});
 	}, []);
 
 	return (
