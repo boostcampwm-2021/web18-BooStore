@@ -50,6 +50,7 @@ const MainPage: React.FC<Props> = () => {
 		const files = await getFiles(parentDir(currentDir));
 		setFiles(files);
 		setCurrentDir(parentDir(currentDir));
+		setSelectedFiles([]);
 	};
 
 	useEffect(() => {
