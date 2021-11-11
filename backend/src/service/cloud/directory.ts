@@ -5,10 +5,13 @@ export interface PathArg {
 	path: string;
 }
 
-export const getFileTree = async ({ loginId, path }: PathArg) => {
+export const getFiles = async ({ loginId, path }: PathArg) => {
 	// ${path} 디렉토리의 파일들과 ${path}가 포함한 파일들
 	const files = Cloud.find(
-		{ directory: { $regex: `(^${path}$)|(^${path}\/([^/])+)$` }, ownerId: loginId },
+		{
+			directory: { $regex: `(^${path}$)|(^${path}\/([^/])+$)|(^\/([^/])+$)` },
+			ownerId: loginId,
+		},
 		{
 			directory: true,
 			name: true,
