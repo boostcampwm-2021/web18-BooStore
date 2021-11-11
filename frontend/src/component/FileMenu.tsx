@@ -14,9 +14,11 @@ interface Props {
 	capacity: Capacity;
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
 	selectedFiles: FileDTO[];
+	currentDir: string;
+	setTempUpload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, selectedFiles }) => {
+const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, selectedFiles, currentDir, setTempUpload }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
 	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
 	const [toggleFailureModal, setToggleFailureModal] = useState(false);
@@ -78,11 +80,11 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 	const sendFiles = async (selectedFiles: File[], totalSize: number) => {
 		const formData = new FormData();
 
-		formData.append('rootDirectory', '/'); // 추후에는 클라우드상의 현재 디렉토리를 인자로 넣어준다.
+		formData.append('rootDirectory', currentDir);
 		let metaData: any = {};
 		let sectionSize = 0;
 		let processedSize = 0;
-		for (const file of selectedFiles) {
+		for await (const file of selectedFiles) {
 			const { size, name } = file;
 			processedSize += size;
 			sectionSize += size;
@@ -105,6 +107,11 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 					throw new Error(res.status.toString());
 				}
 
+				setCapacity((cap) => {
+					const result: Capacity = {...cap};
+					result.currentCapacity += sectionSize;
+					return result;
+				});
 				formData.delete('uploadFiles');
 				formData.delete('relativePath');
 				metaData = {};
@@ -128,6 +135,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 			setToggleProgressModal(true);
 
 			await sendFiles(selectedFiles, totalSize);
+			setTempUpload((prev) => !prev);
 
 			setProgressModalText('Complete!');
 			setIsCompleteSend(true);

@@ -8,7 +8,6 @@ export const getFiles = (directory: string) => {
 			return res.json();
 		})
 		.then((data) => {
-			// console.log(data);
 			const files : FileDTO[] = data; 
 			return files;
 		});

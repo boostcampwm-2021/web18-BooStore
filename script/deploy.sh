@@ -9,14 +9,14 @@ docker compose -p ${DOCKER_APP_NAME} up --no-recreate -d
 
 if [ -z "$EXIST_BLUE" ]; then
     echo "blue up"
-    docker compose -p ${DOCKER_APP_NAME} up boostore_blue -d
+    docker compose -p ${DOCKER_APP_NAME} up --build boostore_blue -d
     
     sleep 10
     
     docker compose -p ${DOCKER_APP_NAME} stop boostore_green
 else
     echo "green up"
-    docker compose -p ${DOCKER_APP_NAME} up boostore_green -d
+    docker compose -p ${DOCKER_APP_NAME} up --build boostore_green -d
     
     sleep 10
     
