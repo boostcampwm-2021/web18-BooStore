@@ -1,8 +1,9 @@
-import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
 import { Capacity } from '../model';
+import DropBox, { DropBoxItem } from './DropBox';
 import ModalComponent from './ModalComponent';
 import ProgressBar from './ProgressBar';
 
@@ -22,23 +23,29 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
 	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
-	const [toggleUploadDropBox, setToggleUploadDropBox] = useState(false);
 	
-	const onClickActButton = () => {
-		setToggleUploadDropBox((prev) => !prev);
-	};
-
 	const onclickFileUploadButton = () => {
 		inputFileRef.current?.removeAttribute('webkitdirectory');
-		
+
 		inputFileRef.current?.click();
-	}
+	};
 	const onclickFolderUploadButton = () => {
 		inputFileRef.current?.setAttribute('webkitdirectory', '');
-		
+
 		inputFileRef.current?.click();
-	}
-	
+	};
+
+	const uploadDropBoxItems: DropBoxItem[] = [
+		{
+			text: '파일로 올리기',
+			onClick: onclickFileUploadButton,
+		},
+		{
+			text: '폴더로 올리기',
+			onClick: onclickFolderUploadButton,
+		},
+	];
+
 	const onChangeFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSelectedFile(event.target.files ? event.target.files : null);
 	};
@@ -134,14 +141,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 			<SelectAllBtn>
 				<ToggleOffSvg />
 			</SelectAllBtn>
-			<ActBox>
-				<ActButton onClick={onClickActButton}>올리기</ActButton>
-				{!toggleUploadDropBox || <DropBox>
-					<DropBoxButton onClick={onclickFileUploadButton}> 파일로 업로드 </DropBoxButton>
-					<hr/>
-					<DropBoxButton onClick={onclickFolderUploadButton}> 폴더로 업로드 </DropBoxButton>
-					</DropBox>}
-			</ActBox>
+			<DropBox nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			<UploadInput
 				multiple
 				type="file"
@@ -183,38 +183,6 @@ const SelectAllBtn = styled.button`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-`;
-
-const ActBox = styled.div`
-	position: relative;
-`;
-const ActButton = styled.button`
-	cursor: pointer;
-	outline: none;
-	border: 1px solid ${(props) => props.theme.color.Line};
-	border-radius: 5px;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
-	width: 150px;
-	height: 100%;
-`;
-const DropBox = styled.div`
-	position: absolute;
-	margin-top: 10px;
-	
-	border: 1px solid ${(props) => props.theme.color.Line};
-	border-radius: 5px;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
-	width: 150px;
-	padding: 10px;
-`;
-const DropBoxButton = styled.button`
-	outline: none;
-	cursor: pointer;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
-	border: none;
-	width: 100%;
-	text-align: center;
-	font-size: 14px;
 `;
 
 const ShareButton = styled.button`
