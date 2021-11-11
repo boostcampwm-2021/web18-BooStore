@@ -68,8 +68,6 @@ const MainPage: React.FC<Props> = () => {
 		getFiles(currentDir);
 		getCapacity();
 	}, []);
-	
-	useEffect(() => console.log('aa', selectedFiles), [selectedFiles]);
 
 	return (
 		<Container>
@@ -84,7 +82,7 @@ const MainPage: React.FC<Props> = () => {
 					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
 				</Directory>
 				<Section>
-					<FileMenu showShareButton capacity={capacity} setCapacity={setCapacity} />
+					<FileMenu showShareButton capacity={capacity} setCapacity={setCapacity} selectedFiles={selectedFiles}/>
 					<FileList files={files} setSelectedFiles={setSelectedFiles} />
 				</Section>
 			</InnerContainer>

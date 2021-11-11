@@ -193,14 +193,7 @@ const SelectAllBtn = styled.button`
 	align-items: center;
 `;
 
-const ShareButton = styled.button`
-	cursor: pointer;
-	outline: none;
-	border: 1px solid ${(props) => props.theme.color.Line};
-	border-radius: 5px;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
-	width: 150px;
-
+const ShareButton = styled(Button)`
 	margin-left: auto;
 `;
 
