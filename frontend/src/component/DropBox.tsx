@@ -12,12 +12,18 @@ interface Props {
 }
 
 const DropBox: React.FC<Props> = ({ items, nameOfToggleButton }) => {
-	const [toggleUploadDropBox, setToggleUploadDropBox] = useState(false);
+	const [isOpen, setOpen] = useState(false);
 	const dropList = useRef<HTMLDivElement>(null);
 
-	const onClickActButton = () => {
-		setToggleUploadDropBox((prev) => !prev);
+	const onClickToggleButton = () => {
+		setOpen((prev) => !prev);
 	};
+	
+	const handleCloseModal = (e: MouseEvent) => {
+		if (isOpen && !dropList.current?.contains(e.target as Node)) {
+			setOpen(false);
+		}
+	}
 	
 	const getJSXFromItems = (items: DropBoxItem[]) => {
 		const initArray: JSX.Element[] = [];
@@ -25,7 +31,7 @@ const DropBox: React.FC<Props> = ({ items, nameOfToggleButton }) => {
 		const jsxList = items.reduce((prev, item, index) => {
 			const { text, onClick } = item;
 			if (prev.length > 0) {
-				prev.push(<hr/>);
+				prev.push(<hr key={-1}/>);
 			}
 			prev.push(<DropBoxButton key={index} onClick={onClick}> {text} </DropBoxButton>);
 			
@@ -35,10 +41,17 @@ const DropBox: React.FC<Props> = ({ items, nameOfToggleButton }) => {
 		return jsxList;
 	}
 	
+	useEffect(() => {
+		window.addEventListener('click', handleCloseModal);
+		return () => {
+			window.removeEventListener('click', handleCloseModal)
+		}
+	}, [isOpen]);
+	
 	return (
 		<Container>
-			<ActButton onClick={onClickActButton}> {nameOfToggleButton} </ActButton>
-			{!toggleUploadDropBox || (
+			<ToggleButton onClick={onClickToggleButton}> {nameOfToggleButton} </ToggleButton>
+			{isOpen && (
 				<DropList ref={dropList}>
 					{getJSXFromItems(items)}
 				</DropList>
@@ -50,7 +63,7 @@ const DropBox: React.FC<Props> = ({ items, nameOfToggleButton }) => {
 const Container = styled.div`
 	position: relative;
 `;
-const ActButton = styled.button`
+const ToggleButton = styled.button`
 	cursor: pointer;
 	outline: none;
 	border: 1px solid ${(props) => props.theme.color.Line};
