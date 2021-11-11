@@ -53,6 +53,9 @@ const Container = styled.div<{ isSelected: boolean }>`
 	grid-template-columns: 1fr 2fr 10fr 2fr 2fr 2fr;
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	background-color: ${({ isSelected, theme }) => isSelected && theme.color.SecondaryBG};
+	&:hover{
+		background-color: ${({theme}) => theme.color.SecondaryBG};
+	}
 `;
 
 export default React.memo(FileList);
