@@ -26,7 +26,7 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 	const body = req.body;
 	const relativePath = JSON.parse(body.relativePath);
 
-	files.forEach((file) => {
+	for await (const file of files) {
 		const { path, size, originalname, mimetype, filename, destination } = file;
 		const uploadArg: UploadArg = {
 			originalName: originalname,
@@ -39,10 +39,10 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 			userLoginId: loginId,
 		};
 
-		uploadFile(uploadArg).then(() => {
-			fs.rm(path);
-		});
-	});
+		await uploadFile(uploadArg);
+		
+		fs.rm(path);
+	}
 
 	res.status(200).send();
 });
