@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
-
+import TypeIcon from './TypeIcon';
 import { FileDTO } from '../DTO';
 import File from './File';
 
@@ -12,9 +12,7 @@ interface Props {
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 }
 
-
 const FileList: React.FC<Props> = ({ files, setSelectedFiles }) => {
-	
 	return (
 		<Container>
 			<FileHeader>
@@ -26,12 +24,13 @@ const FileList: React.FC<Props> = ({ files, setSelectedFiles }) => {
 				<p> 파일 크기 </p>
 			</FileHeader>
 			<Files>
-				{files.map((file, index) => <File key={index} file={file} setSelectedFiles={setSelectedFiles} />)}
+				{files.map((file, index) => (
+					<File key={index} file={file} setSelectedFiles={setSelectedFiles} />
+				))}
 			</Files>
 		</Container>
 	);
 };
-
 
 const Container = styled.div``;
 
@@ -54,5 +53,4 @@ const Files = styled.ul`
 		margin: auto;
 	}
 `;
-
 export default React.memo(FileList);

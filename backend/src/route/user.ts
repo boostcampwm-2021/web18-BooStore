@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { ResponseUser } from '../DTO';
-import { getCapacity, getFileTree, PathArg } from '../service/cloud';
+import { getCapacity, getFiles, PathArg } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
 
 const router = express.Router();
@@ -36,13 +36,35 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 router.get('/files', isAuthenticated, async (req, res) => {
 	const { path } = req.query;
 	const { loginId } = req.user;
-	console.log(path);
+	if (path === undefined) {
+		return res.status(400).send();
+	}
+	if (path === '') {
+		return res.status(400).send();
+	}
 
 	const pathArg: PathArg = {
 		loginId: loginId,
 		path: path as string,
 	};
-	const data = await getFileTree(pathArg);
-	return res.json(data);
+
+	const tempFiles = await getFiles(pathArg);
+	const directories = [];
+	const files = [];
+	tempFiles.map((file) => {
+		if (file.directory === path) {
+			files.push(file);
+		} else {
+			if (directories.indexOf(file.directory) === -1) {
+				directories.push(file.directory);
+				const directory = file.directory.split('/');
+				file.contentType = 'folder';
+				file.size = 0;
+				file.name = directory[directory.length - 1];
+				files.push(file);
+			}
+		}
+	});
+	return res.status(200).json(files);
 });
 export default router;
