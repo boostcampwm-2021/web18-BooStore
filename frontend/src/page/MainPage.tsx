@@ -46,16 +46,17 @@ const MainPage: React.FC<Props> = () => {
 			});
 	};
 
-	const onClickParentButton = async() => {
+	const onClickParentButton = async () => {
 		const files = await getFiles(parentDir(currentDir));
 		setFiles(files);
 		setCurrentDir(parentDir(currentDir));
 	};
 
 	useEffect(() => {
-		const callfile = async ()=>{
+		const callFile = async () => {
 			setFiles(await getFiles(currentDir));
 		};
+		callFile();
 		getCapacity();
 	}, []);
 
@@ -72,8 +73,19 @@ const MainPage: React.FC<Props> = () => {
 					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
 				</Directory>
 				<Section>
-					<FileMenu showShareButton capacity={capacity} setCapacity={setCapacity} selectedFiles={selectedFiles}/>
-					<FileList files={files} setSelectedFiles={setSelectedFiles} setFiles={setFiles} setCurrentDir={setCurrentDir} currentDirectory={currentDir}/>
+					<FileMenu
+						showShareButton
+						capacity={capacity}
+						setCapacity={setCapacity}
+						selectedFiles={selectedFiles}
+					/>
+					<FileList
+						files={files}
+						setSelectedFiles={setSelectedFiles}
+						setFiles={setFiles}
+						setCurrentDir={setCurrentDir}
+						currentDirectory={currentDir}
+					/>
 				</Section>
 			</InnerContainer>
 		</Container>
