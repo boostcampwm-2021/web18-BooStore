@@ -10,9 +10,12 @@ import File from './File';
 interface Props {
 	files: FileDTO[];
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
+	currentDirectory : string;
 }
 
-const FileList: React.FC<Props> = ({ files, setSelectedFiles }) => {
+const FileList: React.FC<Props> = ({ files, setSelectedFiles, setFiles, setCurrentDir, currentDirectory }) => {
 	return (
 		<Container>
 			<FileHeader>
@@ -25,7 +28,7 @@ const FileList: React.FC<Props> = ({ files, setSelectedFiles }) => {
 			</FileHeader>
 			<Files>
 				{files.map((file, index) => (
-					<File key={index} file={file} setSelectedFiles={setSelectedFiles} />
+					<File key={index} file={file} setSelectedFiles={setSelectedFiles} setFiles={setFiles} setCurrentDir={setCurrentDir} currentDirectory={currentDirectory}/>
 				))}
 			</Files>
 		</Container>

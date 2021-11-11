@@ -8,6 +8,7 @@ import { User } from '../model';
 import { Capacity } from '../model/capacity';
 import folderup from '../asset/image/folderup.svg';
 import { FileDTO } from '../DTO';
+import { getFiles } from '../util';
 
 interface Props {
 	user: User;
@@ -24,20 +25,6 @@ const MainPage: React.FC<Props> = () => {
 		parentDir === '' ? (parentDir = '/') : '';
 		// console.log('parent: ', parentDir);
 		return parentDir;
-	};
-
-	const getFiles = async (directory: string) => {
-		// console.log('current :', currentDir);
-		return await fetch('/user/files?path=' + directory, {
-			credentials: 'include',
-		})
-			.then((res) => {
-				return res.json();
-			})
-			.then((data) => {
-				// console.log(data);
-				setFiles(data);
-			});
 	};
 
 	const getCapacity = async () => {
@@ -59,13 +46,16 @@ const MainPage: React.FC<Props> = () => {
 			});
 	};
 
-	const onClickParentButton = () => {
-		getFiles(parentDir(currentDir));
+	const onClickParentButton = async() => {
+		const files = await getFiles(parentDir(currentDir));
+		setFiles(files);
 		setCurrentDir(parentDir(currentDir));
 	};
 
 	useEffect(() => {
-		getFiles(currentDir);
+		const callfile = async ()=>{
+			setFiles(await getFiles(currentDir));
+		};
 		getCapacity();
 	}, []);
 
@@ -83,7 +73,7 @@ const MainPage: React.FC<Props> = () => {
 				</Directory>
 				<Section>
 					<FileMenu showShareButton capacity={capacity} setCapacity={setCapacity} selectedFiles={selectedFiles}/>
-					<FileList files={files} setSelectedFiles={setSelectedFiles} />
+					<FileList files={files} setSelectedFiles={setSelectedFiles} setFiles={setFiles} setCurrentDir={setCurrentDir} currentDirectory={currentDir}/>
 				</Section>
 			</InnerContainer>
 		</Container>
