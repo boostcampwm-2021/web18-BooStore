@@ -6,7 +6,6 @@ import { Capacity } from '../model';
 import ModalComponent from './ModalComponent';
 import ProgressBar from './ProgressBar';
 
-
 interface Props {
 	showShareButton?: boolean;
 	capacity: Capacity;
@@ -23,11 +22,24 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
 	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
-	const onClickUpload = () => {
-		inputFileRef.current?.click();
+	const [toggleUploadDropBox, setToggleUploadDropBox] = useState(false);
+	
+	const onClickActButton = () => {
+		setToggleUploadDropBox((prev) => !prev);
 	};
 
-	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const onclickFileUploadButton = () => {
+		inputFileRef.current?.removeAttribute('webkitdirectory');
+		
+		inputFileRef.current?.click();
+	}
+	const onclickFolderUploadButton = () => {
+		inputFileRef.current?.setAttribute('webkitdirectory', '');
+		
+		inputFileRef.current?.click();
+	}
+	
+	const onChangeFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSelectedFile(event.target.files ? event.target.files : null);
 	};
 
@@ -45,17 +57,17 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 		if (currentCapacity + totalSize > maxCapacity) {
 			return false;
 		}
-		
+
 		const res = await fetch(`/cloud/validate?size=${totalSize}`, {
 			credentials: 'include',
 		});
-		
+
 		return res.ok;
-	}
-	
+	};
+
 	const sendFiles = async (selectedFiles: File[], totalSize: number) => {
 		const formData = new FormData();
-		
+
 		formData.append('rootDirectory', '/'); // 추후에는 클라우드상의 현재 디렉토리를 인자로 넣어준다.
 		let metaData: any = {};
 		let sectionSize = 0;
@@ -64,7 +76,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 			const { size, name } = file;
 			processedSize += size;
 			sectionSize += size;
-			
+
 			setProgressModalText(name);
 			setProcessedFileSize((prev) => prev + size);
 			formData.append('uploadFiles', file, name);
@@ -73,7 +85,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 			// 1MB 단위로 보냄
 			if (sectionSize >= 1024 * 1024 || processedSize == totalSize) {
 				formData.append('relativePath', JSON.stringify(metaData));
-				
+
 				const res = await fetch(`/cloud/upload`, {
 					method: 'POST',
 					credentials: 'include',
@@ -82,22 +94,21 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 				if (!res.ok) {
 					throw new Error(res.status.toString());
 				}
-				
+
 				formData.delete('uploadFiles');
 				formData.delete('relativePath');
 				metaData = {};
 				sectionSize = 0;
 			}
 		}
-	}
-	
-	
+	};
+
 	const handleFileUpload = async () => {
 		const selectedFiles = [...(selectedFile as FileList)];
 		const totalSize = selectedFiles.reduce((prev, file) => prev + file.size, 0);
 
 		try {
-			if (!await validateSize(totalSize)) {
+			if (!(await validateSize(totalSize))) {
 				throw new Error('용량 초과');
 			}
 			setTotalFileSize(totalSize);
@@ -105,17 +116,16 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 			setProgressModalText('Loading...');
 			setIsCompleteSend(false);
 			setToggleProgressModal(true);
-			
+
 			await sendFiles(selectedFiles, totalSize);
-			
+
 			setProgressModalText('Complete!');
 			setIsCompleteSend(true);
-		}
-		catch(err) {
+		} catch (err) {
 			setFailureModalText((err as Error).message);
 			setToggleFailureModal(true);
 		}
-		
+
 		inputFileRef.current!.value = '';
 	};
 
@@ -124,25 +134,29 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity }) =
 			<SelectAllBtn>
 				<ToggleOffSvg />
 			</SelectAllBtn>
-			<ActButton onClick={onClickUpload}>올리기</ActButton>
+			<ActBox>
+				<ActButton onClick={onClickActButton}>올리기</ActButton>
+				{!toggleUploadDropBox || <DropBox>
+					<DropBoxButton onClick={onclickFileUploadButton}> 파일로 업로드 </DropBoxButton>
+					<hr/>
+					<DropBoxButton onClick={onclickFolderUploadButton}> 폴더로 업로드 </DropBoxButton>
+					</DropBox>}
+			</ActBox>
 			<UploadInput
 				multiple
 				type="file"
 				name="uploadFiles"
 				ref={inputFileRef}
-				onChange={onChange}
+				onChange={onChangeFileInput}
 			/>
-			<FailureModal
-				isOpen={toggleFailureModal}
-				setToggleModal={setToggleFailureModal}
-			>
+			<FailureModal isOpen={toggleFailureModal} setToggleModal={setToggleFailureModal}>
 				<p>{failureModalText}</p>
 			</FailureModal>
 			<ProgressModal
 				isOpen={toggleProgressModal}
 				onCloseButton={isCompleteSend}
 				setToggleModal={setToggleProgressModal}
-				>
+			>
 				<div>
 					<p> {progressModalText} </p>
 					<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
@@ -171,6 +185,9 @@ const SelectAllBtn = styled.button`
 	align-items: center;
 `;
 
+const ActBox = styled.div`
+	position: relative;
+`;
 const ActButton = styled.button`
 	cursor: pointer;
 	outline: none;
@@ -178,6 +195,26 @@ const ActButton = styled.button`
 	border-radius: 5px;
 	background-color: ${(props) => props.theme.color.SecondaryBG};
 	width: 150px;
+	height: 100%;
+`;
+const DropBox = styled.div`
+	position: absolute;
+	margin-top: 10px;
+	
+	border: 1px solid ${(props) => props.theme.color.Line};
+	border-radius: 5px;
+	background-color: ${(props) => props.theme.color.SecondaryBG};
+	width: 150px;
+	padding: 10px;
+`;
+const DropBoxButton = styled.button`
+	outline: none;
+	cursor: pointer;
+	background-color: ${(props) => props.theme.color.SecondaryBG};
+	border: none;
+	width: 100%;
+	text-align: center;
+	font-size: 14px;
 `;
 
 const ShareButton = styled.button`
