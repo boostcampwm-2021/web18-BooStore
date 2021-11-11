@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import * as passport from 'passport';
 import passportConfig from './config/passport';
 import * as session from 'express-session';
+import * as fs from 'fs';
 dotenv.config();
 
 import { authRouter, userRouter, cloudRouter } from './route';
@@ -23,6 +24,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passportConfig();
+
+fs.mkdir(path.join(path.resolve(), 'temp/'), ()=>{});
 
 app.use('/', authRouter);
 app.use('/user', userRouter);
