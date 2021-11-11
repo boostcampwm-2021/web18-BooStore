@@ -6,13 +6,15 @@ import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_
 
 import { FileDTO } from '../DTO';
 import TypeIcon from './TypeIcon';
+import { getFiles } from '../util';
 
 interface Props {
 	file: FileDTO;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	currentDirectory : string;
 }
 
-const FileList: React.FC<Props> = ({ file, setSelectedFiles }) => {
+const FileList: React.FC<Props> = ({ file, setSelectedFiles, currentDirectory }) => {
 	const [isSelected, setSelected] = useState(false);
 
 	const { contentType, name, createdAt, updatedAt, size, _id } = file;
@@ -34,13 +36,18 @@ const FileList: React.FC<Props> = ({ file, setSelectedFiles }) => {
 		});
 	};
 
+	const callFile = ( isFolder: boolean, currentDirectory: string) =>{
+		if(isFolder){
+		}
+	}
+
 	useEffect(() => {}, [isSelected]);
 
 	return (
 		<Container onClick={onClickFile} isSelected={isSelected}>
 			{isSelected ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			<TypeIcon type={contentType} />
-			<p> {name} </p>
+			<FileName onClick={()=>callFile(contentType==='folder',currentDirectory)}>{name}</FileName>
 			<p> {createdAt} </p>
 			<p> {updatedAt} </p>
 			<p> {size} </p>
@@ -56,6 +63,9 @@ const Container = styled.div<{ isSelected: boolean }>`
 	&:hover{
 		background-color: ${({theme}) => theme.color.SecondaryBG};
 	}
+`;
+
+const FileName = styled.div`
 `;
 
 export default React.memo(FileList);

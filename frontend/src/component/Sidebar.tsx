@@ -5,7 +5,7 @@ import { ReactComponent as ExpandOnSvg } from '../asset/image/expand_more.svg';
 import { ReactComponent as ExpandOffSvg } from '../asset/image/chevron_left.svg';
 import { ReactComponent as StarSvg } from '../asset/image/star.svg';
 import { Capacity } from '../model/capacity';
-import { convertByteToGB, convertByteToMB, convertByteToKB } from '../util/capacity';
+import { convertByteToGB, convertByteToMB, convertByteToKB } from '../util';
 import ProgressBar from './ProgressBar';
 
 interface Props {
