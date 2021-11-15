@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ReactComponent as Folder } from '../asset/image/icon_folder.svg';
-import { ReactComponent as File } from '../asset/image/icon_file.svg';
-import { ReactComponent as Image } from '../asset/image/icon_image.svg';
-import { ReactComponent as Pdf } from '../asset/image/icon_pdf.svg';
-import { ReactComponent as Zip } from '../asset/image/icon_zip.svg';
-import { ReactComponent as Text } from '../asset/image/icon_text.svg';
+import { ReactComponent as Folder } from '../../asset/image/icon_folder.svg';
+import { ReactComponent as File } from '../../asset/image/icon_file.svg';
+import { ReactComponent as Image } from '../../asset/image/icon_image.svg';
+import { ReactComponent as Pdf } from '../../asset/image/icon_pdf.svg';
+import { ReactComponent as Zip } from '../../asset/image/icon_zip.svg';
+import { ReactComponent as Text } from '../../asset/image/icon_text.svg';
 interface Props {
 	type: string;
 }

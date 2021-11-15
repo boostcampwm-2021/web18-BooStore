@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeConsumer } from 'styled-components';
 
-import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
-import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
+import { ReactComponent as ToggleOffSvg } from '../../asset/image/check_box_outline_blank.svg';
+import { ReactComponent as ToggleOnSvg } from '../../asset/image/check_box_outline_selected.svg';
 
-import { FileDTO } from '../DTO';
+import { FileDTO } from '../../DTO';
 import TypeIcon from './TypeIcon';
-import { getFiles } from '../util';
+import { getFiles } from '../../util';
 
 interface Props {
 	file: FileDTO;
@@ -16,7 +16,7 @@ interface Props {
 	currentDirectory : string;
 }
 
-const FileList: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurrentDir, currentDirectory }) => {
+const File: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurrentDir, currentDirectory }) => {
 	const [isSelected, setSelected] = useState(false);
 
 	const { contentType, name, createdAt, updatedAt, size, _id } = file;
@@ -44,6 +44,7 @@ const FileList: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurren
 			setFiles(files);
 			setCurrentDir(childDirectory);
 			setSelectedFiles([]);
+			setSelected(false);
 		}
 	}
 
@@ -83,4 +84,4 @@ const FileName = styled.div<{isFolder: boolean}>`
 	};
 `
 
-export default React.memo(FileList);
+export default React.memo(File);

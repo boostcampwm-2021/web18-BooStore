@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { ReactComponent as ExpandOnSvg } from '../asset/image/expand_more.svg';
-import { ReactComponent as ExpandOffSvg } from '../asset/image/chevron_left.svg';
-import { ReactComponent as StarSvg } from '../asset/image/star.svg';
-import { Capacity } from '../model/capacity';
-import { convertByteToGB, convertByteToMB, convertByteToKB } from '../util';
-import ProgressBar from './ProgressBar';
+import { ReactComponent as ExpandOnSvg } from '../../asset/image/expand_more.svg';
+import { ReactComponent as ExpandOffSvg } from '../../asset/image/chevron_left.svg';
+import { ReactComponent as StarSvg } from '../../asset/image/star.svg';
+import { Capacity } from '../../model';
+import { convertByteToGB, convertByteToMB, convertByteToKB } from '../../util';
+import ProgressBar from '../common/ProgressBar';
 
 interface Props {
 	capacity: Capacity;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
-import Header from './component/Header';
+import Header from './component/layout/Header';
 import { User } from './model';
 
 const App: React.FC = () => {

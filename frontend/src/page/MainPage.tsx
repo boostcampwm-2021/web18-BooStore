@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import FileList from '../component/FileList';
+import FileList from '../component/fileManagement/FileList';
 
-import FileMenu from '../component/FileMenu';
-import Sidebar from '../component/Sidebar';
+import FileMenu from '../component/fileManagement/FileMenu';
+import Sidebar from '../component/layout/Sidebar';
 import { User } from '../model';
 import { Capacity } from '../model';
 import folderup from '../asset/image/folderup.svg';

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import logo from '../asset/image/logo.png';
-import profile from '../asset/image/profile.png';
+import logo from '../../asset/image/logo.png';
+import profile from '../../asset/image/profile.png';
 import styled from 'styled-components';
-import { User } from '../model';
-import Button from './Button';
+import { User } from '../../model';
+import Button from '../common/Button';
 import { useHistory } from 'react-router';
 
 export type hasUserProps = {

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
-import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
+import { ReactComponent as ToggleOffSvg } from '../../asset/image/check_box_outline_blank.svg';
+import { ReactComponent as ToggleOnSvg } from '../../asset/image/check_box_outline_selected.svg';
 import TypeIcon from './TypeIcon';
-import { FileDTO } from '../DTO';
+import { FileDTO } from '../../DTO';
 import File from './File';
 
 interface Props {

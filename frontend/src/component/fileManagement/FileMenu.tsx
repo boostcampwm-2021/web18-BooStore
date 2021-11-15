@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { ReactComponent as ToggleOffSvg } from '../asset/image/check_box_outline_blank.svg';
-import { ReactComponent as ToggleOnSvg } from '../asset/image/check_box_outline_selected.svg';
-import { FileDTO } from '../DTO';
-import { Capacity } from '../model';
-import DropBox, { DropBoxItem } from './DropBox';
-import ModalComponent from './ModalComponent';
-import ProgressBar from './ProgressBar';
-import Button from './Button';
+import { ReactComponent as ToggleOffSvg } from '../../asset/image/check_box_outline_blank.svg';
+import { ReactComponent as ToggleOnSvg } from '../../asset/image/check_box_outline_selected.svg';
+import { FileDTO } from '../../DTO';
+import { Capacity } from '../../model';
+import DropBox, { DropBoxItem } from '../common/DropBox';
+import ModalComponent from '../common/ModalComponent';
+import ProgressBar from '../common/ProgressBar';
+import Button from '../common/Button';
 
 interface Props {
 	showShareButton?: boolean;
