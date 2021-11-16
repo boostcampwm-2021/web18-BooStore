@@ -153,10 +153,12 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 				<ToggleOffSvg />
 			</SelectAllBtn>
 			{selectedFiles.length > 0 ? (
-				<Button> 다운로드 </Button>
+				<DownloadButton> 다운로드 </DownloadButton>
 			) : (
-				<DropBox nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
+				<UploadButton nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			)}
+			{selectedFiles.length > 0 && <DeleteButton> 삭제하기 </DeleteButton>}
+			{showShareButton && <ShareButton> 공유하기 </ShareButton>}
 
 			<UploadInput
 				multiple
@@ -178,7 +180,6 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 					<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
 				</div>
 			</ProgressModal>
-			{!showShareButton || <ShareButton> 공유하기 </ShareButton>}
 		</Container>
 	);
 };
@@ -199,6 +200,17 @@ const SelectAllBtn = styled.button`
 	display: flex;
 	justify-content: center;
 	align-items: center;
+`;
+
+const UploadButton = styled(DropBox)`
+	margin-right: 20px;
+`;
+
+const DownloadButton = styled(Button)`
+	margin-right: 20px;
+`;
+
+const DeleteButton = styled(Button)`
 `;
 
 const ShareButton = styled(Button)`
