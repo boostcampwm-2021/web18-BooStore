@@ -63,7 +63,7 @@ const MainPage: React.FC<Props> = () => {
 
 	return (
 		<Container>
-			<Sidebar capacity={capacity} />
+			<SidebarForMain capacity={capacity} />
 			<InnerContainer>
 				<Directory>
 					{currentDir === '/' ? (
@@ -100,10 +100,14 @@ const Container = styled.div`
 	height: calc(100vh - ${(props) => props.theme.HeaderHeight});
 `;
 
+const SidebarForMain = styled(Sidebar)`
+	flex: 1;
+`;
+
 const InnerContainer = styled.div`
+	flex: 4;
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	padding: 25px 35px;
-	width: 100%;
 `;
 
 const Directory = styled.p`
