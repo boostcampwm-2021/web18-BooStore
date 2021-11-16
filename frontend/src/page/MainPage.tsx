@@ -6,16 +6,17 @@ import FileMenu from '../component/fileManagement/FileMenu';
 import Sidebar from '../component/layout/Sidebar';
 import { User } from '../model';
 import { Capacity } from '../model';
-import folderup from '../asset/image/folderup.svg';
 import { FileDTO } from '../DTO';
 import { getFiles } from '../util';
+
+import arrow from '../asset/image/icons/icon_left_arrow.svg';
 
 interface Props {
 	user: User;
 }
 
 const MainPage: React.FC<Props> = () => {
-	const [currentDir, setCurrentDir] = useState('/');
+	const [currentDir, setCurrentDir] = useState('/test1/test2/');
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
@@ -61,33 +62,40 @@ const MainPage: React.FC<Props> = () => {
 		getCapacity();
 	}, [tempUpload]);
 
+	const temp = currentDir.split('/').slice(1,-1).join('/');
+
 	return (
 		<Container>
 			<SidebarForMain capacity={capacity} files={files} />
 			<InnerContainer>
-				<Directory>
-					{currentDir === '/' ? (
-						<ParentButton src={folderup} style={{ opacity: 0.5 }}></ParentButton>
-					) : (
-						<ParentButton src={folderup} onClick={onClickParentButton}></ParentButton>
-					)}
-					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
-				</Directory>
-				<FileMenu
-					showShareButton
-					capacity={capacity}
-					setCapacity={setCapacity}
-					selectedFiles={selectedFiles}
-					currentDir={currentDir}
-					setTempUpload={setTempUpload}
-				/>
-				<FileList
-					files={files}
-					setSelectedFiles={setSelectedFiles}
-					setFiles={setFiles}
-					setCurrentDir={setCurrentDir}
-					currentDirectory={currentDir}
-				/>
+				<DirectorySection>
+					<span>내 스토어</span>
+						{
+						temp.split('/').map((el,idx) => (
+							<Directory key={idx}>
+								<img src={ arrow } style={{verticalAlign:"middle"}}></img>
+								<span>{el}</span>
+							</Directory>))
+						}
+				</DirectorySection>
+				<Section>
+					<FileMenu
+						showShareButton
+						capacity={capacity}
+						setCapacity={setCapacity}
+						selectedFiles={selectedFiles}
+						currentDir={currentDir}
+						setTempUpload={setTempUpload}
+					/>
+					<FileList
+						files={files}
+						setSelectedFiles={setSelectedFiles}
+						setFiles={setFiles}
+						setCurrentDir={setCurrentDir}
+						currentDirectory={currentDir}
+					/>
+				</Section>
+>>>>>>> d756baa ([Feat] 현재 디렉토리 출력)
 			</InnerContainer>
 		</Container>
 	);
@@ -113,11 +121,20 @@ const InnerContainer = styled.div`
 	flex-direction: column;
 `;
 
-const Directory = styled.p`
-	font-size: 24px;
-	border-bottom: 2px solid ${(props) => props.theme.color.Line};
+const DirectorySection = styled.div`
+	font-family: ${(props) => props.theme.FontFamily.Medium};
+	font-size: ${(props) => props.theme.fontSize.Title};
+	border-bottom: 1px solid ${(props) => props.theme.color.Line};
+	padding: ${(props) => props.theme.padding.Content}
+	`;
 
-	margin: 0;
+const Directory = styled.span`
+	line-height: 18px;
+	padding: 20px 0px 20px 0px;
+`;
+
+const Section = styled.section`
+	padding: 10px;
 `;
 
 const ParentButton = styled.img`
