@@ -6,8 +6,10 @@ import { ReactComponent as TrashSvg } from '../../asset/image/icons/icon_trash.s
 import { Capacity } from '../../model';
 import { convertByteToUnitString } from '../../util';
 import ProgressBar from '../common/ProgressBar';
+import DirectoryList from '../DirectoryList';
 
 import { themeValue } from '../../asset/style/theme';
+import { FileDTO } from '../../DTO';
 
 
 const convertCapacityToString = (capacity: Capacity) => {
@@ -19,11 +21,12 @@ const convertCapacityToString = (capacity: Capacity) => {
 };
 
 interface Props {
+	files: FileDTO[];
 	capacity: Capacity;
 	className?: string;
 }
 
-const Sidebar: React.FC<Props> = ({ capacity, className }) => {
+const Sidebar: React.FC<Props> = ({ capacity, className, files }) => {
 	const { currentCapacity, maxCapacity } = capacity;
 	const { Point: PointColor } = themeValue.color;
 
@@ -33,7 +36,7 @@ const Sidebar: React.FC<Props> = ({ capacity, className }) => {
 				<CapacityBar value={currentCapacity} maxValue={maxCapacity} color={PointColor} />
 				<ProgressValue>{`${convertCapacityToString(capacity)}`}</ProgressValue>
 			</CapacityContainer>
-			<DirectoryList />
+			<DirectoryList files={files} />
 			<Footer>
 				<FooterNav>
 					<StarSvg />
@@ -81,9 +84,6 @@ const CapacityBar = styled(ProgressBar)`
 const ProgressValue = styled.p`
 	margin: 0;
 	font-size: ${(props) => props.theme.fontSize.ContentSmall};
-`;
-
-const DirectoryList = styled.nav`
 `;
 
 const Footer = styled.div`
