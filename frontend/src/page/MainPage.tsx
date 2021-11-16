@@ -80,7 +80,6 @@ const MainPage: React.FC<Props> = () => {
 		callFile();
 		getCapacity();
 	}, [tempUpload, isAscending]);
-
 	const temp = currentDir.split('/').slice(1).join('/');
 
 	return (
