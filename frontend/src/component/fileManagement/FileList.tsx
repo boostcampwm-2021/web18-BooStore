@@ -58,15 +58,17 @@ const FileList: React.FC<Props> = ({
 };
 
 const Container = styled.div`
-	overflow-y: hidden;
-	display: flex;
-	flex-direction: column;
+	overflow-y: auto;
 `;
 
 const FileHeader = styled.div`	
 	display: grid;
 	grid-template-columns: 20px 60px minmax(100px, 7fr) 3fr 3fr 2fr;
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
+	background-color: ${(props) => props.theme.color.PrimaryBG};
+	
+	position: sticky;
+	top: 0;
 `;
 
 const FileHeaderElement = styled.p`
@@ -79,7 +81,6 @@ const FileHeaderElement = styled.p`
 const Files = styled.ul`
 	padding: 0;
 	margin: 0;
-	overflow-y: auto;
 
 	svg {
 		cursor: pointer;
