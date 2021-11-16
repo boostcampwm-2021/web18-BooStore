@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import logo from '../../asset/image/logo.png';
-import profile from '../../asset/image/profile.png';
+import { ReactComponent as logoMain} from '../../asset/image/icons/logo_main.svg';
+import { ReactComponent as profile } from '../../asset/image/icons/icon_user.svg';
 import styled from 'styled-components';
 import { User } from '../../model';
 import Button from '../common/Button';
@@ -55,11 +55,11 @@ const Header: React.FC<hasUserProps> = ({ user, setUser }) => {
 
 	return (
 		<HeaderSection>
-			<Logo>
-                <LogoImage src={logo} />
+			<Logo href='/'>
+                <LogoImage/>
             </Logo>
 			<ProfileBox show={!!user}>
-				<Profile src={profile} onClick={onClickProfile} />
+				<Profile onClick={onClickProfile} />
 				{isOpenModal && (
 					<ProfileModal ref={profileModal}>
 						<UserNameBox> 
@@ -79,25 +79,28 @@ const HeaderSection = styled.div`
 	justify-content: space-between;
 	width: 100%;
 	height: ${(props) => props.theme.HeaderHeight};
-	background-color: #282828;
-    padding: 10px 20px;
+	background-color:${(props) => props.theme.color.HeaderBG};
 `;
 
-const Logo = styled.div`
+const Logo = styled.a`
     display: flex;
     flex-direction: row;
+	cursor: pointer;
+	margin-left: 40px;
 `;
-const LogoImage = styled.img``;
+
+const LogoImage = styled(logoMain)``;
 
 const ProfileBox = styled.div<{ show: boolean }>`
 	visibility: ${(props) => (props.show ? 'visible' : 'hidden')};
 	position: relative;
     display: flex;
     flex-direction: row;
-    padding: 5px;
 `;
-const Profile = styled.img`
+const Profile = styled(profile)`
+	width: 40px;
     cursor: pointer;
+	margin: 10px 40px 10px 40px;
 `;
 const ProfileModal = styled.div`
 	position: absolute;
