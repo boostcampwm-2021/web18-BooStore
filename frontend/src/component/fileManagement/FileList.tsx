@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-<<<<<<< HEAD
-import { FileDTO } from '../../DTO';
-import File from './File';
-=======
+
 import File from './File';
 import { FileDTO } from '../../DTO';
->>>>>>> dddd407 ([Style] 파일 정렬 레이아웃 추가)
 import { ReactComponent as AscIcon } from '../../asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '../../asset/image/icons/icon_sort_desc.svg';
 
@@ -32,10 +28,7 @@ const FileList: React.FC<Props> = ({
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsAscending(!isAscending);
 	};
-<<<<<<< HEAD
-=======
 
->>>>>>> dddd407 ([Style] 파일 정렬 레이아웃 추가)
 	return (
 		<Container>
 			<FileHeader>
