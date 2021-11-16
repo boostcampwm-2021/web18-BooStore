@@ -5,7 +5,7 @@ import { ReactComponent as ToggleOnSvg } from '../../asset/image/check_box_outli
 import { FileDTO } from '../../DTO';
 import { Capacity } from '../../model';
 import DropBox, { DropBoxItem } from '../common/DropBox';
-import ModalComponent from '../common/ModalComponent';
+import ModalComponent, { ModalType } from '../common/ModalComponent';
 import ProgressBar from '../common/ProgressBar';
 import Button from '../common/Button';
 
@@ -18,12 +18,19 @@ interface Props {
 	setTempUpload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, selectedFiles, currentDir, setTempUpload }) => {
+const FileMenu: React.FC<Props> = ({
+	showShareButton,
+	capacity,
+	setCapacity,
+	selectedFiles,
+	currentDir,
+	setTempUpload
+}) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
 	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
-	const [toggleFailureModal, setToggleFailureModal] = useState(false);
+	const [isOpenFailureModal, setOpenFailureModal] = useState(false);
 	const [isCompleteSend, setIsCompleteSend] = useState(true);
-	const [toggleProgressModal, setToggleProgressModal] = useState(false);
+	const [isOpenProgreeModal, setOpenProgreeModal] = useState(false);
 	const [processedFileSize, setProcessedFileSize] = useState(0);
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
@@ -108,7 +115,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 				}
 
 				setCapacity((cap) => {
-					const result: Capacity = {...cap};
+					const result: Capacity = { ...cap };
 					result.currentCapacity += sectionSize;
 					return result;
 				});
@@ -126,13 +133,13 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 
 		try {
 			if (!(await validateSize(totalSize))) {
-				throw new Error('용량 초과');
+				throw new Error('허용된 용량을 초과했습니다.');
 			}
 			setTotalFileSize(totalSize);
 			setProcessedFileSize(0);
 			setProgressModalText('Loading...');
 			setIsCompleteSend(false);
-			setToggleProgressModal(true);
+			setOpenProgreeModal(true);
 
 			await sendFiles(selectedFiles, totalSize);
 			setTempUpload((prev) => !prev);
@@ -141,7 +148,7 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 			setIsCompleteSend(true);
 		} catch (err) {
 			setFailureModalText((err as Error).message);
-			setToggleFailureModal(true);
+			setOpenFailureModal(true);
 		}
 
 		inputFileRef.current!.value = '';
@@ -153,10 +160,12 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 				<ToggleOffSvg />
 			</SelectAllBtn>
 			{selectedFiles.length > 0 ? (
-				<Button> 다운로드 </Button>
+				<DownloadButton> 다운로드 </DownloadButton>
 			) : (
-				<DropBox nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
+				<UploadButton nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			)}
+			{selectedFiles.length > 0 && <DeleteButton> 삭제하기 </DeleteButton>}
+			{showShareButton && <ShareButton> 공유하기 </ShareButton>}
 
 			<UploadInput
 				multiple
@@ -165,20 +174,24 @@ const FileMenu: React.FC<Props> = ({ showShareButton, capacity, setCapacity, sel
 				ref={inputFileRef}
 				onChange={onChangeFileInput}
 			/>
-			<FailureModal isOpen={toggleFailureModal} setToggleModal={setToggleFailureModal}>
+			<FailureModal
+				isOpen={isOpenFailureModal}
+				setOpen={setOpenFailureModal}
+				modalType={ModalType.Error}
+			>
 				<p>{failureModalText}</p>
 			</FailureModal>
 			<ProgressModal
-				isOpen={toggleProgressModal}
+				isOpen={isOpenProgreeModal}
 				onCloseButton={isCompleteSend}
-				setToggleModal={setToggleProgressModal}
+				setOpen={setOpenProgreeModal}
+				modalType={ModalType.Upload}
 			>
 				<div>
 					<p> {progressModalText} </p>
 					<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
 				</div>
 			</ProgressModal>
-			{!showShareButton || <ShareButton> 공유하기 </ShareButton>}
 		</Container>
 	);
 };
@@ -200,6 +213,16 @@ const SelectAllBtn = styled.button`
 	justify-content: center;
 	align-items: center;
 `;
+
+const UploadButton = styled(DropBox)`
+	margin-right: 20px;
+`;
+
+const DownloadButton = styled(Button)`
+	margin-right: 20px;
+`;
+
+const DeleteButton = styled(Button)``;
 
 const ShareButton = styled(Button)`
 	margin-left: auto;

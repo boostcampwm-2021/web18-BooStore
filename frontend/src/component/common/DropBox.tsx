@@ -10,9 +10,10 @@ export interface DropBoxItem {
 interface Props {
 	items: DropBoxItem[];
 	nameOfToggleButton: string;
+	className?: string;
 }
 
-const DropBox: React.FC<Props> = ({ items, nameOfToggleButton }) => {
+const DropBox: React.FC<Props> = ({ items, nameOfToggleButton, className }) => {
 	const [isOpen, setOpen] = useState(false);
 	const dropList = useRef<HTMLDivElement>(null);
 
@@ -50,7 +51,7 @@ const DropBox: React.FC<Props> = ({ items, nameOfToggleButton }) => {
 	}, [isOpen]);
 	
 	return (
-		<Container>
+		<Container className={className}>
 			<ToggleButton onClick={onClickToggleButton}> {nameOfToggleButton} </ToggleButton>
 			{isOpen && (
 				<DropList ref={dropList}>

@@ -4,29 +4,38 @@ import styled from 'styled-components';
 interface Props {
 	value: number;
 	maxValue: number;
+	color?: string;
+	backgroundColor?: string;
+	className?: string;
 }
 
-const ProgressBar: React.FC<Props> = ({ value, maxValue }) => {
+const ProgressBar: React.FC<Props> = ({
+	value,
+	maxValue,
+	color = '#084A83',
+	backgroundColor = '#D7D7D7',
+	className
+}) => {
 	return (
-		<Background>
-			<Progress percent={(value / maxValue) * 100} />
+		<Background backgroundColor={backgroundColor} className={className}>
+			<Progress percent={(value / maxValue) * 100} backgroundColor={color}/>
 		</Background>
 	);
 };
 
-const Background = styled.div`
-	background-color: #c4c4c4;
-	height: 6px;
+const Background = styled.div<{ backgroundColor: string }>`
+	background-color: ${(props) => props.backgroundColor};
+	height: 8px;
 
-	border-radius: 10px;
-	margin-bottom: 8px;
+	border-radius: 30px;
 `;
-const Progress = styled.div<{ percent: number }>`
-	background-color: ${(props) => props.theme.color.Primary};
-	height: 6px;
+const Progress = styled.div<{ percent: number, backgroundColor: string }>`
+	background-color: ${(props) => props.backgroundColor};
+	height: 100%;
 	width: ${(props) => `${props.percent}%`};
 
-	border-radius: 10px;
+	border-right: 2px solid white;
+	border-radius: 30px;
 `;
 
 export default ProgressBar;

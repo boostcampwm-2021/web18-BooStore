@@ -15,10 +15,13 @@ declare module 'styled-components' {
 		};
 		HeaderHeight: string;
 		fontSize: {
+			Hint: string;
 			Content: string;
+			ContentSmall: string;
 			Title: string;
 		};
 		FontFamily: {
+			Light: string;
 			Medium: string;
 			Bold: string;
 		};
@@ -26,6 +29,6 @@ declare module 'styled-components' {
 			Header: string;
 			Content: string;
 			Modal: string;
-		}
+		};
 	}
 }

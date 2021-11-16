@@ -1,88 +1,121 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
-import { ReactComponent as ExpandOnSvg } from '../../asset/image/expand_more.svg';
-import { ReactComponent as ExpandOffSvg } from '../../asset/image/chevron_left.svg';
-import { ReactComponent as StarSvg } from '../../asset/image/star.svg';
+import { ReactComponent as StarSvg } from '../../asset/image/icons/icon_star.svg';
+import { ReactComponent as TrashSvg } from '../../asset/image/icons/icon_trash.svg';
 import { Capacity } from '../../model';
-import { convertByteToGB, convertByteToMB, convertByteToKB } from '../../util';
+import { convertByteToUnitString } from '../../util';
 import ProgressBar from '../common/ProgressBar';
+import DirectoryList from '../DirectoryList';
 
-interface Props {
-	capacity: Capacity;
-}
+import { themeValue } from '../../asset/style/theme';
+import { FileDTO } from '../../DTO';
+
 
 const convertCapacityToString = (capacity: Capacity) => {
 	const { currentCapacity, maxCapacity } = capacity;
-	const maxCapacityGB = `${convertByteToGB(maxCapacity).toFixed(2)}GB`;
-	
-	if (currentCapacity < 1024 * 1024) {
-		return `${convertByteToKB(currentCapacity).toFixed(2)}KB / ${maxCapacityGB}`;
-	}
-	else if (currentCapacity < 1024 * 1024 * 1024) {
-		return `${convertByteToMB(currentCapacity).toFixed(2)}MB / ${maxCapacityGB}`;
-	}
-	return `${convertByteToGB(currentCapacity).toFixed(2)}GB / ${maxCapacityGB}`;
+	const currentCapacityString = convertByteToUnitString(currentCapacity);
+	const maxCapacityString = convertByteToUnitString(maxCapacity);
+
+	return `${maxCapacityString} 중 ${currentCapacityString} 사용`;
+};
+
+interface Props {
+	files: FileDTO[];
+	capacity: Capacity;
+	className?: string;
 }
 
-const Sidebar: React.FC<Props> = ({ capacity }) => {
+const Sidebar: React.FC<Props> = ({ capacity, className, files }) => {
 	const { currentCapacity, maxCapacity } = capacity;
-	
+	const { Point: PointColor } = themeValue.color;
+
 	return (
-		<Container>
+		<Container className={className}>
 			<CapacityContainer>
-				<ProgressBar value={currentCapacity} maxValue={maxCapacity} />
+				<CapacityBar value={currentCapacity} maxValue={maxCapacity} color={PointColor} />
 				<ProgressValue>{`${convertCapacityToString(capacity)}`}</ProgressValue>
 			</CapacityContainer>
-			<NavBar>
-				{/* 추후 Link로 변경하면 될듯 */}
-				<NavBox>
-					<Nav> 내 디렉토리 </Nav>
-					<ExpandOnSvg />
-				</NavBox>
-				<NavBox>
-					<Nav> 중요 문서함 </Nav>
+			<DirectoryList files={files} />
+			<Footer>
+				<FooterNav>
 					<StarSvg />
-				</NavBox>
-				<NavBox>
-					<Nav> 휴지통 </Nav>
-				</NavBox>
-			</NavBar>
+					<span> 중요 문서함 </span>
+				</FooterNav>
+				<FooterNav>
+					<TrashSvg />
+					<span> 휴지통 </span>
+				</FooterNav>
+			</Footer>
 		</Container>
 	);
 };
 
 const Container = styled.div`
-	width: 300px;
+	min-width: 250px;
+	max-width: 300px;
 	height: 100%;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
+	background-color: ${(props) => props.theme.color.PrimaryBG};
 	border-right: 1px solid ${(props) => props.theme.color.Line};
-
-	padding: 25px;
+	
+	display: flex;
+	flex-direction: column;
+	
+	color: ${(props) => props.theme.color.Content};
 `;
 
 const CapacityContainer = styled.div`
-	margin-bottom: 50px;
+	padding: ${(props) => props.theme.padding.Content};
+	padding-left: 30px;
+	padding-right: 30px;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	border-bottom: 1px solid ${(props) => props.theme.color.Line};
+`;
+const CapacityBar = styled(ProgressBar)`
+	margin-bottom: 15px;
+	width: 100%;
+	height: 11px;
 `;
 
 const ProgressValue = styled.p`
 	margin: 0;
-	font-weight: bold;
+	font-size: ${(props) => props.theme.fontSize.ContentSmall};
 `;
 
-const NavBar = styled.nav``;
-const NavBox = styled.div`
-	margin: 10px 0;
+const Footer = styled.div`
+	display: flex;
+	border-top: 1px solid ${(props) => props.theme.color.Line};
+	
+	width: 100%;
+	height: 50px;
+	margin-top: auto;
+	
+	> * {
+		border-right: 1px solid ${(props) => props.theme.color.Line};
+	}
+	
+	> *:last-child {
+		border-right: none;
+	}
+`;
+
+const FooterNav = styled.a`
+	cursor: pointer;
 
 	display: flex;
+	width: 100%;
+	height: 100%;
+	padding: 0 15px;
+	
 	align-items: center;
-`;
-const Nav = styled.p`
-	font-size: 24px;
-	margin: 0;
-	margin-right: 10px;
-
-	cursor: pointer;
+	
+	> *:first-child {
+		margin-right: 10px;
+	}
 `;
 
-export default React.memo(Sidebar);
+export default Sidebar;

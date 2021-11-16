@@ -4,6 +4,8 @@ import Router from './Router';
 import Header from './component/layout/Header';
 import { User } from './model';
 
+import './asset/css/font.css';
+
 const App: React.FC = () => {
 	const localStorageUser = localStorage.getItem('user');
 	const parsedUser: User | null = localStorageUser == null ? null : JSON.parse(localStorageUser);

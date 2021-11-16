@@ -1,6 +1,6 @@
 import { DefaultTheme } from 'styled-components';
 
-const defaultTheme: DefaultTheme = {
+const themeValue = {
 	color: {
 		PrimaryBG: '#FFFFFF',
 		SecondaryBG: '#F6F6F6',
@@ -10,22 +10,29 @@ const defaultTheme: DefaultTheme = {
 		ModalBG: 'rgba(196, 196, 196, 0.5)',
 		Content: '#282828',
 		Point: '#F3AA18',
-		MetaData: '#888888'
+		MetaData: '#888888',
 	},
-	HeaderHeight: '80px',
+	HeaderHeight: '60px',
 	FontFamily: {
+		Light: 'Gmarket Sans Light',
 		Medium: 'Gmarket Sans Medium',
-		Bold: 'Gmarket Sans Bold'
+		Bold: 'Gmarket Sans Bold',
 	},
 	fontSize: {
+		Hint: '14px',
 		Content: '16px',
+		ContentSmall: '14px',
 		Title: '18px',
 	},
 	padding: {
 		Header: '20px 40px',
 		Content: '20px',
 		Modal: '20px',
-	}
+	},
 };
 
-export { defaultTheme };
+const defaultTheme: DefaultTheme = {
+	...themeValue,
+};
+
+export { defaultTheme, themeValue };
