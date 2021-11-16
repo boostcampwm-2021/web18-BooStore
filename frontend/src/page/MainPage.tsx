@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Key, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FileList from '../component/fileManagement/FileList';
 
@@ -69,10 +69,10 @@ const MainPage: React.FC<Props> = () => {
 			<SidebarForMain capacity={capacity} files={files} />
 			<InnerContainer>
 				<DirectorySection>
-					<span>내 스토어</span>
+					<Directory key={0}>내 스토어</Directory>
 						{
 						temp.split('/').map((el,idx) => (
-							<Directory key={idx}>
+							<Directory key={idx+1}>
 								<img src={ arrow } style={{verticalAlign:"middle"}}></img>
 								<span>{el}</span>
 							</Directory>))
@@ -132,6 +132,7 @@ const Directory = styled.span`
 	line-height: 18px;
 	padding: 20px 0px 20px 0px;
 `;
+
 
 const Section = styled.section`
 	padding: 10px;
