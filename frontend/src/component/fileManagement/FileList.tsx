@@ -63,18 +63,13 @@ const Container = styled.div`
 	flex-direction: column;
 `;
 
-const gridTemplate = `
+const FileHeader = styled.div`	
 	display: grid;
 	grid-template-columns: 20px 60px minmax(100px, 7fr) 3fr 3fr 2fr;
-`;
-
-const FileHeader = styled.div`
-	${gridTemplate};
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 `;
 
 const FileHeaderElement = styled.p`
-	display: inline-block;
 	display: flex;
 	align-items: center;
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Bold};
