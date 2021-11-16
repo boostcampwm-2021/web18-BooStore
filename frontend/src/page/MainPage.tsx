@@ -29,7 +29,7 @@ const Directory: React.FC<DirectoryProps> = ( { idx , name, currentDir, onClickD
 	return (
 		<>
 			{idx!=0? <img src={ arrow } style={{verticalAlign:"middle"}}></img>: ''}
-			<span onClick={()=>onClickDirectory(relativePath)}>{name}</span>
+			<span onClick={()=>onClickDirectory(relativePath)} style={{cursor:'pointer'}}>{name}</span>
 		</>
 	);
 }
