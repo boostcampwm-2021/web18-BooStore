@@ -6,6 +6,8 @@ import { User } from '../../model';
 import Button from '../common/Button';
 import { useHistory } from 'react-router';
 
+import {ReactComponent as LogoSvg} from '../../asset/image/icons/logo.svg';
+
 export type hasUserProps = {
 	user: User | null;
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -60,7 +62,10 @@ const Header: React.FC<hasUserProps> = ({ user, setUser }) => {
 				<Profile src={profile} onClick={onClickProfile} />
 				{isOpenModal && (
 					<ProfileModal ref={profileModal}>
-						<UserName> {user?.loginId}</UserName>
+						<UserNameBox> 
+							<ProfileLogo />
+							<UserName> {user?.loginId}</UserName>
+						</UserNameBox>
 						<LogoutButton onClick={onClickLogoutButton}> 로그아웃 </LogoutButton>
 					</ProfileModal>
 				)}
@@ -101,23 +106,28 @@ const ProfileModal = styled.div`
     
     border: 1px solid ${(props) => props.theme.color.Line};
     border-radius: 8px;
-    background-color: ${(props) => props.theme.color.SecondaryBG};
+    background-color: ${(props) => props.theme.color.PrimaryBG};
     box-shadow: 5px 3px 5px grey;
     
-    padding: 20px 60px;
+    padding: 20px 50px;
     text-align: center;
 `;
+const UserNameBox = styled.div`
+	display: flex;
+	margin-bottom: 5px;
+`;
+const ProfileLogo = styled(LogoSvg)`
+	width: 40px;
+	margin-right: 10px;
+`;
 const UserName = styled.p`
-    margin: 0;
-    margin-bottom: 30px;
-    
-    font-size: 28px;
+    font-size: ${props => props.theme.fontSize.Title};
 `;
 const LogoutButton = styled(Button)`
     background-color: ${(props) => props.theme.color.Primary};
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
     color: white;
-    width: '';
-    padding: 10px 20px;
+    padding: 10px;
     border: none;
     border-radius: 10px;
     box-shadow: 3px 1px 3px grey;
