@@ -84,13 +84,14 @@ const Container = styled.div<{ isSelected: boolean }>`
 	}
 `;
 
-const FileName = styled.div<{ isFolder: boolean }>`
+const FileName = styled.p<{ isFolder: boolean }>`
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
 	color: ${(props) => props.theme.color.Content};
 	&:hover {
 		cursor: default;
 	}
-	margin: auto 0px;
+	margin: auto;
+	margin-left: 0;
 `;
 
 const MetaData = styled.p`
