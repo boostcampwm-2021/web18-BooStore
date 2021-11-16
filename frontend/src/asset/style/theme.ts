@@ -1,6 +1,6 @@
 import { DefaultTheme } from 'styled-components';
 
-const defaultTheme: DefaultTheme = {
+const themeValue = {
 	color: {
 		PrimaryBG: '#FFFFFF',
 		SecondaryBG: '#F6F6F6',
@@ -19,6 +19,7 @@ const defaultTheme: DefaultTheme = {
 	},
 	fontSize: {
 		Content: '16px',
+		ContentSmall: '14px',
 		Title: '18px',
 	},
 	padding: {
@@ -26,6 +27,10 @@ const defaultTheme: DefaultTheme = {
 		Content: '20px',
 		Modal: '20px',
 	}
+}
+
+const defaultTheme: DefaultTheme = {
+	...themeValue
 };
 
-export { defaultTheme };
+export { defaultTheme, themeValue };
