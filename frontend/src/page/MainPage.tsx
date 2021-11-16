@@ -108,25 +108,23 @@ const MainPage: React.FC<Props> = () => {
 								))
 						: ''}
 				</DirectorySection>
-				<Section>
-					<FileMenu
-						showShareButton
-						capacity={capacity}
-						setCapacity={setCapacity}
-						selectedFiles={selectedFiles}
-						currentDir={currentDir}
-						setTempUpload={setTempUpload}
-					/>
-					<FileList
-						files={files}
-						setSelectedFiles={setSelectedFiles}
-						setFiles={setFiles}
-						setCurrentDir={setCurrentDir}
-						currentDirectory={currentDir}
-						isAscending={isAscending}
-						setIsAscending={setIsAscending}
-					/>
-				</Section>
+				<FileMenu
+					showShareButton
+					capacity={capacity}
+					setCapacity={setCapacity}
+					selectedFiles={selectedFiles}
+					currentDir={currentDir}
+					setTempUpload={setTempUpload}
+				/>
+				<FileList
+					files={files}
+					setSelectedFiles={setSelectedFiles}
+					setFiles={setFiles}
+					setCurrentDir={setCurrentDir}
+					currentDirectory={currentDir}
+					isAscending={isAscending}
+					setIsAscending={setIsAscending}
+				/>
 			</InnerContainer>
 		</Container>
 	);
@@ -157,15 +155,6 @@ const DirectorySection = styled.div`
 	font-size: ${(props) => props.theme.fontSize.Title};
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	padding: ${(props) => props.theme.padding.Content};
-`;
-
-const Section = styled.section`
-	padding: 10px;
-`;
-
-const ParentButton = styled.img`
-	width: 20px;
-	height: 20px;
 `;
 
 export default MainPage;
