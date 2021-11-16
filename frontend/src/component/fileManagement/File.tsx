@@ -47,11 +47,13 @@ const File: React.FC<Props> = ({
 			setFiles(files);
 			setCurrentDir(childDirectory);
 			setSelectedFiles([]);
-			setSelected(false);
 		}
 	};
 
-	useEffect(() => {}, [isSelected]);
+	useEffect(() => { 
+		// 디렉토리가 변경되면 선택 상태를 false로 초기화
+		setSelected(false)
+	}, [currentDirectory]);
 
 	const childDir =
 		currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
