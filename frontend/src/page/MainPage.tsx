@@ -160,12 +160,6 @@ const DirectorySection = styled.div`
 	padding: ${(props) => props.theme.padding.Content};
 `;
 
-/*
-const Directory = styled.span`
-	line-height: 18px;
-	padding: 20px 0px 20px 0px;
-`;*/
-
 const Section = styled.section`
 	padding: 10px;
 `;
