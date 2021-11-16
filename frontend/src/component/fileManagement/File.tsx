@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeConsumer } from 'styled-components';
-
-import { ReactComponent as ToggleOffSvg } from '../../asset/image/check_box_outline_blank.svg';
-import { ReactComponent as ToggleOnSvg } from '../../asset/image/check_box_outline_selected.svg';
-
+import { convertByteToUnitString } from '../../util';
 import { FileDTO } from '../../DTO';
 import FileIcon from './FileIcon';
 import { getFiles } from '../../util';
@@ -60,8 +57,7 @@ const File: React.FC<Props> = ({
 		currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
 	const isFolder = contentType === 'folder';
 
-	useEffect(() => {}, []);
-
+	const getConvertedSize = convertByteToUnitString(size);
 	return (
 		<Container onClick={onClickFile} isSelected={isSelected}>
 			<p>{isFolder}</p>
@@ -71,7 +67,7 @@ const File: React.FC<Props> = ({
 			</FileName>
 			<MetaData> {createdAt} </MetaData>
 			<MetaData> {updatedAt} </MetaData>
-			<MetaData> {size} </MetaData>
+			<MetaData> {getConvertedSize} </MetaData>
 		</Container>
 	);
 };
