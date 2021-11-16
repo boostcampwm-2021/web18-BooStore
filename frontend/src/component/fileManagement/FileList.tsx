@@ -64,7 +64,7 @@ const Container = styled.div`
 
 const gridTemplate = `
 	display: grid;
-	grid-template-columns: 20px 60px 10fr 2fr 2fr 2fr;
+	grid-template-columns: 20px 60px minmax(100px, 7fr) 3fr 3fr 2fr;
 `;
 
 const FileHeader = styled.div`

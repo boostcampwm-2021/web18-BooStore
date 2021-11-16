@@ -76,7 +76,7 @@ const File: React.FC<Props> = ({
 const Container = styled.div<{ isSelected: boolean }>`
 	display: grid;
 	align-items: center;
-	grid-template-columns: 20px 60px 10fr 2fr 2fr 2fr;
+	grid-template-columns: 20px 60px minmax(100px, 7fr) 3fr 3fr 2fr;
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	background-color: ${({ isSelected, theme }) => isSelected && theme.color.SecondaryBG};
 	&:hover {
