@@ -40,8 +40,8 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 	originFiles.map((file) => {
 		if (file.directory === path) {
 			const tempFile: ICloud = JSON.parse(JSON.stringify(file));
-			tempFile.createdAt = getFormattedDate(file.createdAt);
-			tempFile.updatedAt = getFormattedDate(file.updatedAt);
+			tempFile.createdAt = file.createdAt;
+			tempFile.updatedAt = file.updatedAt;
 			filteredFiles.push(tempFile);
 		} else {
 			const splittedDirectory = file.directory.split('/');
@@ -51,8 +51,8 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 				tempFile.contentType = 'folder';
 				tempFile.size = 0;
 				tempFile.name = splittedDirectory[splittedPath.length];
-				tempFile.createdAt = getFormattedDate(file.createdAt);
-				tempFile.updatedAt = getFormattedDate(file.updatedAt);
+				tempFile.createdAt = file.createdAt;
+				tempFile.updatedAt = file.updatedAt;
 
 				filteredFolders.push(tempFile);
 			}

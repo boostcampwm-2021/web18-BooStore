@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeConsumer } from 'styled-components';
-import { convertByteToUnitString } from '../../util';
+import { convertByteToUnitString, getDate } from '../../util';
 import { FileDTO } from '../../DTO';
 import FileIcon from './FileIcon';
 import { getFiles } from '../../util';
@@ -50,15 +50,14 @@ const File: React.FC<Props> = ({
 		}
 	};
 
-	useEffect(() => { 
+	useEffect(() => {
 		// 디렉토리가 변경되면 선택 상태를 false로 초기화
-		setSelected(false)
+		setSelected(false);
 	}, [currentDirectory]);
 
 	const childDir =
 		currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
 	const isFolder = contentType === 'folder';
-
 	const getConvertedSize = convertByteToUnitString(size);
 
 	return (
@@ -68,9 +67,9 @@ const File: React.FC<Props> = ({
 			<FileName isFolder={isFolder} onClick={() => getChildrenFiles(isFolder, childDir)}>
 				{name}
 			</FileName>
-			<MetaData> {createdAt} </MetaData>
-			<MetaData> {updatedAt} </MetaData>
-			<MetaData> {getConvertedSize} </MetaData>
+			<MetaData> {getDate(createdAt)} </MetaData>
+			<MetaData> {getDate(updatedAt)} </MetaData>
+			<MetaData> {isFolder ? '-' : getConvertedSize} </MetaData>
 		</Container>
 	);
 };
