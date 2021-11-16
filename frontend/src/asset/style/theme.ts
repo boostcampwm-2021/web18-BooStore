@@ -12,7 +12,7 @@ const themeValue = {
 		Point: '#F3AA18',
 		MetaData: '#888888',
 	},
-	HeaderHeight: '80px',
+	HeaderHeight: '60px',
 	FontFamily: {
 		Light: 'Gmarket Sans Light',
 		Medium: 'Gmarket Sans Medium',
