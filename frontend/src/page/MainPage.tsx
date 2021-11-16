@@ -20,6 +20,7 @@ const MainPage: React.FC<Props> = () => {
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 	const [tempUpload, setTempUpload] = useState(false);
+	const [isAscending, setIsAscending] = useState<boolean>(true);
 
 	const parentDir = (currentDirectory: string) => {
 		let parentDir = currentDirectory.split('/').slice(0, -1).join('/');
@@ -47,7 +48,7 @@ const MainPage: React.FC<Props> = () => {
 	};
 
 	const onClickParentButton = async () => {
-		const files = await getFiles(parentDir(currentDir));
+		const files = await getFiles(parentDir(currentDir), isAscending);
 		setFiles(files);
 		setCurrentDir(parentDir(currentDir));
 		setSelectedFiles([]);
@@ -55,7 +56,7 @@ const MainPage: React.FC<Props> = () => {
 
 	useEffect(() => {
 		const callFile = async () => {
-			setFiles(await getFiles(currentDir));
+			setFiles(await getFiles(currentDir, isAscending));
 		};
 		callFile();
 		getCapacity();
@@ -87,6 +88,8 @@ const MainPage: React.FC<Props> = () => {
 					setFiles={setFiles}
 					setCurrentDir={setCurrentDir}
 					currentDirectory={currentDir}
+					isAscending={isAscending}
+					setIsAscending={setIsAscending}
 				/>
 			</InnerContainer>
 		</Container>
@@ -108,7 +111,7 @@ const InnerContainer = styled.div`
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	height: 100%;
 	overflow-y: hidden;
-	
+
 	display: flex;
 	flex-direction: column;
 `;

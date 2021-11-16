@@ -1,15 +1,14 @@
-import { FileDTO } from "../DTO";
+import { FileDTO } from '../DTO';
 
-export const getFiles = (directory: string) => {
-	return fetch('/user/files?path=' + directory, {
+export const getFiles = (directory: string, isAscending: boolean) => {
+	return fetch('/user/files?path=' + directory + '&isAscending=' + isAscending, {
 		credentials: 'include',
 	})
 		.then((res) => {
 			return res.json();
 		})
 		.then((data) => {
-			const files : FileDTO[] = data; 
+			const files: FileDTO[] = data;
 			return files;
 		});
 };
-

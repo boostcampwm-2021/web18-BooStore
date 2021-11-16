@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
-import { ReactComponent as ToggleOffSvg } from '../../asset/image/check_box_outline_blank.svg';
-import { ReactComponent as ToggleOnSvg } from '../../asset/image/check_box_outline_selected.svg';
-import { FileDTO } from '../../DTO';
 import File from './File';
+import { FileDTO } from '../../DTO';
+import { ReactComponent as AscIcon } from '../../asset/image/icons/icon_sort_asc.svg';
+import { ReactComponent as DescIcon } from '../../asset/image/icons/icon_sort_desc.svg';
 
 interface Props {
 	files: FileDTO[];
@@ -12,6 +11,8 @@ interface Props {
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
+	isAscending: boolean;
+	setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const FileList: React.FC<Props> = ({
@@ -20,13 +21,21 @@ const FileList: React.FC<Props> = ({
 	setFiles,
 	setCurrentDir,
 	currentDirectory,
+	isAscending,
+	setIsAscending,
 }) => {
+	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
+		setIsAscending(!isAscending);
+	};
+
 	return (
 		<Container>
 			<FileHeader>
 				<p></p>
 				<p></p>
-				<FileHeaderElement> 이름 </FileHeaderElement>
+				<FileHeaderElement onClick={onClickIsAscending}>
+					{'이름'} {isAscending ? <AscIcon /> : <DescIcon />}
+				</FileHeaderElement>
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
@@ -64,6 +73,9 @@ const FileHeader = styled.div`
 `;
 
 const FileHeaderElement = styled.p`
+	display: inline-block;
+	display: flex;
+	align-items: center;
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Bold};
 	color: ${(props) => props.theme.color.Content};
 `;
