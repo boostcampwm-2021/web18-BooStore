@@ -1,34 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
-import { ReactComponent as ExpandOnSvg } from '../../asset/image/expand_more.svg';
-import { ReactComponent as ExpandOffSvg } from '../../asset/image/chevron_left.svg';
 import { ReactComponent as StarSvg } from '../../asset/image/icons/icon_star.svg';
 import { ReactComponent as TrashSvg } from '../../asset/image/icons/icon_trash.svg';
 import { Capacity } from '../../model';
-import { convertByteToGB, convertByteToMB, convertByteToKB } from '../../util';
+import { convertByteToUnitString } from '../../util';
 import ProgressBar from '../common/ProgressBar';
 
 import { themeValue } from '../../asset/style/theme';
 
-const KB = Math.pow(1024, 1);
-const MB = Math.pow(1024, 2);
-const GB = Math.pow(1024, 3);
 
-const applyCapacityValueToUnit = (value: number) => {
-	if (value < MB) {
-		return `${parseFloat(convertByteToKB(value).toFixed(1))}KB`;
-	} else if (value < GB) {
-		return `${parseFloat(convertByteToMB(value).toFixed(1))}MB`;
-	}
-	return `${parseFloat(convertByteToGB(value).toFixed(1))}GB`;
-};
-
-//1GB 중 503.1MB 사용
 const convertCapacityToString = (capacity: Capacity) => {
 	const { currentCapacity, maxCapacity } = capacity;
-	const currentCapacityString = applyCapacityValueToUnit(currentCapacity);
-	const maxCapacityString = applyCapacityValueToUnit(maxCapacity);
+	const currentCapacityString = convertByteToUnitString(currentCapacity);
+	const maxCapacityString = convertByteToUnitString(maxCapacity);
 
 	return `${maxCapacityString} 중 ${currentCapacityString} 사용`;
 };
@@ -48,7 +33,7 @@ const Sidebar: React.FC<Props> = ({ capacity, className }) => {
 				<CapacityBar value={currentCapacity} maxValue={maxCapacity} color={PointColor} />
 				<ProgressValue>{`${convertCapacityToString(capacity)}`}</ProgressValue>
 			</CapacityContainer>
-			<DirectoryList/ >
+			<DirectoryList />
 			<Footer>
 				<FooterNav>
 					<StarSvg />
