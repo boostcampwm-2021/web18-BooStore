@@ -10,9 +10,6 @@ const GlobalStyle = createGlobalStyle`
 		margin: 0;
 		padding: 0;
 	}
-	* {
-		box-sizing: border-box;
-	}
     
     @font-face {
         font-family: "Gmarket Sans Medium";
@@ -27,6 +24,11 @@ const GlobalStyle = createGlobalStyle`
         font-weight: bold;
         font-style: normal;
     }
+    
+	* {
+		box-sizing: border-box;
+        font-family: "Gmarket Sans Medium";
+	}
 `;
 
 export default GlobalStyle;

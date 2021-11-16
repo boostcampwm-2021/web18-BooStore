@@ -16,6 +16,7 @@ declare module 'styled-components' {
 		HeaderHeight: string;
 		fontSize: {
 			Content: string;
+			ContentSmall: string;
 			Title: string;
 		};
 		FontFamily: {
