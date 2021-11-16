@@ -63,7 +63,7 @@ const MainPage: React.FC<Props> = () => {
 
 	return (
 		<Container>
-			<SidebarForMain capacity={capacity} />
+			<SidebarForMain capacity={capacity} files={files} />
 			<InnerContainer>
 				<Directory>
 					{currentDir === '/' ? (
@@ -73,23 +73,21 @@ const MainPage: React.FC<Props> = () => {
 					)}
 					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
 				</Directory>
-				<Section>
-					<FileMenu
-						showShareButton
-						capacity={capacity}
-						setCapacity={setCapacity}
-						selectedFiles={selectedFiles}
-						currentDir={currentDir}
-						setTempUpload={setTempUpload}
-					/>
-					<FileList
-						files={files}
-						setSelectedFiles={setSelectedFiles}
-						setFiles={setFiles}
-						setCurrentDir={setCurrentDir}
-						currentDirectory={currentDir}
-					/>
-				</Section>
+				<FileMenu
+					showShareButton
+					capacity={capacity}
+					setCapacity={setCapacity}
+					selectedFiles={selectedFiles}
+					currentDir={currentDir}
+					setTempUpload={setTempUpload}
+				/>
+				<FileList
+					files={files}
+					setSelectedFiles={setSelectedFiles}
+					setFiles={setFiles}
+					setCurrentDir={setCurrentDir}
+					currentDirectory={currentDir}
+				/>
 			</InnerContainer>
 		</Container>
 	);
@@ -98,6 +96,7 @@ const MainPage: React.FC<Props> = () => {
 const Container = styled.div`
 	display: flex;
 	height: calc(100vh - ${(props) => props.theme.HeaderHeight});
+	overflow-y: hidden;
 `;
 
 const SidebarForMain = styled(Sidebar)`
@@ -107,7 +106,11 @@ const SidebarForMain = styled(Sidebar)`
 const InnerContainer = styled.div`
 	flex: 4;
 	background-color: ${(props) => props.theme.color.PrimaryBG};
-	padding: 25px 35px;
+	height: 100%;
+	overflow-y: hidden;
+	
+	display: flex;
+	flex-direction: column;
 `;
 
 const Directory = styled.p`
@@ -115,11 +118,6 @@ const Directory = styled.p`
 	border-bottom: 2px solid ${(props) => props.theme.color.Line};
 
 	margin: 0;
-	padding-bottom: 20px;
-`;
-
-const Section = styled.section`
-	padding: 10px;
 `;
 
 const ParentButton = styled.img`

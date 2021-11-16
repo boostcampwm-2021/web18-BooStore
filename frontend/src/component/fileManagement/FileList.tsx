@@ -35,7 +35,11 @@ const FileList: React.FC<Props> = ({ files, setSelectedFiles, setFiles, setCurre
 	);
 };
 
-const Container = styled.div``;
+const Container = styled.div`
+	overflow-y: hidden;
+	display: flex;
+	flex-direction: column;
+`;
 
 const gridTemplate = `
 	display: grid;
@@ -50,6 +54,7 @@ const FileHeader = styled.div`
 const Files = styled.ul`
 	padding: 0;
 	margin: 0;
+	overflow-y: auto;
 
 	svg {
 		cursor: pointer;

@@ -129,11 +129,9 @@ const LogoutButton = styled(Button)`
     color: white;
     padding: 10px;
     border: none;
-    border-radius: 10px;
     box-shadow: 3px 1px 3px grey;
     
-    font-size: 16px;
-    font-weight: bold;
+    font-size: ${(props) => props.theme.fontSize.Content};
 `;
 
 export default Header;
