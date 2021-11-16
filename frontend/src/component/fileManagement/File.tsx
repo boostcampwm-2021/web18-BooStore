@@ -39,6 +39,7 @@ const File: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurrentDir
 	};
 
 	const getChildrenFiles = async( isFolder: boolean, childDirectory: string) =>{
+		console.log(childDirectory);
 		if(isFolder){
 			const files = await getFiles(childDirectory);
 			setFiles(files);
@@ -51,7 +52,7 @@ const File: React.FC<Props> = ({ file, setSelectedFiles, setFiles, setCurrentDir
 	useEffect(() => {}, [isSelected]);
 
 	const childDir = currentDirectory==='/'? currentDirectory+name: currentDirectory+'/'+name;
-	const isFolder = contentType==='folder'
+	const isFolder = contentType==='folder';
 
 	return (
 		<Container onClick={onClickFile} isSelected={isSelected}>
