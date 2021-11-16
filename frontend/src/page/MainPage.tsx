@@ -60,7 +60,7 @@ const MainPage: React.FC<Props> = () => {
 		};
 		callFile();
 		getCapacity();
-	}, [tempUpload]);
+	}, [tempUpload, isAscending]);
 
 	return (
 		<Container>

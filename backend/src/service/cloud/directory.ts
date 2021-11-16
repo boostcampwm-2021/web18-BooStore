@@ -4,6 +4,7 @@ export interface FilesArg {
 	loginId: string;
 	path: string;
 	regex: string;
+	isAscending: boolean;
 }
 
 export interface FilteredFilesArg {
@@ -11,7 +12,7 @@ export interface FilteredFilesArg {
 	originFiles: ICloud[];
 }
 
-export const getFiles = async ({ loginId, path, regex }: FilesArg) => {
+export const getFiles = async ({ loginId, path, regex, isAscending }: FilesArg) => {
 	const files = Cloud.find(
 		{
 			directory: { $regex: regex },
@@ -25,7 +26,8 @@ export const getFiles = async ({ loginId, path, regex }: FilesArg) => {
 			updatedAt: true,
 			size: true,
 			ownerId: true,
-		}
+		},
+		{ sort: { name: isAscending ? 'asc' : 'desc' } }
 	).exec();
 	return files;
 };
@@ -34,19 +36,35 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 	const directories = [];
 	const splittedPath = path === '/' ? [''] : (path as string).split('/');
 	const filteredFiles = [];
+	const filteredFolders = [];
 	originFiles.map((file) => {
 		if (file.directory === path) {
-			filteredFiles.push(file);
+			const tempFile: ICloud = JSON.parse(JSON.stringify(file));
+			tempFile.createdAt = getFormattedDate(file.createdAt);
+			tempFile.updatedAt = getFormattedDate(file.updatedAt);
+			filteredFiles.push(tempFile);
 		} else {
 			const splittedDirectory = file.directory.split('/');
 			if (directories.indexOf(splittedDirectory[splittedPath.length]) === -1) {
 				directories.push(splittedDirectory[splittedPath.length]);
-				file.contentType = 'folder';
-				file.size = 0;
-				file.name = splittedDirectory[splittedPath.length];
-				filteredFiles.push(file);
+				const tempFile: ICloud = JSON.parse(JSON.stringify(file));
+				tempFile.contentType = 'folder';
+				tempFile.size = 0;
+				tempFile.name = splittedDirectory[splittedPath.length];
+				tempFile.createdAt = getFormattedDate(file.createdAt);
+				tempFile.updatedAt = getFormattedDate(file.updatedAt);
+
+				filteredFolders.push(tempFile);
 			}
 		}
 	});
-	return filteredFiles;
+	return filteredFolders.concat(filteredFiles);
+};
+
+const getFormattedDate = (date: string) => {
+	return new Date(Date.parse(date))
+		.toLocaleString()
+		.replace('.', '년')
+		.replace('.', '월')
+		.replace('.', '일');
 };
