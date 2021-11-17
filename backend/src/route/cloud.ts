@@ -1,6 +1,6 @@
 import * as express from 'express';
 
-import { isAuthenticated } from '../middleware';
+import { isAuthenticated, upload } from '../middleware';
 import * as fs from 'fs/promises';
 import {
 	canIncreaseCurrentCapacity,
@@ -13,7 +13,6 @@ import {
 	uploadFile,
 	removeFolders,
 } from '../service/cloud';
-import upload from '../middleware/multer';
 import { FileEditAction } from '../DTO';
 
 const router = express.Router();
