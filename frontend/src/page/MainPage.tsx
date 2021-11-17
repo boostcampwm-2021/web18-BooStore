@@ -44,7 +44,6 @@ const MainPage: React.FC<Props> = () => {
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
-	const [tempUpload, setTempUpload] = useState(false);
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 
 	const getCapacity = async () => {
@@ -73,13 +72,14 @@ const MainPage: React.FC<Props> = () => {
 		setSelectedFiles([]);
 	};
 
-	useEffect(() => {
-		const callFile = async () => {
-			setFiles(await getFiles(currentDir, isAscending));
-		};
-		callFile();
+	const updateFiles = async () => {
+		setFiles(await getFiles(currentDir, isAscending));
 		getCapacity();
-	}, [tempUpload, isAscending]);
+	}
+	
+	useEffect(() => {
+		updateFiles();
+	}, [isAscending]);
 	const temp = currentDir.split('/').slice(1).join('/');
 
 	return (
@@ -113,8 +113,10 @@ const MainPage: React.FC<Props> = () => {
 					capacity={capacity}
 					setCapacity={setCapacity}
 					selectedFiles={selectedFiles}
+					setSelectedFiles={setSelectedFiles}
 					currentDir={currentDir}
-					setTempUpload={setTempUpload}
+					setFiles={setFiles}
+					updateFiles={updateFiles}
 				/>
 				<FileList
 					files={files}
