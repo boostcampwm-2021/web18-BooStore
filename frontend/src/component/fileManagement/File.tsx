@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeConsumer } from 'styled-components';
-import { convertByteToUnitString, getDate } from '../../util';
-import { FileDTO } from '../../DTO';
+import { convertByteToUnitString, getDate, getFiles } from '@util';
+import { FileDTO } from '@DTO';
 import FileIcon from './FileIcon';
-import { getFiles } from '../../util';
 
 interface Props {
 	file: FileDTO;

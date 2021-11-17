@@ -1,0 +1,24 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./src",
+		"paths": {
+			"@util": ["./util"],
+			"@util/*": ["./util/*"],
+			
+			"@asset": ["./asset"],
+			"@asset/*": ["./asset/*"],
+			
+			"@component": ["./component"],
+			"@component/*": ["./component/*"],
+			
+			"@DTO": ["./DTO"],
+			"@DTO/*": ["./DTO/*"],
+			
+			"@model": ["./model"],
+			"@model/*": ["./model/*"],
+			
+			"@page": ["./page"],
+			"@page/*": ["./page/*"]
+		}
+	}
+}

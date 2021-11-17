@@ -1,16 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Capacity } from '@model';
+import { convertByteToUnitString } from '@util';
+import ProgressBar from '@component/common/ProgressBar';
+import DirectoryList from '@component/DirectoryList';
+import { themeValue } from '@asset/style/theme';
+import { FileDTO } from '@DTO';
 
-import { ReactComponent as StarSvg } from '../../asset/image/icons/icon_star.svg';
-import { ReactComponent as TrashSvg } from '../../asset/image/icons/icon_trash.svg';
-import { Capacity } from '../../model';
-import { convertByteToUnitString } from '../../util';
-import ProgressBar from '../common/ProgressBar';
-import DirectoryList from '../DirectoryList';
-
-import { themeValue } from '../../asset/style/theme';
-import { FileDTO } from '../../DTO';
-
+import { ReactComponent as StarSvg } from '@asset/image/icons/icon_star.svg';
+import { ReactComponent as TrashSvg } from '@asset/image/icons/icon_trash.svg';
 
 const convertCapacityToString = (capacity: Capacity) => {
 	const { currentCapacity, maxCapacity } = capacity;

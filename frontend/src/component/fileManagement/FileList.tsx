@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import File from './File';
-import { FileDTO } from '../../DTO';
-import { ReactComponent as AscIcon } from '../../asset/image/icons/icon_sort_asc.svg';
-import { ReactComponent as DescIcon } from '../../asset/image/icons/icon_sort_desc.svg';
+import { FileDTO } from '@DTO';
+
+import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
+import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
 
 interface Props {
 	files: FileDTO[];

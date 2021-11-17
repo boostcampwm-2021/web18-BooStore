@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { ReactComponent as OpenFolderSvg } from '../../asset/image/icons/icon_folder_empty.svg';
-import { ReactComponent as FolderSvg } from '../../asset/image/icons/icon_folder.svg';
-import { ReactComponent as ArrowBottomSvg } from '../../asset/image/icons/icon_arrow_bottom.svg';
-import { ReactComponent as ArrowRightSvg } from '../../asset/image/icons/icon_left_arrow.svg';
+import { ReactComponent as OpenFolderSvg } from '@asset/image/icons/icon_folder_empty.svg';
+import { ReactComponent as FolderSvg } from '@asset/image/icons/icon_folder.svg';
+import { ReactComponent as ArrowBottomSvg } from '@asset/image/icons/icon_arrow_bottom.svg';
+import { ReactComponent as ArrowRightSvg } from '@asset/image/icons/icon_left_arrow.svg';
 
 interface Props {
 	className?: string;

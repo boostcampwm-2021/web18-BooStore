@@ -2,9 +2,9 @@ import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { ModalType } from './type';
 
-import { ReactComponent as ProgressIcon } from '../../../asset/image/icons/icon_progress.svg';
-import { ReactComponent as ErrorIcon } from '../../../asset/image/icons/icon_warning.svg';
-import { ReactComponent as ShareIcon } from '../../../asset/image/icons/icon_share.svg';
+import { ReactComponent as ProgressIcon } from '@asset/image/icons/icon_progress.svg';
+import { ReactComponent as ErrorIcon } from '@asset/image/icons/icon_warning.svg';
+import { ReactComponent as ShareIcon } from '@asset/image/icons/icon_share.svg';
 
 interface Props {
 	modalType: ModalType;

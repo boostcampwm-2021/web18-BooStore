@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FileDTO } from '../../DTO';
+import { FileDTO } from '@DTO';
 
 import Directory from './Directory';
 

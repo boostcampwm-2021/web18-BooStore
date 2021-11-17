@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ReactComponent as logoMain} from '../../asset/image/icons/logo_main.svg';
-import { ReactComponent as profile } from '../../asset/image/icons/icon_user.svg';
 import styled from 'styled-components';
-import { User } from '../../model';
-import Button from '../common/Button';
+import { User } from '@model';
+import Button from '@component/common/Button';
 import { useHistory } from 'react-router';
 
-import {ReactComponent as LogoSvg} from '../../asset/image/icons/logo.svg';
+import { ReactComponent as logoMain} from '@asset/image/icons/logo_main.svg';
+import { ReactComponent as profile } from '@asset/image/icons/icon_user.svg';
+import {ReactComponent as LogoSvg} from '@asset/image/icons/logo.svg';
 
 export type hasUserProps = {
 	user: User | null;

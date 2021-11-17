@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { User } from '../model';
+import { User } from '@model';
 import Modal from 'react-modal';
 import { ModalButton } from './SignupComponent';
-import { ReactComponent as Account } from '../../src/asset/image/icons/icon_login_user.svg';
-import { ReactComponent as Password } from '../../src/asset/image/icons/icon_login_password.svg';
-import { ReactComponent as Logo } from '../../src/asset/image/icons/logo_big.svg';
+
+import { ReactComponent as Account } from '@asset/image/icons/icon_login_user.svg';
+import { ReactComponent as Password } from '@asset/image/icons/icon_login_password.svg';
+import { ReactComponent as Logo } from '@asset/image/icons/logo_big.svg';
 
 interface Props {
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
