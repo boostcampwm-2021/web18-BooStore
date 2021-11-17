@@ -9,6 +9,7 @@ import { FileDTO } from '@DTO';
 
 import { ReactComponent as StarSvg } from '@asset/image/icons/icon_star.svg';
 import { ReactComponent as TrashSvg } from '@asset/image/icons/icon_trash.svg';
+import { Link } from 'react-router-dom';
 
 const convertCapacityToString = (capacity: Capacity) => {
 	const { currentCapacity, maxCapacity } = capacity;
@@ -36,11 +37,11 @@ const Sidebar: React.FC<Props> = ({ capacity, className, files }) => {
 			</CapacityContainer>
 			<DirectoryList files={files} />
 			<Footer>
-				<FooterNav>
+				<FooterNav to="/star">
 					<StarSvg />
 					<span> 중요 문서함 </span>
 				</FooterNav>
-				<FooterNav>
+				<FooterNav to="/trash">
 					<TrashSvg />
 					<span> 휴지통 </span>
 				</FooterNav>
@@ -101,7 +102,7 @@ const Footer = styled.div`
 	}
 `;
 
-const FooterNav = styled.a`
+const FooterNav = styled(Link)`
 	cursor: pointer;
 
 	display: flex;
@@ -111,6 +112,10 @@ const FooterNav = styled.a`
 	
 	align-items: center;
 	
+	color: ${(props) => props.theme.color.Content};
+    &:focus, &:hover, &:visited, &:link, &:active {
+		color: ${(props) => props.theme.color.Content};
+    }
 	> *:first-child {
 		margin-right: 10px;
 	}

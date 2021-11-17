@@ -7,6 +7,7 @@ import { useHistory } from 'react-router';
 import { ReactComponent as logoMain} from '@asset/image/icons/logo_main.svg';
 import { ReactComponent as profile } from '@asset/image/icons/icon_user.svg';
 import {ReactComponent as LogoSvg} from '@asset/image/icons/logo.svg';
+import { Link } from 'react-router-dom';
 
 export type hasUserProps = {
 	user: User | null;
@@ -55,7 +56,7 @@ const Header: React.FC<hasUserProps> = ({ user, setUser }) => {
 
 	return (
 		<HeaderSection>
-			<Logo href='/'>
+			<Logo to='/'>
                 <LogoImage/>
             </Logo>
 			<ProfileBox show={!!user}>
@@ -82,7 +83,7 @@ const HeaderSection = styled.div`
 	background-color:${(props) => props.theme.color.HeaderBG};
 `;
 
-const Logo = styled.a`
+const Logo = styled(Link)`
     display: flex;
     flex-direction: row;
 	cursor: pointer;
