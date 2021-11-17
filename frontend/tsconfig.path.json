@@ -18,7 +18,10 @@
 			"@model/*": ["./model/*"],
 			
 			"@page": ["./page"],
-			"@page/*": ["./page/*"]
+			"@page/*": ["./page/*"],
+			
+			"@api": ["./api"],
+			"@api/*": ["./api/*"]
 		}
 	}
 }
