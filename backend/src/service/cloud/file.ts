@@ -2,7 +2,7 @@ import S3 from '../../model/object-storage';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Cloud } from '../../model';
-import { increaseCurrentCapacity } from '.';
+import { decreaseCurrentCapacity, increaseCurrentCapacity } from '.';
 
 const bucketName = process.env.S3_BUCKET_NAME;
 const OBJECT_STORAGE_BASE = 'https://kr.object.ncloudstorage.com';
@@ -62,41 +62,47 @@ export const uploadFile = async ({
 
 interface FilesFunctionArgs {
 	targetIds: string[];
+	userLoginId: string;
 }
 
-export const removeFiles = async ({ targetIds }: FilesFunctionArgs) => {
+export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
 	const files = await Cloud.find(
 		{
+			ownerId: userLoginId,
 			_id: { $in: targetIds },
 		},
-		{ osLink: true }
+		{ osLink: true, size: true, ownerId: true }
 	).exec();
 	if (files.length === 0) {
 		return;
 	}
-	
+
 	const keys = files.map(({ osLink }) => {
 		const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
 		const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-		return { Key: osLink.replace(pattern, '').replace(patternTest, '')};
-	})
-
+		return { Key: osLink.replace(pattern, '').replace(patternTest, '') };
+	});
 	S3.deleteObjects({
 		Bucket: bucketName,
 		Delete: {
-			Objects: keys
-		}
-	}).promise()
-	.catch(() => {});
-	
+			Objects: keys,
+		},
+	})
+		.promise()
+		.catch(() => {});
+
+	const totalSize = files.reduce((prev, { size }) => prev + size, 0);
+	await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
+
 	await Cloud.deleteMany({
-		_id: { $in: targetIds }
+		_id: { $in: targetIds },
 	});
 };
 
-export const moveTrashFiles = async ({ targetIds }: FilesFunctionArgs) => {
+export const moveTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
 	const result = await Cloud.updateMany(
 		{
+			ownerId: userLoginId,
 			_id: { $in: targetIds },
 		},
 		{
@@ -105,4 +111,59 @@ export const moveTrashFiles = async ({ targetIds }: FilesFunctionArgs) => {
 	);
 
 	return result.matchedCount;
+};
+
+export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
+	const result = await Cloud.updateMany(
+		{
+			ownerId: userLoginId,
+			_id: { $in: targetIds },
+		},
+		{
+			isDeleted: false,
+		}
+	);
+
+	return result.matchedCount;
+};
+
+interface FoldersFunctionArgs {
+	directorys: string[];
+	userLoginId: string;
+}
+
+export const moveTrashFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
+	return Promise.all(
+		directorys
+			.map((directory) => directory.replace('/', '\\/'))
+			.map(async (directory) =>
+				Cloud.updateMany(
+					{
+						ownerId: userLoginId,
+						directory: { $regex: `^${directory}(\/.*)?$` },
+					},
+					{
+						isDeleted: true,
+					}
+				)
+			)
+	);
+};
+
+export const restoreTrashFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
+	return Promise.all(
+		directorys
+			.map((directory) => directory.replace('/', '\\/'))
+			.map(async (directory) =>
+				Cloud.updateMany(
+					{
+						ownerId: userLoginId,
+						directory: { $regex: `^${directory}(\/.*)?$` },
+					},
+					{
+						isDeleted: false,
+					}
+				)
+			)
+	);
 };
