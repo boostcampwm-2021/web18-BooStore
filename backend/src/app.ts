@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(path.resolve(), '../frontend/build')));
 
 app.use(session({ 
-	secret: 'secret123123', 
+	secret: process.env.SESSION_SECRET, 
 	resave: true, 
 	saveUninitialized: false,
 	store: MongoStore.create({
