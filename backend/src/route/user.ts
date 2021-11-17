@@ -52,7 +52,6 @@ router.get('/files', isAuthenticated, async (req, res) => {
 
 	const filesArg: FilesArg = {
 		loginId: loginId,
-		path: path as string,
 		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
 		isAscending: JSON.parse(isAscending as string),
 	};

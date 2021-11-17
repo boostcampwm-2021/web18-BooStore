@@ -1,9 +1,17 @@
 import * as express from 'express';
-
+import * as path from 'path';
 import { isAuthenticated } from '../middleware';
 import * as fs from 'fs/promises';
 import { Cloud } from '../model';
-import { canIncreaseCurrentCapacity, UploadArg, uploadFile } from '../service/cloud';
+import {
+	canIncreaseCurrentCapacity,
+	DownloadListMetadataArg,
+	getDownloadListMetadata,
+	UploadArg,
+	uploadFile,
+	DownloadFilesArg,
+	downloadFiles,
+} from '../service/cloud';
 import upload from '../middleware/multer';
 
 const router = express.Router();
@@ -40,11 +48,34 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 		};
 
 		await uploadFile(uploadArg);
-		
+
 		fs.rm(path);
 	}
 
 	res.status(200).send();
+});
+
+router.get('/download', isAuthenticated, async (req, res) => {
+	const { loginId } = req.user;
+	const { current_dir } = req.query;
+	const { files } = req.query;
+	const { folders } = req.query;
+
+	if (current_dir === undefined || files === undefined || folders === undefined) {
+		return res.status(400).send();
+	}
+
+	const fileMetas = await getDownloadListMetadata({
+		loginId: loginId,
+		currentDir: current_dir as string,
+		fileIds: typeof files === 'string' ? [files] : (files as Array<string>),
+		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
+	});
+	console.log(fileMetas);
+
+	await downloadFiles({ downloadList: fileMetas });
+
+	return res.download(path.join(path.resolve(), 'temp/', loginId, '/'), 'test0-1.txt');
 });
 
 export default router;
