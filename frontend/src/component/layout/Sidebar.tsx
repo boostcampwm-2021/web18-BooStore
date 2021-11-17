@@ -20,12 +20,11 @@ const convertCapacityToString = (capacity: Capacity) => {
 };
 
 interface Props {
-	files: FileDTO[];
 	capacity: Capacity;
 	className?: string;
 }
 
-const Sidebar: React.FC<Props> = ({ capacity, className, files }) => {
+const Sidebar: React.FC<Props> = ({ capacity, className }) => {
 	const { currentCapacity, maxCapacity } = capacity;
 	const { Point: PointColor } = themeValue.color;
 
@@ -35,7 +34,7 @@ const Sidebar: React.FC<Props> = ({ capacity, className, files }) => {
 				<CapacityBar value={currentCapacity} maxValue={maxCapacity} color={PointColor} />
 				<ProgressValue>{`${convertCapacityToString(capacity)}`}</ProgressValue>
 			</CapacityContainer>
-			<DirectoryList files={files} />
+			<DirectoryList/>
 			<Footer>
 				<FooterNav to="/star">
 					<StarSvg />

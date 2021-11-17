@@ -86,7 +86,7 @@ const MainPage: React.FC<MainPageProps> = () => {
 
 	return (
 		<Container>
-			<SidebarForMain capacity={capacity} files={files} />
+			<SidebarForMain capacity={capacity}/>
 			<InnerContainer>
 				<DirectorySection>
 					<Directory

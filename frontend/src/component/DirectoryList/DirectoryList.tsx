@@ -1,17 +1,26 @@
-import React from 'react';
+import React,{ useState } from 'react';
 import styled from 'styled-components';
 import { FileDTO } from '@DTO';
 
 import Directory from './Directory';
 
+import { getDirectoryList } from '../../api'; 
+
 interface Props {
-	files: FileDTO[];
 	className?: string;
 }
 
-const DirectoryList: React.FC<Props> = ({ className, files }) => {
-	// files써서 디렉토리 리스트 만들면 될듯하네요...
-	
+const directories = getDirectoryList();
+const makeDirectoryTree = (directories: Set<string>) =>{
+
+}
+
+const [directoryTree,SetDirectoryTree]= useState(null);
+
+const DirectoryList: React.FC<Props> = ({ className }) => {
+
+
+
 	return (
 		<Container className={className}>
 			<Directory name={"내 스토어"} isIncludeCurPath={true} >
