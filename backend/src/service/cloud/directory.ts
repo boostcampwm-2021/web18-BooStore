@@ -78,14 +78,14 @@ export const getDirectoryList = async( loginId : string ) =>{
 		directory: true,
 	});
 
-	const directoryArr = Array.from(makeDirectoryToSetFormat(allFiles));
+	const directoryArr = makeDirectoryToArrFormat(allFiles);
 	return directoryArr;
 }
 
-const makeDirectoryToSetFormat = ( allFiles : Directory[]) =>{
+const makeDirectoryToArrFormat = ( allFiles : Directory[]) =>{
 	let directorySet = new Set();
 	allFiles.forEach((file) => {
 		directorySet.add(file.directory);
 	});
-	return directorySet;
+	return Array.from(directorySet);
 }

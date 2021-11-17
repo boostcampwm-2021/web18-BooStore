@@ -60,7 +60,7 @@ router.get('/files', isAuthenticated, async (req, res) => {
 
 router.get('/directory', isAuthenticated, async(req,res)=>{
 	const { loginId } = req.user;
-	const temp = await getDirectoryList(loginId);
-	console.log(temp);
+	const directoryList = await getDirectoryList(loginId);
+	return res.json(directoryList);
 })
 export default router;

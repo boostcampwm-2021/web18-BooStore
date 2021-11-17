@@ -6,19 +6,33 @@ import Directory from './Directory';
 
 import { getDirectoryList } from '../../api'; 
 
+const makeDirectoryTree = (directories: string[]) =>{
+	const splitDirectories: Array<string[]>=[];
+	directories.forEach(el => {
+		splitDirectories.push(el.split('/'));
+	});
+	splitDirectories.sort((a: string[], b: string[])=>{
+		if(a.length > b.length) return 1;
+		else if(a.length === b.length) return 0;
+		else return -1;
+	})
+	alert(splitDirectories);
+}
+
 interface Props {
 	className?: string;
 }
 
-const directories = getDirectoryList();
-const makeDirectoryTree = (directories: Set<string>) =>{
-
-}
-
-
 const DirectoryList: React.FC<Props> = ({ className }) => {
 
-	getDirectoryList();
+	
+	//const tree = makeDirectoryTree(directories);
+	
+	const makeTree = async()=>{
+		const directories = await getDirectoryList();
+		const tree = makeDirectoryTree(directories);
+	}
+	makeTree();
 
 	return (
 		<Container className={className}>
