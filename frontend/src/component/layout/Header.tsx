@@ -106,6 +106,7 @@ const ProfileModal = styled.div`
 	position: absolute;
     top: 150%;
     right: 0;
+	z-index: 2;
     
     border: 1px solid ${(props) => props.theme.color.Line};
     border-radius: 8px;
