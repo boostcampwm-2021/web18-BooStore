@@ -29,7 +29,7 @@ const FileMenuForMain: React.FC<Props> = ({
 	setSelectedFiles,
 	currentDir,
 	setFiles,
-	updateFiles = () => {}
+	updateFiles = () => {},
 }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
 	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
@@ -62,16 +62,31 @@ const FileMenuForMain: React.FC<Props> = ({
 			onClick: onclickFolderUploadButton,
 		},
 	];
-	
+
 	const onChangeFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSelectedUploadFiles(event.target.files);
 	};
 
 	const onClickDelete = () => {
-		const targetIds = selectedFiles.map((file) => file._id);
+		const ids = selectedFiles.map((file) => file._id);
+		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
+
+		const targetIds = selectedFiles
+			.filter((file) => file.contentType !== 'folder')
+			.map((file) => file._id);
+		const directorys = selectedFiles
+			.filter((file) => file.contentType === 'folder')
+			.map((file) => {
+				const { directory, name } = file;
+				if (directory.endsWith('/')) {
+					return directory + name;
+				}
+				return `${directory}/${name}`;
+			});
 		const body = {
 			targetIds: targetIds,
-			action: FileEditAction.trash
+			directorys: directorys,
+			action: FileEditAction.trash,
 		};
 		fetch('/cloud/files', {
 			method: 'PUT',
@@ -81,9 +96,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			},
 			body: JSON.stringify(body),
 		});
-		setFiles(files => {
-			return files.filter(file => !targetIds.includes(file._id));
-		})
+		
 		setSelectedFiles([]);
 	};
 
@@ -168,7 +181,7 @@ const FileMenuForMain: React.FC<Props> = ({
 
 			await sendFiles(uploadFiles, totalSize);
 			updateFiles();
-			
+
 			setProgressModalText('Complete!');
 			setIsCompleteSend(true);
 		} catch (err) {
