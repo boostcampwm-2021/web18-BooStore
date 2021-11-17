@@ -7,6 +7,7 @@ export interface ICloud {
 	directory: string;
 	ownerId: string;
 	contentType: string;
+	isDeleted: boolean;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -38,6 +39,10 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 		contentType: {
 			type: String,
 			required: true,
+		},
+		isDeleted: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	{

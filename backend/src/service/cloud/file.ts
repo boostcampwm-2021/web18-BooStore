@@ -28,9 +28,15 @@ export const uploadFile = async ({
 	size,
 	userLoginId,
 }: UploadArg) => {
-	const objectStorageKey = path.join(userLoginId, fileName).split(/\\\\|\\/).join('/');
+	const objectStorageKey = path
+		.join(userLoginId, fileName)
+		.split(/\\\\|\\/)
+		.join('/');
 	const diskFilePath = path.join(destination, fileName);
-	const cloudDirectory = path.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/')).split(/\\\\|\\/).join('/');
+	const cloudDirectory = path
+		.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'))
+		.split(/\\\\|\\/)
+		.join('/');
 
 	await S3.upload({
 		Bucket: bucketName,
@@ -52,4 +58,51 @@ export const uploadFile = async ({
 	await metadata.save();
 
 	await increaseCurrentCapacity({ loginId: userLoginId, value: size });
+};
+
+interface FilesFunctionArgs {
+	targetIds: string[];
+}
+
+export const removeFiles = async ({ targetIds }: FilesFunctionArgs) => {
+	const files = await Cloud.find(
+		{
+			_id: { $in: targetIds },
+		},
+		{ osLink: true }
+	).exec();
+	if (files.length === 0) {
+		return;
+	}
+	
+	const keys = files.map(({ osLink }) => {
+		const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
+		const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+		return { Key: osLink.replace(pattern, '').replace(patternTest, '')};
+	})
+
+	S3.deleteObjects({
+		Bucket: bucketName,
+		Delete: {
+			Objects: keys
+		}
+	}).promise()
+	.catch(() => {});
+	
+	await Cloud.deleteMany({
+		_id: { $in: targetIds }
+	});
+};
+
+export const moveTrashFiles = async ({ targetIds }: FilesFunctionArgs) => {
+	const result = await Cloud.updateMany(
+		{
+			_id: { $in: targetIds },
+		},
+		{
+			isDeleted: true,
+		}
+	);
+
+	return result.matchedCount;
 };
