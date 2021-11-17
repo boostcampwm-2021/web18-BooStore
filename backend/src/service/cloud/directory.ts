@@ -2,7 +2,6 @@ import { Cloud, ICloud } from '../../model';
 
 export interface FilesArg {
 	loginId: string;
-	path: string;
 	regex: string;
 	isAscending: boolean;
 }
@@ -12,7 +11,7 @@ export interface FilteredFilesArg {
 	originFiles: ICloud[];
 }
 
-export const getFiles = async ({ loginId, path, regex, isAscending }: FilesArg) => {
+export const getFiles = async ({ loginId, regex, isAscending }: FilesArg) => {
 	const files = Cloud.find(
 		{
 			directory: { $regex: regex },
