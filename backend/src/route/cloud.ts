@@ -2,7 +2,17 @@ import * as express from 'express';
 
 import { isAuthenticated } from '../middleware';
 import * as fs from 'fs/promises';
-import { canIncreaseCurrentCapacity, moveTrashFiles, moveTrashFolders, removeFiles, restoreTrashFiles, restoreTrashFolders, UploadArg, uploadFile } from '../service/cloud';
+import {
+	canIncreaseCurrentCapacity,
+	moveTrashFiles,
+	moveTrashFolders,
+	removeFiles,
+	restoreTrashFiles,
+	restoreTrashFolders,
+	UploadArg,
+	uploadFile,
+	removeFolders,
+} from '../service/cloud';
 import upload from '../middleware/multer';
 import { FileEditAction } from '../DTO';
 
@@ -40,7 +50,7 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 		};
 
 		await uploadFile(uploadArg);
-		
+
 		fs.rm(path);
 	}
 
@@ -50,9 +60,9 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 router.put('/files', isAuthenticated, async (req, res) => {
 	const { targetIds = [], directorys = [], action } = req.body;
 	const { loginId } = req.user;
-	
-	try{
-		switch(action) {
+
+	try {
+		switch (action) {
 			case FileEditAction.trash:
 				await moveTrashFiles({ targetIds, userLoginId: loginId });
 				await moveTrashFolders({ directorys, userLoginId: loginId });
@@ -64,27 +74,25 @@ router.put('/files', isAuthenticated, async (req, res) => {
 			case FileEditAction.move:
 				break;
 		}
-		
+
 		res.send();
-	}
-	catch(err) {
+	} catch (err) {
 		res.send(500).send();
 	}
 });
 
 router.delete('/files', isAuthenticated, async (req, res) => {
-	const { targetIds } = req.body;
+	const { targetIds = [], directorys = [] } = req.body;
 	const { loginId } = req.user;
-	
-	try{
+
+	try {
 		await removeFiles({ targetIds, userLoginId: loginId });
-		
+		await removeFolders({ directorys, userLoginId: loginId });
+
 		res.send();
-	}
-	catch(err) {
+	} catch (err) {
 		res.send(500).send();
 	}
-})
-
+});
 
 export default router;

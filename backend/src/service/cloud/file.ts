@@ -18,6 +18,16 @@ export interface UploadArg {
 	userLoginId: string;
 }
 
+interface FilesFunctionArgs {
+	targetIds: string[];
+	userLoginId: string;
+}
+
+interface FoldersFunctionArgs {
+	directorys: string[];
+	userLoginId: string;
+}
+
 export const uploadFile = async ({
 	originalName,
 	mimetype,
@@ -60,43 +70,13 @@ export const uploadFile = async ({
 	await increaseCurrentCapacity({ loginId: userLoginId, value: size });
 };
 
-interface FilesFunctionArgs {
-	targetIds: string[];
-	userLoginId: string;
-}
-
-export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
-	const files = await Cloud.find(
-		{
-			ownerId: userLoginId,
-			_id: { $in: targetIds },
-		},
-		{ osLink: true, size: true, ownerId: true }
-	).exec();
-	if (files.length === 0) {
-		return;
-	}
-
-	const keys = files.map(({ osLink }) => {
-		const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
-		const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-		return { Key: osLink.replace(pattern, '').replace(patternTest, '') };
-	});
-	S3.deleteObjects({
+const removeObjectStorageObjects = async (keys) => {
+	return await S3.deleteObjects({
 		Bucket: bucketName,
 		Delete: {
 			Objects: keys,
 		},
-	})
-		.promise()
-		.catch(() => {});
-
-	const totalSize = files.reduce((prev, { size }) => prev + size, 0);
-	await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
-
-	await Cloud.deleteMany({
-		_id: { $in: targetIds },
-	});
+	}).promise();
 };
 
 export const moveTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
@@ -127,10 +107,33 @@ export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctio
 	return result.matchedCount;
 };
 
-interface FoldersFunctionArgs {
-	directorys: string[];
-	userLoginId: string;
-}
+export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
+	const files = await Cloud.find(
+		{
+			ownerId: userLoginId,
+			_id: { $in: targetIds },
+		},
+		{ osLink: true, size: true, ownerId: true }
+	).exec();
+	if (files.length === 0) {
+		return;
+	}
+
+	const keys = files.map(({ osLink }) => {
+		const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
+		const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+		return { Key: osLink.replace(pattern, '').replace(patternTest, '') };
+	});
+	removeObjectStorageObjects(keys);
+
+	const totalSize = files.reduce((prev, { size }) => prev + size, 0);
+	await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
+
+	await Cloud.deleteMany({
+		ownerId: userLoginId,
+		_id: { $in: targetIds },
+	});
+};
 
 export const moveTrashFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
@@ -165,5 +168,39 @@ export const restoreTrashFolders = async ({ directorys, userLoginId }: FoldersFu
 					}
 				)
 			)
+	);
+};
+
+export const removeFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
+	return Promise.all(
+		directorys
+			.map((directory) => directory.replace('/', '\\/'))
+			.map(async (directory) => {
+				const files = await Cloud.find(
+					{
+						ownerId: userLoginId,
+						directory: { $regex: `^${directory}(\/.*)?$` },
+					},
+					{ osLink: true, size: true, ownerId: true }
+				).exec();
+				if (files.length === 0) {
+					return;
+				}
+
+				const keys = files.map(({ osLink }) => {
+					const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
+					const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+					return { Key: osLink.replace(pattern, '').replace(patternTest, '') };
+				});
+				removeObjectStorageObjects(keys);
+
+				const totalSize = files.reduce((prev, { size }) => prev + size, 0);
+				await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
+
+				await Cloud.deleteMany({
+					ownerId: userLoginId,
+					directory: { $regex: `^${directory}(\/.*)?$` },
+				});
+			})
 	);
 };
