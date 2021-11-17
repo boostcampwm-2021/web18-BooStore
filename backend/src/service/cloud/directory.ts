@@ -46,7 +46,7 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 				file.contentType = 'folder';
 				file.size = 0;
 				file.name = splittedDirectory[splittedPath.length];
-				file.directory = splittedPath.join('/');
+				file.directory = path;
 				filteredFolders.push(file);
 			}
 		}
