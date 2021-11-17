@@ -1,17 +1,18 @@
-import React, { Key, useEffect, useState } from 'react';
+import React, { Key, useCallback, useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import FileList from '../component/fileManagement/FileList';
 
-import FileMenu from '../component/fileManagement/FileMenu';
-import Sidebar from '../component/layout/Sidebar';
-import { User } from '../model';
-import { Capacity } from '../model';
-import { FileDTO } from '../DTO';
-import { getFiles } from '../util';
+import FileList from '@component/fileManagement/FileList';
+import FileMenu from '@component/fileManagement/FileMenuForMain';
+import Sidebar from '@component/layout/Sidebar';
+import { User } from '@model';
+import { Capacity } from '@model';
+import { FileDTO } from '@DTO';
+import { getFiles } from '@util';
+import { getCapacity } from '@api';
 
-import arrow from '../asset/image/icons/icon_left_arrow.svg';
+import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
-interface Props {
+interface MainPageProps {
 	user: User;
 }
 
@@ -27,11 +28,13 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 		.split('/')
 		.slice(0, idx + 1)
 		.join('/');
-	relativePath === '' ? (relativePath = '/') : '';
+	if (relativePath === '') {
+		relativePath = '/';
+	}
 
 	return (
 		<>
-			{idx != 0 ? <img src={arrow} style={{ verticalAlign: 'middle' }}></img> : ''}
+			{idx != 0 && <img src={arrow} style={{ verticalAlign: 'middle' }}></img>}
 			<span onClick={() => onClickDirectory(relativePath)} style={{ cursor: 'pointer' }}>
 				{name}
 			</span>
@@ -39,31 +42,12 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 	);
 };
 
-const MainPage: React.FC<Props> = () => {
+const MainPage: React.FC<MainPageProps> = () => {
 	const [currentDir, setCurrentDir] = useState('/');
-	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
+	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 	const [isAscending, setIsAscending] = useState<boolean>(true);
-
-	const getCapacity = async () => {
-		await fetch('/user/capacity', {
-			credentials: 'include',
-		})
-			.then((res) => {
-				if (res.ok) {
-					return res.json();
-				} else {
-					throw new Error('something wrong');
-				}
-			})
-			.then((data) => {
-				setCapacity(data);
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-	};
 
 	const onClickDirectory = async (relativePath: string) => {
 		const files = await getFiles(relativePath, isAscending);
@@ -74,13 +58,30 @@ const MainPage: React.FC<Props> = () => {
 
 	const updateFiles = async () => {
 		setFiles(await getFiles(currentDir, isAscending));
-		getCapacity();
-	}
-	
+		setCapacity(await getCapacity());
+	};
+
+	const getCurDirectoryComponent = useCallback(() => {
+		if (currentDir === '/') {
+			return;
+		}
+		return currentDir
+			.split('/')
+			.slice(1)
+			.map((el, idx) => (
+				<Directory
+					idx={idx + 1}
+					name={el}
+					currentDir={currentDir}
+					onClickDirectory={onClickDirectory}
+					key={idx + 1}
+				/>
+			));
+	}, [currentDir]);
+
 	useEffect(() => {
 		updateFiles();
 	}, [isAscending]);
-	const temp = currentDir.split('/').slice(1).join('/');
 
 	return (
 		<Container>
@@ -94,19 +95,7 @@ const MainPage: React.FC<Props> = () => {
 						onClickDirectory={onClickDirectory}
 						key={0}
 					/>
-					{temp != ''
-						? temp
-								.split('/')
-								.map((el, idx) => (
-									<Directory
-										idx={idx + 1}
-										name={el}
-										currentDir={currentDir}
-										onClickDirectory={onClickDirectory}
-										key={idx + 1}
-									/>
-								))
-						: ''}
+					{getCurDirectoryComponent()}
 				</DirectorySection>
 				<FileMenu
 					showShareButton

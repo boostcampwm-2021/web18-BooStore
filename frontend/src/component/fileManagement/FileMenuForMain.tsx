@@ -21,7 +21,7 @@ interface Props {
 	updateFiles?: Function;
 }
 
-const FileMenu: React.FC<Props> = ({
+const FileMenuForMain: React.FC<Props> = ({
 	showShareButton,
 	capacity,
 	setCapacity,
@@ -262,4 +262,4 @@ const UploadInput = styled.input`
 const FailureModal = styled(ModalComponent)``;
 const ProgressModal = styled(ModalComponent)``;
 
-export default React.memo(FileMenu);
+export default React.memo(FileMenuForMain);
