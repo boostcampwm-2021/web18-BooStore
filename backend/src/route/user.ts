@@ -40,8 +40,7 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 });
 
 router.get('/files', isAuthenticated, async (req, res) => {
-	const { path } = req.query;
-	const { isAscending } = req.query;
+	const { path, isAscending, isDeleted } = req.query;
 	const { loginId } = req.user;
 	if (path === undefined) {
 		return res.status(400).send();
@@ -54,7 +53,8 @@ router.get('/files', isAuthenticated, async (req, res) => {
 		loginId: loginId,
 		path: path as string,
 		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
-		isAscending: JSON.parse(isAscending as string),
+		isAscending: isAscending === 'true',
+		isDeleted: isDeleted === 'true'
 	};
 
 	const tempFiles = await getFiles(filesArg);
