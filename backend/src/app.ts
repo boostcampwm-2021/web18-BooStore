@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import * as passport from 'passport';
 import passportConfig from './config/passport';
 import * as session from 'express-session';
+const MongoStore = require('connect-mongo');
 import * as fs from 'fs';
 dotenv.config();
 
@@ -19,20 +20,27 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(path.resolve(), '../frontend/build')));
 
-app.use(session({ secret: 'secret123123', resave: true, saveUninitialized: false }));
+app.use(session({ 
+	secret: 'secret123123', 
+	resave: true, 
+	saveUninitialized: false,
+	store: MongoStore.create({
+		mongoUrl: process.env.MONGO_URI
+	})
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 passportConfig();
 
-fs.mkdir(path.join(path.resolve(), 'temp/'), ()=>{});
+fs.mkdir(path.join(path.resolve(), 'temp/'), () => {});
 
 app.use('/', authRouter);
 app.use('/user', userRouter);
 app.use('/cloud', cloudRouter);
 app.use('*', (req, res) => {
 	res.sendFile('index.html', {
-		root: path.join(__dirname, '../../frontend/build')
+		root: path.join(__dirname, '../../frontend/build'),
 	});
 });
 
