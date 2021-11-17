@@ -19,7 +19,7 @@ const LoginPage: React.FC<Props> = ({ setUser }) => {
 const LoginPageBackground = styled.div`
 	width: 100%;
 	height: 100vh;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
+	background-color: ${(props) => props.theme.color.PrimaryBG};
 	display: flex;
 	align-items: center;
 	justify-content: center;
