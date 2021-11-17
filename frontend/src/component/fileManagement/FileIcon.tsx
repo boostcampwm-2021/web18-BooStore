@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { ReactComponent as Folder } from '@asset/image/icons/icon_folder.svg';
-import { ReactComponent as TextFile } from '@asset/image/icon_text.svg';
+import { ReactComponent as TextFile } from '@asset/image/icons/icon_text.svg';
 import { ReactComponent as DefaultFile } from '@asset/image/icons/icon_file.svg';
 import { ReactComponent as DocsFile } from '@asset/image/icons/icon_docs.svg';
 import { ReactComponent as ImageFile } from '@asset/image/icons/icon_image.svg';
