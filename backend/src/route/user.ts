@@ -23,16 +23,6 @@ router.get('/', isAuthenticated, (req, res) => {
 });
 
 router.get('/capacity', isAuthenticated, async (req, res) => {
-	/*
-	// 세션을 사용하는게 좋을까? 아니면 디비에 다시 접근하는게 좋을까...
-	// 고민해보자
-	const { maxCapacity, currentCapacity } = req.user;
-	const data = {
-		currentCapacity,
-		maxCapacity,
-	};
-	*/
-
 	const { loginId } = req.user;
 	const data = await getCapacity({ loginId });
 
