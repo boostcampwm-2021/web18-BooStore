@@ -7,7 +7,6 @@ import FileIcon from './FileIcon';
 interface Props {
 	file: FileDTO;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
-	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 }
@@ -15,13 +14,14 @@ interface Props {
 const File: React.FC<Props> = ({
 	file,
 	setSelectedFiles,
-	setFiles,
 	setCurrentDir,
 	currentDirectory,
 }) => {
 	const [isSelected, setSelected] = useState(false);
 
 	const { contentType, name, createdAt, updatedAt, size, _id } = file;
+	const isFolder = contentType === 'folder';
+	const getConvertedSize = convertByteToUnitString(size);
 
 	const onClickFile = (event: React.MouseEvent<HTMLDivElement>) => {
 		setSelected((prev) => !prev);
@@ -40,12 +40,11 @@ const File: React.FC<Props> = ({
 		});
 	};
 
-	const getChildrenFiles = async (isFolder: boolean, childDirectory: string) => {
+	const changeCurrentDirectory = async () => {
 		if (isFolder) {
-			const files = await getFiles(childDirectory, true);
-			setFiles(files);
-			setCurrentDir(childDirectory);
-			setSelectedFiles([]);
+			const childDir =
+				currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
+			setCurrentDir(childDir);
 		}
 	};
 
@@ -54,16 +53,12 @@ const File: React.FC<Props> = ({
 		setSelected(false);
 	}, [currentDirectory]);
 
-	const childDir =
-		currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
-	const isFolder = contentType === 'folder';
-	const getConvertedSize = convertByteToUnitString(size);
 
 	return (
 		<Container onClick={onClickFile} isSelected={isSelected}>
 			<p>{isFolder}</p>
 			<FileIcon type={contentType} />
-			<FileName isFolder={isFolder} onClick={() => getChildrenFiles(isFolder, childDir)}>
+			<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
 				{name}
 			</FileName>
 			<MetaData> {getDate(createdAt)} </MetaData>

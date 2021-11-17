@@ -8,10 +8,19 @@ import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
 import { getFiles } from '@util';
-import { getCapacity } from '@api';
+import { getCapacity } from 'api';
+
+import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
 interface TrashPageProps {
 	user: User;
+}
+
+interface DirectoryProps {
+	idx: number;
+	name: string;
+	currentDir: string;
+	onClickDirectory: (relativePath: string) => Promise<void>;
 }
 
 const TrashPage: React.FC<TrashPageProps> = () => {
@@ -21,21 +30,55 @@ const TrashPage: React.FC<TrashPageProps> = () => {
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 
+	const onClickDirectory = async (relativePath: string) => {
+		setSelectedFiles([]);
+		
+		const files = await getFiles(relativePath, isAscending, true);
+		setFiles(files);
+		setCurrentDir(relativePath);
+	};
+
+	const getCurDirectoryComponent = useCallback(() => {
+		if (currentDir === '/') {
+			return;
+		}
+		return currentDir
+			.split('/')
+			.slice(1)
+			.map((el, idx) => (
+				<Directory
+					idx={idx + 1}
+					name={el}
+					currentDir={currentDir}
+					onClickDirectory={onClickDirectory}
+					key={idx + 1}
+				/>
+			));
+	}, [currentDir]);
+	
 	const updateFiles = async () => {
+		setSelectedFiles([]);
 		setFiles(await getFiles(currentDir, isAscending, true));
 		setCapacity(await getCapacity());
 	};
 
 	useEffect(() => {
 		updateFiles();
-	}, [isAscending]);
+	}, [currentDir, isAscending]);
 
 	return (
 		<Container>
 			<SidebarForMain capacity={capacity} files={files} />
 			<InnerContainer>
 				<DirectorySection>
-					휴지통
+					<Directory
+						idx={0}
+						name={'휴지통'}
+						currentDir={currentDir}
+						onClickDirectory={onClickDirectory}
+						key={0}
+					/>
+					{getCurDirectoryComponent()}
 				</DirectorySection>
 				<FileMenu
 					setCapacity={setCapacity}
@@ -46,7 +89,6 @@ const TrashPage: React.FC<TrashPageProps> = () => {
 				<FileList
 					files={files}
 					setSelectedFiles={setSelectedFiles}
-					setFiles={setFiles}
 					setCurrentDir={setCurrentDir}
 					currentDirectory={currentDir}
 					isAscending={isAscending}
@@ -56,6 +98,26 @@ const TrashPage: React.FC<TrashPageProps> = () => {
 		</Container>
 	);
 };
+
+const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDirectory }) => {
+	let relativePath: string = currentDir
+		.split('/')
+		.slice(0, idx + 1)
+		.join('/');
+	if (relativePath === '') {
+		relativePath = '/';
+	}
+
+	return (
+		<>
+			{idx != 0 && <img src={arrow} style={{ verticalAlign: 'middle' }}></img>}
+			<span onClick={() => onClickDirectory(relativePath)} style={{ cursor: 'pointer' }}>
+				{name}
+			</span>
+		</>
+	);
+};
+
 
 const Container = styled.div`
 	display: flex;

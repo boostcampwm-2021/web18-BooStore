@@ -8,7 +8,7 @@ import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
 import { getFiles } from '@util';
-import { getCapacity } from '@api';
+import { getCapacity } from 'api';
 
 import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
@@ -57,6 +57,7 @@ const MainPage: React.FC<MainPageProps> = () => {
 	};
 
 	const updateFiles = async () => {
+		setSelectedFiles([]);
 		setFiles(await getFiles(currentDir, isAscending));
 		setCapacity(await getCapacity());
 	};
@@ -81,7 +82,7 @@ const MainPage: React.FC<MainPageProps> = () => {
 
 	useEffect(() => {
 		updateFiles();
-	}, [isAscending]);
+	}, [currentDir, isAscending]);
 
 	return (
 		<Container>
@@ -110,7 +111,6 @@ const MainPage: React.FC<MainPageProps> = () => {
 				<FileList
 					files={files}
 					setSelectedFiles={setSelectedFiles}
-					setFiles={setFiles}
 					setCurrentDir={setCurrentDir}
 					currentDirectory={currentDir}
 					isAscending={isAscending}
