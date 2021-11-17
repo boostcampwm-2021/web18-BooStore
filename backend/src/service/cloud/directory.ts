@@ -2,7 +2,6 @@ import { Cloud, ICloud } from '../../model';
 
 export interface FilesArg {
 	loginId: string;
-	path: string;
 	regex: string;
 	isAscending: boolean;
 }
@@ -12,7 +11,7 @@ export interface FilteredFilesArg {
 	originFiles: ICloud[];
 }
 
-export const getFiles = async ({ loginId, path, regex, isAscending }: FilesArg) => {
+export const getFiles = async ({ loginId, regex, isAscending }: FilesArg) => {
 	const files = Cloud.find(
 		{
 			directory: { $regex: regex },
@@ -39,32 +38,18 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 	const filteredFolders = [];
 	originFiles.map((file) => {
 		if (file.directory === path) {
-			const tempFile: ICloud = JSON.parse(JSON.stringify(file));
-			tempFile.createdAt = file.createdAt;
-			tempFile.updatedAt = file.updatedAt;
-			filteredFiles.push(tempFile);
+			filteredFiles.push(file);
 		} else {
 			const splittedDirectory = file.directory.split('/');
 			if (directories.indexOf(splittedDirectory[splittedPath.length]) === -1) {
 				directories.push(splittedDirectory[splittedPath.length]);
-				const tempFile: ICloud = JSON.parse(JSON.stringify(file));
-				tempFile.contentType = 'folder';
-				tempFile.size = 0;
-				tempFile.name = splittedDirectory[splittedPath.length];
-				tempFile.createdAt = file.createdAt;
-				tempFile.updatedAt = file.updatedAt;
-
-				filteredFolders.push(tempFile);
+				file.contentType = 'folder';
+				file.size = 0;
+				file.name = splittedDirectory[splittedPath.length];
+				file.directory = path;
+				filteredFolders.push(file);
 			}
 		}
 	});
 	return filteredFolders.concat(filteredFiles);
-};
-
-const getFormattedDate = (date: string) => {
-	return new Date(Date.parse(date))
-		.toLocaleString()
-		.replace('.', '년')
-		.replace('.', '월')
-		.replace('.', '일');
 };
