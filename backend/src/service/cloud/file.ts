@@ -86,6 +86,7 @@ export const moveTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionAr
 			_id: { $in: targetIds },
 		},
 		{
+			deletedAt: new Date(),
 			isDeleted: true,
 		}
 	);
@@ -146,6 +147,7 @@ export const moveTrashFolders = async ({ directorys, userLoginId }: FoldersFunct
 						directory: { $regex: `^${directory}(\/.*)?$` },
 					},
 					{
+						deletedAt: new Date(),
 						isDeleted: true,
 					}
 				)
