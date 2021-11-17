@@ -15,11 +15,10 @@ const makeDirectoryTree = (directories: Set<string>) =>{
 
 }
 
-const [directoryTree,SetDirectoryTree]= useState(null);
 
 const DirectoryList: React.FC<Props> = ({ className }) => {
 
-
+	getDirectoryList();
 
 	return (
 		<Container className={className}>

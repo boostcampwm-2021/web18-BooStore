@@ -6,6 +6,7 @@ import {
 	getFilteredFiles,
 	FilesArg,
 	FilteredFilesArg,
+	getDirectoryList
 } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
 
@@ -56,4 +57,10 @@ router.get('/files', isAuthenticated, async (req, res) => {
 	const files = getFilteredFiles(filteredFilesArg);
 	return res.status(200).json(files);
 });
+
+router.get('/directory', isAuthenticated, async(req,res)=>{
+	const { loginId } = req.user;
+	const temp = await getDirectoryList(loginId);
+	console.log(temp);
+})
 export default router;
