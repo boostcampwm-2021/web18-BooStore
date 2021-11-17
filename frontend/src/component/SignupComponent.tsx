@@ -49,7 +49,6 @@ const SignupComponent: React.FC<Props> = () => {
 	};
 
 	const isEqualPassword = () => {
-		if (password === '') return false;
 		return password === passwordCheck;
 	};
 
