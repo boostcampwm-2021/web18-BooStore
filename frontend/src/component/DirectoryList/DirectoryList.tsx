@@ -7,6 +7,7 @@ import Directory from './Directory';
 import { getDirectoryList } from 'api';
 import { makeTree, treeNode } from '@util';
 import { User } from '@model';
+import { useHistory } from 'react-router';
 
 const makeDirectoryTree = (directories: string[]) => {
 	const splitDirectories: Array<string[]> = [];
@@ -33,6 +34,7 @@ const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => 
 		parentDirectory: '',
 		children: new Map(),
 	});
+	const history = useHistory();
 
 	const makeFolderStructure = async () => {
 		const directories = await getDirectoryList();
@@ -53,7 +55,11 @@ const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => 
 			curDir = '내 스토어';
 		}
 		
+		
 		const onClickNav = () => {
+			history.push('/', {
+				currentDirectory: treeNode.relativeDirectory
+			});
 			setCurrentDir(treeNode.relativeDirectory);
 		}
 		

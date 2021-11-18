@@ -12,6 +12,7 @@ import { getFiles } from '@util';
 import { getCapacity } from 'api';
 
 import { ReactComponent as ArrowSvg } from '@asset/image/icons/icon_left_arrow.svg';
+import { useLocation } from 'react-router';
 
 interface MainPageProps {
 	user: User;
@@ -48,11 +49,12 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	const [currentDir, setCurrentDir] = useState('/');
 	const [capacity, setCapacity] = useState<Capacity>({
 		currentCapacity: 0,
-		maxCapacity: 1024 * 1024 * 1024,
+		maxCapacity: 1024 * 1024 * 10,
 	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 	const [isAscending, setIsAscending] = useState<boolean>(true);
+	const location = useLocation<{ currentDirectory: string|undefined}>();
 
 	const onClickDirectory = async (relativePath: string) => {
 		const files = await getFiles(relativePath, isAscending);
@@ -88,6 +90,11 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	useEffect(() => {
 		updateFiles();
 	}, [currentDir, isAscending]);
+	
+	useEffect(() => {
+		const currentDirectory = location.state?.currentDirectory;
+		setCurrentDir(currentDirectory ?? '/');
+	}, []);
 
 	return (
 		<>
