@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Capacity } from '@model';
+import { Capacity, User } from '@model';
 import { convertByteToUnitString } from '@util';
 import ProgressBar from '@component/common/ProgressBar';
 import DirectoryList from '@component/DirectoryList';
@@ -22,9 +22,10 @@ const convertCapacityToString = (capacity: Capacity) => {
 interface Props {
 	capacity: Capacity;
 	className?: string;
+	files: FileDTO[];
 }
 
-const Sidebar: React.FC<Props> = ({ capacity, className }) => {
+const Sidebar: React.FC<Props> = ({ capacity, className, files }) => {
 	const { currentCapacity, maxCapacity } = capacity;
 	const { Point: PointColor } = themeValue.color;
 
@@ -34,7 +35,7 @@ const Sidebar: React.FC<Props> = ({ capacity, className }) => {
 				<CapacityBar value={currentCapacity} maxValue={maxCapacity} color={PointColor} />
 				<ProgressValue>{`${convertCapacityToString(capacity)}`}</ProgressValue>
 			</CapacityContainer>
-			<DirectoryList/>
+			<DirectoryList files={files}/>
 			<Footer>
 				<FooterNav to="/star">
 					<StarSvg />

@@ -42,7 +42,7 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 	);
 };
 
-const MainPage: React.FC<MainPageProps> = () => {
+const MainPage: React.FC<MainPageProps> = ({ user }) => {
 	const [currentDir, setCurrentDir] = useState('/');
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
@@ -89,7 +89,7 @@ const MainPage: React.FC<MainPageProps> = () => {
 
 	return (
 		<Container>
-			<SidebarForMain capacity={capacity}/>
+			<SidebarForMain capacity={capacity} files={files}/>
 			<InnerContainer>
 				<DirectorySection>
 					<Directory

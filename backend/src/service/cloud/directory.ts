@@ -12,17 +12,16 @@ export interface FilteredFilesArg {
 	originFiles: ICloud[];
 }
 
-interface Directory{
+interface Directory {
 	directory: string;
 }
 
 export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: FilesArg) => {
-
 	const files = Cloud.find(
 		{
 			directory: { $regex: regex },
 			ownerId: loginId,
-			isDeleted
+			isDeleted,
 		},
 		{
 			directory: true,
@@ -69,23 +68,26 @@ const getFormattedDate = (date: string) => {
 		.replace('.', '일');
 };
 
-export const getDirectoryList = async( loginId : string ) =>{
-	const allFiles = await Cloud.find({
-		ownerId: loginId,
-	},
-	{
-		_id: false,
-		directory: true,
-	});
+export const getDirectoryList = async (loginId: string) => {
+	const allFiles = await Cloud.find(
+		{
+			ownerId: loginId,
+			isDeleted: false,
+		},
+		{
+			_id: false,
+			directory: true,
+		}
+	);
 
 	const directoryArr = makeDirectoryToArrFormat(allFiles);
 	return directoryArr;
-}
+};
 
-const makeDirectoryToArrFormat = ( allFiles : Directory[]) =>{
+const makeDirectoryToArrFormat = (allFiles: Directory[]) => {
 	let directorySet = new Set();
 	allFiles.forEach((file) => {
 		directorySet.add(file.directory);
 	});
 	return Array.from(directorySet);
-}
+};

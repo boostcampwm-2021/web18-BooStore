@@ -8,21 +8,22 @@ export interface treeNode{
     children : Map<string,treeNode>;
 }
 
-const root: treeNode = {
-    relativeDirectory: '/',
-    parentDirectory: '',
-    children: new Map()
-}
 
 export const makeTree = (arr : Array<string[]>)=>{
+    const root: treeNode = {
+        relativeDirectory: '/',
+        parentDirectory: '',
+        children: new Map()
+    }
+    
     arr.forEach((el)=>{
         let newNode = arrToNode(el);
-        insertNode(newNode);
+        insertNode(root, newNode);
     })
     return root;
 }
 
-const insertNode = (node : treeNode) => {
+const insertNode = (root: treeNode, node : treeNode) => {
     const copiedNode = {...node};
     const parent = findParent(root,copiedNode);
     parent.children.set(copiedNode.relativeDirectory,copiedNode);
