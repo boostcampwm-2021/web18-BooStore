@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import File from './File';
 import { FileDTO } from '@DTO';
+import Selection from './Selection';
 
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
@@ -18,122 +19,6 @@ interface Props {
 	className?: string;
 }
 
-interface SelectionProps {}
-
-const Selection: React.FC<SelectionProps> = ({ children }) => {
-	const [point, setPoint] = useState({
-		startX: 0,
-		startY: 0,
-		endX: 0,
-		endY: 0,
-	});
-	const [isDraging, setDraging] = useState(false);
-	const container = useRef<HTMLDivElement>(null);
-
-	const getOffsetPosition = (target: HTMLDivElement, pageX: number, pageY: number) => {
-		return {
-			offsetX: pageX - target.offsetLeft,
-			offsetY: pageY - target.offsetTop,
-		};
-	};
-
-	const onStartDrag = (event: MouseEvent) => {
-		if (!container.current || !container.current.contains(event.target as Element)) {
-			return;
-		}
-		const { pageX, pageY } = event;
-		const { offsetX, offsetY } = getOffsetPosition(container.current, pageX, pageY);
-		
-		setPoint({
-			startX: offsetX,
-			startY: offsetY,
-			endX: offsetX,
-			endY: offsetY,
-		});
-		setDraging(true);
-	};
-	const onEndDrag = (event: MouseEvent) => {
-		setDraging(false);
-	};
-	const onChangeBox = useCallback(
-		(event: MouseEvent) => {
-			if (!container.current || !isDraging) {
-				return;
-			}
-			const { pageX, pageY } = event;
-			const { offsetWidth, offsetHeight } = container.current;
-			let { offsetX, offsetY } = getOffsetPosition(container.current, pageX, pageY);
-			
-			if (offsetX < 0) {
-				offsetX = 0;
-			}
-			else if (offsetX > offsetWidth) {
-				offsetX = offsetWidth;
-			}
-			if (offsetY < 0) {
-				offsetY = 0;
-			}
-			else if (offsetY > offsetHeight) {
-				offsetY = offsetHeight;
-			}
-			
-			setPoint((prev) => ({ ...prev, endX: offsetX, endY: offsetY }));
-		},
-		[isDraging]
-	);
-	
-	useEffect(() => {
-		window.addEventListener('mousemove', onChangeBox);
-		
-		return () => {
-			window.removeEventListener('mousemove', onChangeBox);
-		}
-	}, [isDraging]);
-	
-	useEffect(() => {
-		window.addEventListener('mousedown', onStartDrag);
-		window.addEventListener('mouseup', onEndDrag);
-		
-		return () => {
-			window.removeEventListener('mousedown', onStartDrag);
-			window.removeEventListener('mouseup', onEndDrag);
-		}
-	}, []);
-
-	return (
-		<SelectionContainer ref={container}>
-			{isDraging && (
-				<DragBox
-					ltX={Math.min(point.startX, point.endX)}
-					ltY={Math.min(point.startY, point.endY)}
-					rbX={Math.max(point.startX, point.endX)}
-					rbY={Math.max(point.startY, point.endY)}
-				/>
-			)}
-			{children}
-		</SelectionContainer>
-	);
-};
-const SelectionContainer = styled.div`
-	position: relative;
-	height: 100%;
-`;
-const DragBox = styled.div.attrs<{ ltX: number; ltY: number; rbX: number; rbY: number }>(
-	({ltY, ltX, rbY, rbX}) => ({
-		style: {
-			top: `${ltY}px`,
-			left: `${ltX}px`,
-			width: `${rbX - ltX}px`,
-			height: `${rbY - ltY}px`,
-			zIndex: 99,
-		}
-	})
-)<{ ltX: number; ltY: number; rbX: number; rbY: number }>`
-	position: absolute;
-
-	background-color: rgba(155, 193, 239, 0.4);
-`;
-
 const FileList: React.FC<Props> = ({
 	files,
 	setSelectedFiles,
@@ -142,11 +27,30 @@ const FileList: React.FC<Props> = ({
 	isAscending,
 	selectedFiles,
 	setIsAscending,
-	className
+	className,
 }) => {
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsAscending(!isAscending);
 	};
+
+	const addSelect = (id: string) => {
+		setSelectedFiles((selectedFiles) => {
+			const result = [...selectedFiles];
+			const element = selectedFiles.find((ele) => ele._id == id);
+			if (element) {
+				return selectedFiles;
+			}
+			
+			const file = files.find((ele) => ele._id === id);
+			result.push({ ...file as FileDTO });
+			return result;
+		});
+	};
+	const removeSelect = (id: string) => {
+		setSelectedFiles((selectedFiles) => {
+			return [...selectedFiles].filter((ele) => ele._id !== id);
+		});
+	}
 
 	return (
 		<Container className={className}>
@@ -161,9 +65,10 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
 			</FileHeader>
 			<Files>
-				<Selection>
+				<Selection addSelcted={addSelect} removeSelect={removeSelect}>
 					{files.map((file, index) => (
 						<File
+							className="file"
 							key={index}
 							file={file}
 							selectedFiles={selectedFiles}
@@ -181,7 +86,7 @@ const FileList: React.FC<Props> = ({
 const Container = styled.div`
 	overflow-y: auto;
 	overflow-x: hidden;
-	
+
 	display: flex;
 	flex-direction: column;
 `;

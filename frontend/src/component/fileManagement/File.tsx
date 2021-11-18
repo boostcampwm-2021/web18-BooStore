@@ -10,9 +10,17 @@ interface Props {
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 	selectedFiles: FileDTO[];
+	className?: string;
 }
 
-const File: React.FC<Props> = ({ file, setSelectedFiles, setCurrentDir, currentDirectory, selectedFiles }) => {
+const File: React.FC<Props> = ({
+	file,
+	setSelectedFiles,
+	setCurrentDir,
+	currentDirectory,
+	selectedFiles,
+	className,
+}) => {
 	const [isSelected, setSelected] = useState(false);
 
 	const { contentType, name, createdAt, updatedAt, size, _id } = file;
@@ -44,21 +52,25 @@ const File: React.FC<Props> = ({ file, setSelectedFiles, setCurrentDir, currentD
 	};
 
 	useEffect(() => {
-		if (selectedFiles.find(ele => ele._id === _id)) {
+		if (selectedFiles.find((ele) => ele._id === _id)) {
 			setSelected(true);
-		}
-		else {
+		} else {
 			setSelected(false);
 		}
 	}, [selectedFiles]);
-	
+
 	useEffect(() => {
 		// 디렉토리가 변경되면 선택 상태를 false로 초기화
 		setSelected(false);
 	}, [currentDirectory]);
 
 	return (
-		<Container onClick={onClickFile} isSelected={isSelected}>
+		<Container
+			onClick={onClickFile}
+			isSelected={isSelected}
+			className={className}
+			data-id={_id}
+		>
 			<p>{isFolder}</p>
 			<FileIcon type={contentType} />
 			<FileNameBox>
@@ -85,10 +97,10 @@ const Container = styled.div<{ isSelected: boolean }>`
 	}
 `;
 const FileNameBox = styled.div`
-	overflow:hidden;
-	text-overflow:ellipsis;
-	white-space:nowrap;
-	
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
 	padding-right: 10%;
 `;
 
