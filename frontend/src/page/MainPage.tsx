@@ -10,7 +10,7 @@ import { FileDTO } from '@DTO';
 import { getFiles } from '@util';
 import { getCapacity } from 'api';
 
-import arrow from '@asset/image/icons/icon_left_arrow.svg';
+import {ReactComponent as ArrowSvg} from '@asset/image/icons/icon_left_arrow.svg';
 
 interface MainPageProps {
 	user: User;
@@ -34,7 +34,7 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 
 	return (
 		<>
-			{idx != 0 && <img src={arrow} style={{ verticalAlign: 'middle' }}></img>}
+			{idx != 0 && <ArrowSvg style={{ verticalAlign: 'middle' }} />}
 			<span onClick={() => onClickDirectory(relativePath)} style={{ cursor: 'pointer' }}>
 				{name}
 			</span>
