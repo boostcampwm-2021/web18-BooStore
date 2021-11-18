@@ -109,7 +109,7 @@ const MainPage: React.FC<MainPageProps> = ({ user }) => {
 					files={files}
 					updateFiles={updateFiles}
 				/>
-				<FileList
+				<StyledFileList
 					files={files}
 					selectedFiles={selectedFiles}
 					setSelectedFiles={setSelectedFiles}
@@ -148,6 +148,9 @@ const DirectorySection = styled.div`
 	font-size: ${(props) => props.theme.fontSize.Title};
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	padding: ${(props) => props.theme.padding.Content};
+`;
+const StyledFileList = styled(FileList)`
+	flex: 1;
 `;
 
 export default MainPage;

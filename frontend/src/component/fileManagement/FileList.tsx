@@ -15,6 +15,7 @@ interface Props {
 	currentDirectory: string;
 	isAscending: boolean;
 	setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
+	className?: string;
 }
 
 interface SelectionProps {}
@@ -115,6 +116,7 @@ const Selection: React.FC<SelectionProps> = ({ children }) => {
 };
 const SelectionContainer = styled.div`
 	position: relative;
+	height: 100%;
 `;
 const DragBox = styled.div.attrs<{ ltX: number; ltY: number; rbX: number; rbY: number }>(
 	({ltY, ltX, rbY, rbX}) => ({
@@ -140,13 +142,14 @@ const FileList: React.FC<Props> = ({
 	isAscending,
 	selectedFiles,
 	setIsAscending,
+	className
 }) => {
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsAscending(!isAscending);
 	};
 
 	return (
-		<Container>
+		<Container className={className}>
 			<FileHeader>
 				<p></p>
 				<p></p>
@@ -178,6 +181,9 @@ const FileList: React.FC<Props> = ({
 const Container = styled.div`
 	overflow-y: auto;
 	overflow-x: hidden;
+	
+	display: flex;
+	flex-direction: column;
 `;
 
 const FileHeader = styled.div`
@@ -200,11 +206,12 @@ const FileHeaderElement = styled.p`
 const Files = styled.ul`
 	padding: 0;
 	margin: 0;
+	flex: 1;
+	user-select: none;
 
 	svg {
 		cursor: pointer;
 		margin: auto;
 	}
-	user-select: none;
 `;
 export default React.memo(FileList);
