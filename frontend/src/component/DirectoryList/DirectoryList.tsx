@@ -5,9 +5,10 @@ import { FileDTO } from '@DTO';
 import Directory from './Directory';
 
 import { getDirectoryList } from '../../api'; 
+import { makeTree } from '@util';
 
 const makeDirectoryTree = (directories: string[]) =>{
-	const splitDirectories: Array<string[]>=[];
+	const splitDirectories: Array<string[]> = []; 
 	directories.forEach(el => {
 		splitDirectories.push(el.split('/'));
 	});
@@ -16,7 +17,7 @@ const makeDirectoryTree = (directories: string[]) =>{
 		else if(a.length === b.length) return 0;
 		else return -1;
 	})
-	alert(splitDirectories);
+	makeTree(splitDirectories);
 }
 
 interface Props {
