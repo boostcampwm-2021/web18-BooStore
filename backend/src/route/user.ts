@@ -55,6 +55,7 @@ router.get('/files', isAuthenticated, async (req, res) => {
 	};
 
 	const files = getFilteredFiles(filteredFilesArg);
+	console.log(files);
 	return res.status(200).json(files);
 });
 

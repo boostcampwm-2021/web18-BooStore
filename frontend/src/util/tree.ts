@@ -43,9 +43,6 @@ const findParent = (parent: treeNode,node: treeNode) => {
     return parent;
 }
 
-const deleteNode = (node : treeNode) => {
-
-}
 const arrToNode = (arr : string[] ) => {
     return ({
         relativeDirectory: arr.join('/'),

@@ -58,7 +58,10 @@ const MainPage: React.FC<MainPageProps> = () => {
 
 	const updateFiles = async () => {
 		setSelectedFiles([]);
-		setFiles(await getFiles(currentDir, isAscending));
+		//setFiles(await getFiles(currentDir, isAscending));
+		const temp = await getFiles(currentDir, isAscending);
+		console.log(temp);
+		setFiles(temp);
 		setCapacity(await getCapacity());
 	};
 

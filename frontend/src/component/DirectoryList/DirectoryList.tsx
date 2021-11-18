@@ -4,7 +4,7 @@ import { FileDTO } from '@DTO';
 
 import Directory from './Directory';
 
-import { getDirectoryList } from '../../api'; 
+import { getDirectoryList } from 'api'; 
 import { makeTree, treeNode } from '@util';
 
 const makeDirectoryTree = (directories: string[]) =>{
