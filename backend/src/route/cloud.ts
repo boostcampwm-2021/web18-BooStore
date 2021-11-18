@@ -18,6 +18,8 @@ import {
 	restoreTrashFiles,
 	restoreTrashFolders,
 	removeFolders,
+	createZipFile,
+	deleteZipFile,
 } from '../service/cloud';
 
 const router = express.Router();
@@ -63,9 +65,7 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 
 router.get('/download', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
-	const { current_dir } = req.query;
-	const { files } = req.query;
-	const { folders } = req.query;
+	const { current_dir, files, folders } = req.query;
 
 	if (current_dir === undefined || files === undefined || folders === undefined) {
 		return res.status(400).send();
@@ -80,8 +80,12 @@ router.get('/download', isAuthenticated, async (req, res) => {
 	console.log(fileMetas);
 
 	await downloadFiles({ downloadList: fileMetas });
-
-	return res.download(path.join(path.resolve(), 'temp/', loginId, '/'), 'test0-1.txt');
+	const targetFolderPath = path.join(path.resolve(), 'temp/', loginId);
+	const zipFolderPath = path.join(path.resolve(), 'temp/', `${loginId}.zip`);
+	createZipFile({ targetFolderPath, zipFolderPath });
+	res.download(zipFolderPath);
+	deleteZipFile({ targetFolderPath, zipFolderPath });
+	return;
 });
 
 router.put('/files', isAuthenticated, async (req, res) => {
