@@ -17,6 +17,81 @@ interface Props {
 	setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface SelectionProps {}
+
+const Selection: React.FC<SelectionProps> = ({ children }) => {
+	const [point, setPoint] = useState({
+		startX: 0,
+		startY: 0,
+		endX: 0,
+		endY: 0,
+	});
+	const [isDraging, setDraging] = useState(false);
+
+	const getOffsetPosition = (event: React.MouseEvent<HTMLDivElement>) => {
+		return {
+			offsetX: event.pageX - event.currentTarget.offsetLeft,
+			offsetY: event.pageY - event.currentTarget.offsetTop,
+		};
+	};
+
+	const onStartDrag = (event: React.MouseEvent<HTMLDivElement>) => {
+		const { offsetX, offsetY } = getOffsetPosition(event);
+
+		setPoint({
+			startX: offsetX,
+			startY: offsetY,
+			endX: offsetX,
+			endY: offsetY,
+		});
+		setDraging(true);
+	};
+	const onEndDrag = (event: React.MouseEvent<HTMLDivElement>) => {
+		setDraging(false);
+	};
+	const onChangeBox = useCallback(
+		(event: React.MouseEvent<HTMLDivElement>) => {
+			if (!isDraging) {
+				return;
+			}
+
+			const { offsetX, offsetY } = getOffsetPosition(event);
+			setPoint((prev) => ({ ...prev, endX: offsetX, endY: offsetY }));
+		},
+		[isDraging]
+	);
+
+	return (
+		<SelectionContainer
+			onMouseDown={onStartDrag}
+			onMouseUp={onEndDrag}
+			onMouseMove={onChangeBox}
+		>
+			{isDraging && (
+				<DragBox
+					ltX={Math.min(point.startX, point.endX)}
+					ltY={Math.min(point.startY, point.endY)}
+					rbX={Math.max(point.startX, point.endX)}
+					rbY={Math.max(point.startY, point.endY)}
+				/>
+			)}
+			{children}
+		</SelectionContainer>
+	);
+};
+const SelectionContainer = styled.div`
+	position: relative;
+`;
+const DragBox = styled.div<{ ltX: number; ltY: number; rbX: number; rbY: number }>`
+	position: absolute;
+	top: ${({ ltY }) => ltY}px;
+	left: ${({ ltX }) => ltX}px;
+	width: ${({ ltX, rbX }) => rbX - ltX}px;
+	height: ${({ ltY, rbY }) => rbY - ltY}px;
+
+	background-color: rgba(155, 193, 239, 0.4);
+`;
+
 const FileList: React.FC<Props> = ({
 	files,
 	setSelectedFiles,
@@ -43,16 +118,18 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
 			</FileHeader>
 			<Files>
-				{files.map((file, index) => (
-					<File
-						key={index}
-						file={file}
-						selectedFiles={selectedFiles}
-						setSelectedFiles={setSelectedFiles}
-						setCurrentDir={setCurrentDir}
-						currentDirectory={currentDirectory}
-					/>
-				))}
+				<Selection>
+					{files.map((file, index) => (
+						<File
+							key={index}
+							file={file}
+							selectedFiles={selectedFiles}
+							setSelectedFiles={setSelectedFiles}
+							setCurrentDir={setCurrentDir}
+							currentDirectory={currentDirectory}
+						/>
+					))}
+				</Selection>
 			</Files>
 		</Container>
 	);
@@ -87,5 +164,6 @@ const Files = styled.ul`
 		cursor: pointer;
 		margin: auto;
 	}
+	user-select: none;
 `;
 export default React.memo(FileList);
