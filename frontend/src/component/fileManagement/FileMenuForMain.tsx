@@ -68,21 +68,27 @@ const FileMenuForMain: React.FC<Props> = ({
 	};
 
 	const onClickDownload = async () => {
-		// const targetIds = selectedFiles
-		// 	.filter((file) => file.contentType !== 'folder')
-		// 	.map((file) => file._id);
-		// console.log(
-		// 	targetIds.reduce((acc, cur) => {
-		// 		return (acc += cur + '&');
-		// 	}, 'files=')
-		// );
-		// const directories = selectedFiles
-		// 	.filter((file) => file.contentType === 'folder')
-		// 	.map((file) => {
-		// 		return file.name;
-		// 	});
+		const targetIds = selectedFiles
+			.filter((file) => file.contentType !== 'folder')
+			.map((file) => file._id)
+			.reduce((acc, cur) => {
+				return (acc += 'files=' + cur + '&');
+			}, '');
+		const filesQuery = targetIds === '' ? 'files=&' : targetIds;
 
-		const queryString = `current_dir=/depth0&files=61948cbe933d7d418587fd5e&files=61948cbe933d7d418587fd56&folders=depth1`;
+		const directories = selectedFiles
+			.filter((file) => file.contentType === 'folder')
+			.map((file) => {
+				return file.name;
+			})
+			.reduce((acc, cur) => {
+				return (acc += 'folders=' + cur + '&');
+			}, '');
+		const directoriesQuery =
+			directories === '' ? 'folders=' : directories.substr(0, directories.length - 1);
+
+		const queryString = `current_dir=${currentDir}&${filesQuery}${directoriesQuery}`;
+		console.log(queryString);
 		fetch(`/cloud/download?${queryString}`, {
 			credentials: 'include',
 		})
@@ -104,9 +110,6 @@ const FileMenuForMain: React.FC<Props> = ({
 				a.remove();
 			})
 			.catch((err) => console.log(err));
-
-		// console.log('targetIds', targetIds);
-		// console.log('directories', directories);
 	};
 
 	const onClickDelete = () => {
