@@ -31,7 +31,7 @@ export const getDownloadListMetadata = async ({
 	const folders = Promise.all(
 		directories.map((directory) => {
 			return getDownloadFolderMetadata({
-				directory: currentDir === '/' ? currentDir : currentDir + '/' + directory,
+				directory: (currentDir === '/' ? currentDir : currentDir + '/') + directory,
 				loginId,
 			});
 		})
