@@ -1,4 +1,4 @@
-import React,{ useState } from 'react';
+import React,{ useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FileDTO } from '@DTO';
 
@@ -17,6 +17,7 @@ const makeDirectoryTree = (directories: string[]) =>{
 		else if(a.length === b.length) return 0;
 		else return -1;
 	})
+	console.log(splitDirectories);
 	makeTree(splitDirectories);
 }
 
@@ -33,7 +34,10 @@ const DirectoryList: React.FC<Props> = ({ className }) => {
 		const directories = await getDirectoryList();
 		const tree = makeDirectoryTree(directories);
 	}
-	makeTree();
+
+	useEffect(()=>{
+		makeTree();
+	},[]);
 
 	return (
 		<Container className={className}>

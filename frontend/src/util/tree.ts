@@ -28,9 +28,11 @@ export const makeTree = (arr : Array<string[]>)=>{
 
 const insertNode = (node : treeNode) => {
     const copiedNode = {...node};
-    const parent = findParent(root,node);
+    const parent = findParent(root,copiedNode);
+    console.log("cur: "+JSON.stringify(copiedNode));
+    console.log("parent: "+JSON.stringify(parent));
     parent.children.set(copiedNode.relativeDirectory,copiedNode);
-    console.log('parent:'+parent.relativeDirectory+'\n'+"child:"+copiedNode.relativeDirectory);
+    console.log("insert child: "+JSON.stringify(parent));
 }
 
 const findParent = (parent: treeNode,node: treeNode) => {
@@ -40,10 +42,13 @@ const findParent = (parent: treeNode,node: treeNode) => {
         return parent;
     }
 
-    parent.children.forEach((el)=>{
-        parent= findParent(el,node);
-        return false;
-    })
+    for(let child of parent.children){
+        parent = findParent(child[1],node);
+        if(parent){
+            break;
+        }
+    }
+
     return parent;
 }
 
