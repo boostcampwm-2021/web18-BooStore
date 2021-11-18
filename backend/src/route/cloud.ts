@@ -71,20 +71,21 @@ router.get('/download', isAuthenticated, async (req, res) => {
 		return res.status(400).send();
 	}
 
-	const fileMetas = await getDownloadListMetadata({
+	const metadataList = await getDownloadListMetadata({
 		loginId: loginId,
 		currentDir: current_dir as string,
 		fileIds: typeof files === 'string' ? [files] : (files as Array<string>),
 		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
 	});
-	console.log(fileMetas);
+	await downloadFiles({ downloadList: metadataList });
 
-	await downloadFiles({ downloadList: fileMetas });
 	const targetFolderPath = path.join(path.resolve(), 'temp/', loginId);
 	const zipFolderPath = path.join(path.resolve(), 'temp/', `${loginId}.zip`);
+
 	createZipFile({ targetFolderPath, zipFolderPath });
-	res.download(zipFolderPath);
+	res.download(zipFolderPath, `${loginId}.zip`);
 	deleteZipFile({ targetFolderPath, zipFolderPath });
+
 	return;
 });
 
