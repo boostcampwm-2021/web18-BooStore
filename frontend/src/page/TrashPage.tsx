@@ -68,7 +68,7 @@ const TrashPage: React.FC<TrashPageProps> = ({user}) => {
 
 	return (
 		<Container>
-			<SidebarForTrash capacity={capacity} files={files}/>
+			<SidebarForTrash capacity={capacity} files={files} setCurrentDir={setCurrentDir}/>
 			<InnerContainer>
 				<DirectorySection>
 					<Directory

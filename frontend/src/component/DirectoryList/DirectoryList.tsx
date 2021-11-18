@@ -24,9 +24,10 @@ const makeDirectoryTree = (directories: string[]) => {
 interface Props {
 	className?: string;
 	files: FileDTO[];
+	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const DirectoryList: React.FC<Props> = ({ className, files }) => {
+const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => {
 	const [folderStructure, setFolderStructure] = useState({
 		relativeDirectory: '/',
 		parentDirectory: '',
@@ -51,10 +52,12 @@ const DirectoryList: React.FC<Props> = ({ className, files }) => {
 		let curDir = treeNode.relativeDirectory.split('/').splice(-1)[0];
 		curDir === '' ? (curDir = '내 스토어') : '';
 		
-		console.log(childrenToArr, treeNode);
+		const onClickNav = () => {
+			setCurrentDir(treeNode.relativeDirectory);
+		}
 		
 		return (
-			<Directory name={curDir}>
+			<Directory name={curDir} onClickNav={onClickNav}>
 				{childrenToArr.map((treeNode: treeNode) => {
 					return (
 						<Fragment key={treeNode.relativeDirectory}>

@@ -89,7 +89,7 @@ const MainPage: React.FC<MainPageProps> = ({ user }) => {
 
 	return (
 		<Container>
-			<SidebarForMain capacity={capacity} files={files}/>
+			<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir}/>
 			<InnerContainer>
 				<DirectorySection>
 					<Directory
