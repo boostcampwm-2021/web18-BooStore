@@ -23,7 +23,7 @@ interface DirectoryProps {
 	onClickDirectory: (relativePath: string) => Promise<void>;
 }
 
-const TrashPage: React.FC<TrashPageProps> = () => {
+const TrashPage: React.FC<TrashPageProps> = ({user}) => {
 	const [currentDir, setCurrentDir] = useState('/');
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
@@ -68,7 +68,7 @@ const TrashPage: React.FC<TrashPageProps> = () => {
 
 	return (
 		<Container>
-			<SidebarForMain capacity={capacity} files={files} />
+			<SidebarForTrash capacity={capacity} files={files} setCurrentDir={setCurrentDir}/>
 			<InnerContainer>
 				<DirectorySection>
 					<Directory
@@ -125,7 +125,7 @@ const Container = styled.div`
 	overflow-y: hidden;
 `;
 
-const SidebarForMain = styled(Sidebar)`
+const SidebarForTrash = styled(Sidebar)`
 	flex: 1;
 `;
 

@@ -10,7 +10,7 @@ import { FileDTO } from '@DTO';
 import { getFiles } from '@util';
 import { getCapacity } from 'api';
 
-import arrow from '@asset/image/icons/icon_left_arrow.svg';
+import {ReactComponent as ArrowSvg} from '@asset/image/icons/icon_left_arrow.svg';
 
 interface MainPageProps {
 	user: User;
@@ -34,7 +34,7 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 
 	return (
 		<>
-			{idx != 0 && <img src={arrow} style={{ verticalAlign: 'middle' }}></img>}
+			{idx != 0 && <ArrowSvg style={{ verticalAlign: 'middle' }} />}
 			<span onClick={() => onClickDirectory(relativePath)} style={{ cursor: 'pointer' }}>
 				{name}
 			</span>
@@ -42,7 +42,7 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 	);
 };
 
-const MainPage: React.FC<MainPageProps> = () => {
+const MainPage: React.FC<MainPageProps> = ({ user }) => {
 	const [currentDir, setCurrentDir] = useState('/');
 	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
 	const [files, setFiles] = useState<FileDTO[]>([]);
@@ -86,7 +86,7 @@ const MainPage: React.FC<MainPageProps> = () => {
 
 	return (
 		<Container>
-			<SidebarForMain capacity={capacity} files={files} />
+			<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir}/>
 			<InnerContainer>
 				<DirectorySection>
 					<Directory
