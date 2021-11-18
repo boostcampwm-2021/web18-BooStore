@@ -66,7 +66,7 @@ const File: React.FC<Props> = ({
 
 	return (
 		<Container
-			onClick={onClickFile}
+			onMouseDown={onClickFile}
 			isSelected={isSelected}
 			className={className}
 			data-id={_id}
@@ -107,9 +107,8 @@ const FileNameBox = styled.div`
 const FileName = styled.span<{ isFolder: boolean }>`
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
 	color: ${(props) => props.theme.color.Content};
-	&:hover {
-		cursor: default;
-	}
+	
+	cursor: ${({isFolder}) => isFolder && 'pointer'};
 	margin: auto;
 	margin-left: 0;
 `;
