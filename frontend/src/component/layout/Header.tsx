@@ -12,9 +12,10 @@ import { Link } from 'react-router-dom';
 export type hasUserProps = {
 	user: User | null;
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
+	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const Header: React.FC<hasUserProps> = ({ user, setUser }) => {
+const Header: React.FC<hasUserProps> = ({ user, setUser, setCurrentDir }) => {
 	const [isOpenModal, setOpenModal] = useState(false);
     const profileModal = useRef<HTMLDivElement>(null);
 	const history = useHistory();
@@ -56,7 +57,7 @@ const Header: React.FC<hasUserProps> = ({ user, setUser }) => {
 
 	return (
 		<HeaderSection>
-			<Logo to='/'>
+			<Logo to='/' onClick={() => setCurrentDir('/')}>
                 <LogoImage/>
             </Logo>
 			<ProfileBox show={!!user}>

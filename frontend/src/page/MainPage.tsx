@@ -4,16 +4,18 @@ import styled, { keyframes } from 'styled-components';
 import FileList from '@component/fileManagement/FileList';
 import FileMenu from '@component/fileManagement/FileMenuForMain';
 import Sidebar from '@component/layout/Sidebar';
+import Header from '@component/layout/Header';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
 import { getFiles } from '@util';
 import { getCapacity } from 'api';
 
-import {ReactComponent as ArrowSvg} from '@asset/image/icons/icon_left_arrow.svg';
+import { ReactComponent as ArrowSvg } from '@asset/image/icons/icon_left_arrow.svg';
 
 interface MainPageProps {
 	user: User;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 interface DirectoryProps {
@@ -42,9 +44,12 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 	);
 };
 
-const MainPage: React.FC<MainPageProps> = ({ user }) => {
+const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	const [currentDir, setCurrentDir] = useState('/');
-	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
+	const [capacity, setCapacity] = useState<Capacity>({
+		currentCapacity: 0,
+		maxCapacity: 1024 * 1024 * 1024,
+	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 	const [isAscending, setIsAscending] = useState<boolean>(true);
@@ -85,41 +90,44 @@ const MainPage: React.FC<MainPageProps> = ({ user }) => {
 	}, [currentDir, isAscending]);
 
 	return (
-		<Container>
-			<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir}/>
-			<InnerContainer>
-				<DirectorySection>
-					<Directory
-						idx={0}
-						name={'내 스토어'}
+		<>
+			<Header user={user} setUser={setUser} setCurrentDir={setCurrentDir} />
+			<Container>
+				<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir} />
+				<InnerContainer>
+					<DirectorySection>
+						<Directory
+							idx={0}
+							name={'내 스토어'}
+							currentDir={currentDir}
+							onClickDirectory={onClickDirectory}
+							key={0}
+						/>
+						{getCurDirectoryComponent()}
+					</DirectorySection>
+					<FileMenu
+						showShareButton
+						capacity={capacity}
+						setCapacity={setCapacity}
+						selectedFiles={selectedFiles}
+						setSelectedFiles={setSelectedFiles}
 						currentDir={currentDir}
-						onClickDirectory={onClickDirectory}
-						key={0}
+						setFiles={setFiles}
+						files={files}
+						updateFiles={updateFiles}
 					/>
-					{getCurDirectoryComponent()}
-				</DirectorySection>
-				<FileMenu
-					showShareButton
-					capacity={capacity}
-					setCapacity={setCapacity}
-					selectedFiles={selectedFiles}
-					setSelectedFiles={setSelectedFiles}
-					currentDir={currentDir}
-					setFiles={setFiles}
-					files={files}
-					updateFiles={updateFiles}
-				/>
-				<StyledFileList
-					files={files}
-					selectedFiles={selectedFiles}
-					setSelectedFiles={setSelectedFiles}
-					setCurrentDir={setCurrentDir}
-					currentDirectory={currentDir}
-					isAscending={isAscending}
-					setIsAscending={setIsAscending}
-				/>
-			</InnerContainer>
-		</Container>
+					<StyledFileList
+						files={files}
+						selectedFiles={selectedFiles}
+						setSelectedFiles={setSelectedFiles}
+						setCurrentDir={setCurrentDir}
+						currentDirectory={currentDir}
+						isAscending={isAscending}
+						setIsAscending={setIsAscending}
+					/>
+				</InnerContainer>
+			</Container>
+		</>
 	);
 };
 
