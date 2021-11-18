@@ -15,10 +15,10 @@ const Router: React.FC<hasUserProps> = ({ user, setUser }) => {
 		return (
 			<Switch>
 				<Route path="/" exact>
-					<Main user={user} />
+					<Main user={user} setUser={setUser} />
 				</Route>
 				<Route path="/trash" exact>
-					<TrashPage user={user} />
+					<TrashPage user={user} setUser={setUser} />
 				</Route>
 				<Redirect to="/" />
 			</Switch>

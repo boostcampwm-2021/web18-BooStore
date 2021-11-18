@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FileDTO, FileEditAction } from '@DTO';
 import { Capacity } from '@model';
@@ -18,6 +18,7 @@ interface Props {
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	currentDir: string;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	files: FileDTO[]
 	updateFiles?: Function;
 }
 
@@ -29,6 +30,7 @@ const FileMenuForMain: React.FC<Props> = ({
 	setSelectedFiles,
 	currentDir,
 	setFiles,
+	files,
 	updateFiles = () => {},
 }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
@@ -40,6 +42,7 @@ const FileMenuForMain: React.FC<Props> = ({
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
 	const [selectedUploadFiles, setSelectedUploadFiles] = useState<FileList | null>(null);
+	const [isOnSelectAll, setOnSelectAll] = useState(false);
 
 	const onclickFileUploadButton = () => {
 		inputFileRef.current?.removeAttribute('webkitdirectory');
@@ -155,15 +158,6 @@ const FileMenuForMain: React.FC<Props> = ({
 		setSelectedFiles([]);
 	};
 
-	useEffect(() => {
-		if (selectedUploadFiles === null || selectedUploadFiles.length === 0) {
-			return;
-		}
-
-		handleFileUpload();
-		setSelectedUploadFiles(null);
-	}, [selectedUploadFiles]);
-
 	const validateSize = async (totalSize: number) => {
 		const { currentCapacity, maxCapacity } = capacity;
 		if (currentCapacity + totalSize > maxCapacity) {
@@ -247,10 +241,42 @@ const FileMenuForMain: React.FC<Props> = ({
 		inputFileRef.current!.value = '';
 	};
 
+	const onClickSelectAll = useCallback(() => {
+		if (isOnSelectAll) {
+			setSelectedFiles([]);
+		}
+		else {
+			setSelectedFiles([ ...files ]);
+		}
+		
+		setOnSelectAll(prev => !prev);
+	}, [ files, isOnSelectAll ]);
+
+	useEffect(() => {
+		if (selectedUploadFiles === null || selectedUploadFiles.length === 0) {
+			return;
+		}
+
+		handleFileUpload();
+		setSelectedUploadFiles(null);
+	}, [selectedUploadFiles]);
+	
+	useEffect(() => {
+		if (files.length === 0) {
+			setOnSelectAll(false);
+		}
+		else if (selectedFiles.length === files.length) {
+			setOnSelectAll(true);
+		}
+		else {
+			setOnSelectAll(false);
+		}
+	}, [selectedFiles, files]);
+	
 	return (
 		<Container>
-			<SelectAllBtn>
-				<ToggleOffSvg />
+			<SelectAllBtn onClick={onClickSelectAll}>
+				{isOnSelectAll ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			</SelectAllBtn>
 			{selectedFiles.length > 0 ? (
 				<DownloadButton onClick={onClickDownload}> 다운로드 </DownloadButton>
@@ -282,10 +308,8 @@ const FileMenuForMain: React.FC<Props> = ({
 				setOpen={setOpenProgreeModal}
 				modalType={ModalType.Upload}
 			>
-				<div>
-					<p> {progressModalText} </p>
-					<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
-				</div>
+				<span> {progressModalText} </span>
+				<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
 			</ProgressModal>
 		</Container>
 	);

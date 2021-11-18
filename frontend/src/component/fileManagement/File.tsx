@@ -9,6 +9,8 @@ interface Props {
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
+	selectedFiles: FileDTO[];
+	className?: string;
 }
 
 const File: React.FC<Props> = ({
@@ -16,6 +18,8 @@ const File: React.FC<Props> = ({
 	setSelectedFiles,
 	setCurrentDir,
 	currentDirectory,
+	selectedFiles,
+	className,
 }) => {
 	const [isSelected, setSelected] = useState(false);
 
@@ -24,7 +28,6 @@ const File: React.FC<Props> = ({
 	const getConvertedSize = convertByteToUnitString(size);
 
 	const onClickFile = (event: React.MouseEvent<HTMLDivElement>) => {
-		setSelected((prev) => !prev);
 		setSelectedFiles((selectedFiles) => {
 			const result = [...selectedFiles];
 			const element = selectedFiles.find((ele) => {
@@ -49,18 +52,33 @@ const File: React.FC<Props> = ({
 	};
 
 	useEffect(() => {
+		if (selectedFiles.find((ele) => ele._id === _id)) {
+			setSelected(true);
+		} else {
+			setSelected(false);
+		}
+	}, [selectedFiles]);
+
+	useEffect(() => {
 		// 디렉토리가 변경되면 선택 상태를 false로 초기화
 		setSelected(false);
 	}, [currentDirectory]);
 
-
 	return (
-		<Container onClick={onClickFile} isSelected={isSelected}>
+		<Container
+			onMouseDown={onClickFile}
+			isSelected={isSelected}
+			className={className}
+			data-id={_id}
+		>
 			<p>{isFolder}</p>
 			<FileIcon type={contentType} />
-			<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
-				{name}
-			</FileName>
+			<FileNameBox>
+				<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
+					{name}
+				</FileName>
+			</FileNameBox>
+
 			<MetaData> {getDate(createdAt)} </MetaData>
 			<MetaData> {getDate(updatedAt)} </MetaData>
 			<MetaData> {isFolder ? '-' : getConvertedSize} </MetaData>
@@ -78,13 +96,19 @@ const Container = styled.div<{ isSelected: boolean }>`
 		background-color: ${({ theme }) => theme.color.SecondaryBG};
 	}
 `;
+const FileNameBox = styled.div`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 
-const FileName = styled.p<{ isFolder: boolean }>`
+	padding-right: 10%;
+`;
+
+const FileName = styled.span<{ isFolder: boolean }>`
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
 	color: ${(props) => props.theme.color.Content};
-	&:hover {
-		cursor: default;
-	}
+	
+	cursor: ${({isFolder}) => isFolder && 'pointer'};
 	margin: auto;
 	margin-left: 0;
 `;

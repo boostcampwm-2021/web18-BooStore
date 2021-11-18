@@ -4,6 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import FileList from '@component/fileManagement/FileList';
 import FileMenu from '@component/fileManagement/FileMenuForTrash';
 import Sidebar from '@component/layout/Sidebar';
+import Header from '@component/layout/Header';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
@@ -14,6 +15,7 @@ import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
 interface TrashPageProps {
 	user: User;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 interface DirectoryProps {
@@ -23,16 +25,19 @@ interface DirectoryProps {
 	onClickDirectory: (relativePath: string) => Promise<void>;
 }
 
-const TrashPage: React.FC<TrashPageProps> = ({user}) => {
+const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 	const [currentDir, setCurrentDir] = useState('/');
-	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
+	const [capacity, setCapacity] = useState<Capacity>({
+		currentCapacity: 0,
+		maxCapacity: 1024 * 1024 * 1024,
+	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 
 	const onClickDirectory = async (relativePath: string) => {
 		setSelectedFiles([]);
-		
+
 		const files = await getFiles(relativePath, isAscending, true);
 		setFiles(files);
 		setCurrentDir(relativePath);
@@ -55,7 +60,7 @@ const TrashPage: React.FC<TrashPageProps> = ({user}) => {
 				/>
 			));
 	}, [currentDir]);
-	
+
 	const updateFiles = async () => {
 		setSelectedFiles([]);
 		setFiles(await getFiles(currentDir, isAscending, true));
@@ -67,35 +72,40 @@ const TrashPage: React.FC<TrashPageProps> = ({user}) => {
 	}, [currentDir, isAscending]);
 
 	return (
-		<Container>
-			<SidebarForTrash capacity={capacity} files={files} setCurrentDir={setCurrentDir}/>
-			<InnerContainer>
-				<DirectorySection>
-					<Directory
-						idx={0}
-						name={'휴지통'}
-						currentDir={currentDir}
-						onClickDirectory={onClickDirectory}
-						key={0}
+		<>
+			<Header user={user} setUser={setUser} setCurrentDir={setCurrentDir} />
+			<Container>
+				<SidebarForTrash capacity={capacity} files={files} setCurrentDir={setCurrentDir} />
+				<InnerContainer>
+					<DirectorySection>
+						<Directory
+							idx={0}
+							name={'휴지통'}
+							currentDir={currentDir}
+							onClickDirectory={onClickDirectory}
+							key={0}
+						/>
+						{getCurDirectoryComponent()}
+					</DirectorySection>
+					<FileMenu
+						setCapacity={setCapacity}
+						selectedFiles={selectedFiles}
+						setSelectedFiles={setSelectedFiles}
+						setFiles={setFiles}
+						files={files}
 					/>
-					{getCurDirectoryComponent()}
-				</DirectorySection>
-				<FileMenu
-					setCapacity={setCapacity}
-					selectedFiles={selectedFiles}
-					setSelectedFiles={setSelectedFiles}
-					setFiles={setFiles}
-				/>
-				<FileList
-					files={files}
-					setSelectedFiles={setSelectedFiles}
-					setCurrentDir={setCurrentDir}
-					currentDirectory={currentDir}
-					isAscending={isAscending}
-					setIsAscending={setIsAscending}
-				/>
-			</InnerContainer>
-		</Container>
+					<StyledFileList
+						files={files}
+						selectedFiles={selectedFiles}
+						setSelectedFiles={setSelectedFiles}
+						setCurrentDir={setCurrentDir}
+						currentDirectory={currentDir}
+						isAscending={isAscending}
+						setIsAscending={setIsAscending}
+					/>
+				</InnerContainer>
+			</Container>
+		</>
 	);
 };
 
@@ -117,7 +127,6 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 		</>
 	);
 };
-
 
 const Container = styled.div`
 	display: flex;
@@ -144,6 +153,9 @@ const DirectorySection = styled.div`
 	font-size: ${(props) => props.theme.fontSize.Title};
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	padding: ${(props) => props.theme.padding.Content};
+`;
+const StyledFileList = styled(FileList)`
+	flex: 1;
 `;
 
 export default TrashPage;

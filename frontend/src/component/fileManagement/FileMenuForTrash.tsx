@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FileDTO, FileEditAction } from '@DTO';
 import { Capacity } from '@model';
@@ -16,6 +16,7 @@ interface Props {
 	selectedFiles: FileDTO[];
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	files: FileDTO[];
 }
 
 const FileMenuForTrash: React.FC<Props> = ({
@@ -23,7 +24,10 @@ const FileMenuForTrash: React.FC<Props> = ({
 	selectedFiles,
 	setSelectedFiles,
 	setFiles,
+	files,
 }) => {
+	const [isOnSelectAll, setOnSelectAll] = useState(false);
+
 	const onClickDelete = () => {
 		const ids = selectedFiles.map((file) => file._id);
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
@@ -95,10 +99,21 @@ const FileMenuForTrash: React.FC<Props> = ({
 		setSelectedFiles([]);
 	};
 
+	const onClickSelectAll = useCallback(() => {
+		if (isOnSelectAll) {
+			setSelectedFiles([]);
+		}
+		else {
+			setSelectedFiles([ ...files ]);
+		}
+		
+		setOnSelectAll(prev => !prev);
+	}, [ files, selectedFiles, isOnSelectAll ]);
+
 	return (
 		<Container>
-			<SelectAllBtn>
-				<ToggleOffSvg />
+			<SelectAllBtn onClick={onClickSelectAll}>
+				{isOnSelectAll ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			</SelectAllBtn>
 			<DownloadButton onClick={onClickRestore} disabled={selectedFiles.length === 0}>
 				복원하기
