@@ -88,7 +88,6 @@ const FileMenuForMain: React.FC<Props> = ({
 			directories === '' ? 'folders=' : directories.substr(0, directories.length - 1);
 
 		const queryString = `current_dir=${currentDir}&${filesQuery}${directoriesQuery}`;
-		console.log(queryString);
 		fetch(`/cloud/download?${queryString}`, {
 			credentials: 'include',
 		})
@@ -107,7 +106,6 @@ const FileMenuForMain: React.FC<Props> = ({
 				return { fileName: fileName, blob: blob };
 			})
 			.then(({ fileName, blob }) => {
-				console.log(fileName, blob);
 				const url = window.URL.createObjectURL(blob);
 				const a = document.createElement('a');
 				a.href = url;
