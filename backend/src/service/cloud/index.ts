@@ -1,4 +1,4 @@
 export * from './capacity';
-export * from './upload';
+export * from './file';
 export * from './directory';
 export * from './download';

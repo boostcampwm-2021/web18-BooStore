@@ -23,16 +23,6 @@ router.get('/', isAuthenticated, (req, res) => {
 });
 
 router.get('/capacity', isAuthenticated, async (req, res) => {
-	/*
-	// 세션을 사용하는게 좋을까? 아니면 디비에 다시 접근하는게 좋을까...
-	// 고민해보자
-	const { maxCapacity, currentCapacity } = req.user;
-	const data = {
-		currentCapacity,
-		maxCapacity,
-	};
-	*/
-
 	const { loginId } = req.user;
 	const data = await getCapacity({ loginId });
 
@@ -40,8 +30,7 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 });
 
 router.get('/files', isAuthenticated, async (req, res) => {
-	const { path } = req.query;
-	const { isAscending } = req.query;
+	const { path, isAscending, isDeleted } = req.query;
 	const { loginId } = req.user;
 	if (path === undefined) {
 		return res.status(400).send();
@@ -53,7 +42,8 @@ router.get('/files', isAuthenticated, async (req, res) => {
 	const filesArg: FilesArg = {
 		loginId: loginId,
 		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
-		isAscending: JSON.parse(isAscending as string),
+		isAscending: isAscending === 'true',
+		isDeleted: isDeleted === 'true'
 	};
 
 	const tempFiles = await getFiles(filesArg);

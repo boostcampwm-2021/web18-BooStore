@@ -1,8 +1,9 @@
 import * as express from 'express';
 import * as path from 'path';
-import { isAuthenticated } from '../middleware';
 import * as fs from 'fs/promises';
-import { Cloud } from '../model';
+
+import { FileEditAction } from '../DTO';
+import { isAuthenticated, upload } from '../middleware';
 import {
 	canIncreaseCurrentCapacity,
 	DownloadListMetadataArg,
@@ -11,8 +12,13 @@ import {
 	uploadFile,
 	DownloadFilesArg,
 	downloadFiles,
+	moveTrashFiles,
+	moveTrashFolders,
+	removeFiles,
+	restoreTrashFiles,
+	restoreTrashFolders,
+	removeFolders,
 } from '../service/cloud';
-import upload from '../middleware/multer';
 
 const router = express.Router();
 
@@ -76,6 +82,44 @@ router.get('/download', isAuthenticated, async (req, res) => {
 	await downloadFiles({ downloadList: fileMetas });
 
 	return res.download(path.join(path.resolve(), 'temp/', loginId, '/'), 'test0-1.txt');
+});
+
+router.put('/files', isAuthenticated, async (req, res) => {
+	const { targetIds = [], directorys = [], action } = req.body;
+	const { loginId } = req.user;
+
+	try {
+		switch (action) {
+			case FileEditAction.trash:
+				await moveTrashFiles({ targetIds, userLoginId: loginId });
+				await moveTrashFolders({ directorys, userLoginId: loginId });
+				break;
+			case FileEditAction.restore:
+				await restoreTrashFiles({ targetIds, userLoginId: loginId });
+				await restoreTrashFolders({ directorys, userLoginId: loginId });
+				break;
+			case FileEditAction.move:
+				break;
+		}
+
+		res.send();
+	} catch (err) {
+		res.send(500).send();
+	}
+});
+
+router.delete('/files', isAuthenticated, async (req, res) => {
+	const { targetIds = [], directorys = [] } = req.body;
+	const { loginId } = req.user;
+
+	try {
+		await removeFiles({ targetIds, userLoginId: loginId });
+		await removeFolders({ directorys, userLoginId: loginId });
+
+		res.send();
+	} catch (err) {
+		res.send(500).send();
+	}
 });
 
 export default router;

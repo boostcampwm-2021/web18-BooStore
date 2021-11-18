@@ -2,7 +2,7 @@ import React, { Key, useCallback, useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 
 import FileList from '@component/fileManagement/FileList';
-import FileMenu from '@component/fileManagement/FileMenuForMain';
+import FileMenu from '@component/fileManagement/FileMenuForTrash';
 import Sidebar from '@component/layout/Sidebar';
 import { User } from '@model';
 import { Capacity } from '@model';
@@ -12,7 +12,7 @@ import { getCapacity } from 'api';
 
 import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
-interface MainPageProps {
+interface TrashPageProps {
 	user: User;
 }
 
@@ -22,6 +22,82 @@ interface DirectoryProps {
 	currentDir: string;
 	onClickDirectory: (relativePath: string) => Promise<void>;
 }
+
+const TrashPage: React.FC<TrashPageProps> = () => {
+	const [currentDir, setCurrentDir] = useState('/');
+	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
+	const [files, setFiles] = useState<FileDTO[]>([]);
+	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
+	const [isAscending, setIsAscending] = useState<boolean>(true);
+
+	const onClickDirectory = async (relativePath: string) => {
+		setSelectedFiles([]);
+		
+		const files = await getFiles(relativePath, isAscending, true);
+		setFiles(files);
+		setCurrentDir(relativePath);
+	};
+
+	const getCurDirectoryComponent = useCallback(() => {
+		if (currentDir === '/') {
+			return;
+		}
+		return currentDir
+			.split('/')
+			.slice(1)
+			.map((el, idx) => (
+				<Directory
+					idx={idx + 1}
+					name={el}
+					currentDir={currentDir}
+					onClickDirectory={onClickDirectory}
+					key={idx + 1}
+				/>
+			));
+	}, [currentDir]);
+	
+	const updateFiles = async () => {
+		setSelectedFiles([]);
+		setFiles(await getFiles(currentDir, isAscending, true));
+		setCapacity(await getCapacity());
+	};
+
+	useEffect(() => {
+		updateFiles();
+	}, [currentDir, isAscending]);
+
+	return (
+		<Container>
+			<SidebarForMain capacity={capacity} files={files} />
+			<InnerContainer>
+				<DirectorySection>
+					<Directory
+						idx={0}
+						name={'휴지통'}
+						currentDir={currentDir}
+						onClickDirectory={onClickDirectory}
+						key={0}
+					/>
+					{getCurDirectoryComponent()}
+				</DirectorySection>
+				<FileMenu
+					setCapacity={setCapacity}
+					selectedFiles={selectedFiles}
+					setSelectedFiles={setSelectedFiles}
+					setFiles={setFiles}
+				/>
+				<FileList
+					files={files}
+					setSelectedFiles={setSelectedFiles}
+					setCurrentDir={setCurrentDir}
+					currentDirectory={currentDir}
+					isAscending={isAscending}
+					setIsAscending={setIsAscending}
+				/>
+			</InnerContainer>
+		</Container>
+	);
+};
 
 const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDirectory }) => {
 	let relativePath: string = currentDir
@@ -42,84 +118,6 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 	);
 };
 
-const MainPage: React.FC<MainPageProps> = () => {
-	const [currentDir, setCurrentDir] = useState('/');
-	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
-	const [files, setFiles] = useState<FileDTO[]>([]);
-	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
-	const [isAscending, setIsAscending] = useState<boolean>(true);
-
-	const onClickDirectory = async (relativePath: string) => {
-		const files = await getFiles(relativePath, isAscending);
-		setFiles(files);
-		setCurrentDir(relativePath);
-		setSelectedFiles([]);
-	};
-
-	const updateFiles = async () => {
-		setSelectedFiles([]);
-		setFiles(await getFiles(currentDir, isAscending));
-		setCapacity(await getCapacity());
-	};
-
-	const getCurDirectoryComponent = useCallback(() => {
-		if (currentDir === '/') {
-			return;
-		}
-		return currentDir
-			.split('/')
-			.slice(1)
-			.map((el, idx) => (
-				<Directory
-					idx={idx + 1}
-					name={el}
-					currentDir={currentDir}
-					onClickDirectory={onClickDirectory}
-					key={idx + 1}
-				/>
-			));
-	}, [currentDir]);
-
-	useEffect(() => {
-		updateFiles();
-	}, [currentDir, isAscending]);
-
-	return (
-		<Container>
-			<SidebarForMain capacity={capacity} files={files} />
-			<InnerContainer>
-				<DirectorySection>
-					<Directory
-						idx={0}
-						name={'내 스토어'}
-						currentDir={currentDir}
-						onClickDirectory={onClickDirectory}
-						key={0}
-					/>
-					{getCurDirectoryComponent()}
-				</DirectorySection>
-				<FileMenu
-					showShareButton
-					capacity={capacity}
-					setCapacity={setCapacity}
-					selectedFiles={selectedFiles}
-					setSelectedFiles={setSelectedFiles}
-					currentDir={currentDir}
-					setFiles={setFiles}
-					updateFiles={updateFiles}
-				/>
-				<FileList
-					files={files}
-					setSelectedFiles={setSelectedFiles}
-					setCurrentDir={setCurrentDir}
-					currentDirectory={currentDir}
-					isAscending={isAscending}
-					setIsAscending={setIsAscending}
-				/>
-			</InnerContainer>
-		</Container>
-	);
-};
 
 const Container = styled.div`
 	display: flex;
@@ -148,4 +146,4 @@ const DirectorySection = styled.div`
 	padding: ${(props) => props.theme.padding.Content};
 `;
 
-export default MainPage;
+export default TrashPage;
