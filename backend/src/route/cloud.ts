@@ -77,7 +77,6 @@ router.get('/download', isAuthenticated, async (req, res) => {
 		fileIds: typeof files === 'string' ? [files] : (files as Array<string>),
 		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
 	});
-	console.log(fileMetas);
 
 	await downloadFiles({ downloadList: fileMetas });
 
