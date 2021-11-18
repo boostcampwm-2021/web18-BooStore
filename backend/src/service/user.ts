@@ -30,7 +30,7 @@ const CloudService = {
 		}
 	}
 }
-const MAX_CAPACITY = 1024 * 1024 * 1024; // 나중에 설정파일로 빼고싶다.
+const MAX_CAPACITY = Number(process.env.MAX_CAPACITY); 
 
 export const createUser = async ({ loginId, password }) => {
 	const existsUser = await User.findOne({ loginId }).exec();
