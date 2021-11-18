@@ -1,19 +1,24 @@
 import * as express from 'express';
-
-import { isAuthenticated, upload } from '../middleware';
+import * as path from 'path';
 import * as fs from 'fs/promises';
+
+import { FileEditAction } from '../DTO';
+import { isAuthenticated, upload } from '../middleware';
 import {
 	canIncreaseCurrentCapacity,
+	DownloadListMetadataArg,
+	getDownloadListMetadata,
+	UploadArg,
+	uploadFile,
+	DownloadFilesArg,
+	downloadFiles,
 	moveTrashFiles,
 	moveTrashFolders,
 	removeFiles,
 	restoreTrashFiles,
 	restoreTrashFolders,
-	UploadArg,
-	uploadFile,
 	removeFolders,
 } from '../service/cloud';
-import { FileEditAction } from '../DTO';
 
 const router = express.Router();
 
@@ -54,6 +59,29 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 	}
 
 	res.status(200).send();
+});
+
+router.get('/download', isAuthenticated, async (req, res) => {
+	const { loginId } = req.user;
+	const { current_dir } = req.query;
+	const { files } = req.query;
+	const { folders } = req.query;
+
+	if (current_dir === undefined || files === undefined || folders === undefined) {
+		return res.status(400).send();
+	}
+
+	const fileMetas = await getDownloadListMetadata({
+		loginId: loginId,
+		currentDir: current_dir as string,
+		fileIds: typeof files === 'string' ? [files] : (files as Array<string>),
+		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
+	});
+	console.log(fileMetas);
+
+	await downloadFiles({ downloadList: fileMetas });
+
+	return res.download(path.join(path.resolve(), 'temp/', loginId, '/'), 'test0-1.txt');
 });
 
 router.put('/files', isAuthenticated, async (req, res) => {
