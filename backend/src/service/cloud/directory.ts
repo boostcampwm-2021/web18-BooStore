@@ -2,8 +2,9 @@ import { Cloud, ICloud } from '../../model';
 
 export interface FilesArg {
 	loginId: string;
-	path: string;
 	regex: string;
+	isAscending: boolean;
+	isDeleted: boolean;
 }
 
 export interface FilteredFilesArg {
@@ -11,11 +12,16 @@ export interface FilteredFilesArg {
 	originFiles: ICloud[];
 }
 
-export const getFiles = async ({ loginId, path, regex }: FilesArg) => {
+interface Directory {
+	directory: string;
+}
+
+export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: FilesArg) => {
 	const files = Cloud.find(
 		{
 			directory: { $regex: regex },
 			ownerId: loginId,
+			isDeleted,
 		},
 		{
 			directory: true,
@@ -25,7 +31,8 @@ export const getFiles = async ({ loginId, path, regex }: FilesArg) => {
 			updatedAt: true,
 			size: true,
 			ownerId: true,
-		}
+		},
+		{ sort: { name: isAscending ? 'asc' : 'desc' } }
 	).exec();
 	return files;
 };
@@ -34,6 +41,7 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 	const directories = [];
 	const splittedPath = path === '/' ? [''] : (path as string).split('/');
 	const filteredFiles = [];
+	const filteredFolders = [];
 	originFiles.map((file) => {
 		if (file.directory === path) {
 			filteredFiles.push(file);
@@ -44,9 +52,42 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 				file.contentType = 'folder';
 				file.size = 0;
 				file.name = splittedDirectory[splittedPath.length];
-				filteredFiles.push(file);
+				file.directory = path;
+				filteredFolders.push(file);
 			}
 		}
 	});
-	return filteredFiles;
+	return filteredFolders.concat(filteredFiles);
+};
+
+const getFormattedDate = (date: string) => {
+	return new Date(Date.parse(date))
+		.toLocaleString()
+		.replace('.', '년')
+		.replace('.', '월')
+		.replace('.', '일');
+};
+
+export const getDirectoryList = async (loginId: string) => {
+	const allFiles = await Cloud.find(
+		{
+			ownerId: loginId,
+			isDeleted: false,
+		},
+		{
+			_id: false,
+			directory: true,
+		}
+	);
+
+	const directoryArr = makeDirectoryToArrFormat(allFiles);
+	return directoryArr;
+};
+
+const makeDirectoryToArrFormat = (allFiles: Directory[]) => {
+	let directorySet = new Set();
+	allFiles.filter(file => file.directory.length > 1).forEach((file) => {
+		directorySet.add(file.directory);
+	});
+	return Array.from(directorySet);
 };

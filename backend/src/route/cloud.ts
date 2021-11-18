@@ -1,10 +1,26 @@
 import * as express from 'express';
-
-import { isAuthenticated } from '../middleware';
+import * as path from 'path';
 import * as fs from 'fs/promises';
-import { Cloud } from '../model';
-import { canIncreaseCurrentCapacity, UploadArg, uploadFile } from '../service/cloud';
-import upload from '../middleware/multer';
+
+import { FileEditAction } from '../DTO';
+import { isAuthenticated, upload } from '../middleware';
+import {
+	canIncreaseCurrentCapacity,
+	DownloadListMetadataArg,
+	getDownloadListMetadata,
+	UploadArg,
+	uploadFile,
+	DownloadFilesArg,
+	downloadFiles,
+	moveTrashFiles,
+	moveTrashFolders,
+	removeFiles,
+	restoreTrashFiles,
+	restoreTrashFolders,
+	removeFolders,
+	createZipFile,
+	deleteZipFile,
+} from '../service/cloud';
 
 const router = express.Router();
 
@@ -40,11 +56,74 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 		};
 
 		await uploadFile(uploadArg);
-		
+
 		fs.rm(path);
 	}
 
 	res.status(200).send();
+});
+
+router.get('/download', isAuthenticated, async (req, res) => {
+	const { loginId } = req.user;
+	const { current_dir, files, folders } = req.query;
+
+	if (current_dir === undefined || files === undefined || folders === undefined) {
+		return res.status(400).send();
+	}
+
+	const metadataList = await getDownloadListMetadata({
+		loginId: loginId,
+		currentDir: current_dir as string,
+		fileIds: typeof files === 'string' ? [files] : (files as Array<string>),
+		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
+	});
+	await downloadFiles({ downloadList: metadataList });
+	const targetFolderPath = path.join(path.resolve(), 'temp/', loginId);
+	const zipFolderPath = path.join(path.resolve(), 'temp/', `${loginId}.zip`);
+
+	createZipFile({ targetFolderPath, zipFolderPath });
+	res.download(zipFolderPath, `${loginId}.zip`);
+	deleteZipFile({ targetFolderPath, zipFolderPath });
+
+	return;
+});
+
+router.put('/files', isAuthenticated, async (req, res) => {
+	const { targetIds = [], directorys = [], action } = req.body;
+	const { loginId } = req.user;
+
+	try {
+		switch (action) {
+			case FileEditAction.trash:
+				await moveTrashFiles({ targetIds, userLoginId: loginId });
+				await moveTrashFolders({ directorys, userLoginId: loginId });
+				break;
+			case FileEditAction.restore:
+				await restoreTrashFiles({ targetIds, userLoginId: loginId });
+				await restoreTrashFolders({ directorys, userLoginId: loginId });
+				break;
+			case FileEditAction.move:
+				break;
+		}
+
+		res.send();
+	} catch (err) {
+		res.send(500).send();
+	}
+});
+
+router.delete('/files', isAuthenticated, async (req, res) => {
+	const { targetIds = [], directorys = [] } = req.body;
+	const { loginId } = req.user;
+
+	try {
+		await removeFiles({ targetIds, userLoginId: loginId });
+		await removeFolders({ directorys, userLoginId: loginId });
+
+		res.send();
+	} catch (err) {
+		res.send(500).send();
+	}
 });
 
 export default router;

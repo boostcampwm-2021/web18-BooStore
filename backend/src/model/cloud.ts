@@ -7,8 +7,10 @@ export interface ICloud {
 	directory: string;
 	ownerId: string;
 	contentType: string;
+	isDeleted: boolean;
 	createdAt: string;
 	updatedAt: string;
+	deletedAt: Date;
 }
 
 interface ICloudDoc extends ICloud, Document {}
@@ -39,6 +41,13 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 			type: String,
 			required: true,
 		},
+		isDeleted: {
+			type: Boolean,
+			default: false,
+		},
+		deletedAt: {
+			type: Date,
+		}
 	},
 	{
 		versionKey: false,

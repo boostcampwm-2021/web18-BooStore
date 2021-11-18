@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import SignupComponent from '../component/SignupComponent';
 
@@ -15,7 +15,7 @@ const SignupPage: React.FC<Props> = () => {
 const SignupPageBackground = styled.div`
 	width: 100%;
 	height: 100vh;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
+	background-color: ${(props) => props.theme.color.PrimaryBG};
 	display: flex;
 	align-items: center;
 	justify-content: center;

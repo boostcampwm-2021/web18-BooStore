@@ -1,12 +1,11 @@
-import React, { Children } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import LoginComponent from '../component/LoginComponent';
 import { User } from '../model';
 
 interface Props {
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
-
 
 const LoginPage: React.FC<Props> = ({ setUser }) => {
 	return (
@@ -19,7 +18,7 @@ const LoginPage: React.FC<Props> = ({ setUser }) => {
 const LoginPageBackground = styled.div`
 	width: 100%;
 	height: 100vh;
-	background-color: ${(props) => props.theme.color.SecondaryBG};
+	background-color: ${(props) => props.theme.color.PrimaryBG};
 	display: flex;
 	align-items: center;
 	justify-content: center;

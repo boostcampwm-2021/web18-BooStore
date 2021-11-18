@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { User } from '../model';
-import Modal from 'react-modal';
-import { ModalButton } from './SignupComponent';
+import { User } from '@model';
+
+import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+
+import { ReactComponent as Account } from '@asset/image/icons/icon_login_user.svg';
+import { ReactComponent as Password } from '@asset/image/icons/icon_login_password.svg';
+import { ReactComponent as Logo } from '@asset/image/icons/logo_big.svg';
 
 interface Props {
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -18,9 +22,10 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 	const history = useHistory();
 
 	const [inputs, setInputs] = useState<Inputs>({ id: '', password: '' });
-	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [modalText, setModalText] = useState('유효하지 않은 아이디 또는 비밀번호 입니다.');
-
+	const [failureModalText, setFailureModalText] = useState(
+		'올바르지 않은 아이디 또는 비밀번호 입니다.'
+	);
+	const [isOpenFailureModal, setOpenFailureModal] = useState(false);
 	const { id, password } = inputs;
 
 	const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +67,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 				});
 			})
 			.catch((err) => {
-				setModalIsOpen(true);
+				setOpenFailureModal(true);
 			});
 		onReset();
 	};
@@ -74,115 +79,103 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 	};
 
 	return (
-		<LoginBackground>
+		<>
 			<LoginContainer>
-				<Input
-					name="id"
-					value={id}
-					placeholder="아이디"
-					onChange={onChange}
-					autoComplete="off"
-				/>
-				<Input
-					name="password"
-					value={password}
-					placeholder="비밀번호"
-					onChange={onChange}
-					type="password"
-				/>
-				<FlexDiv>
-					<Button onClick={onClickLogin}>log in</Button>
-					<Button onClick={onClickSignup}>sign up</Button>
-				</FlexDiv>
-				<Modal
-					isOpen={modalIsOpen}
-					onRequestClose={() => setModalIsOpen(false)}
-					ariaHideApp={false}
+				<LogoIcon />
+				<InputContainer>
+					<AccountIcon />
+					<Input
+						name="id"
+						value={id}
+						placeholder="아이디"
+						onChange={onChange}
+						autoComplete="off"
+					/>
+				</InputContainer>
+				<InputContainer>
+					<PasswordIcon />
+					<Input
+						name="password"
+						value={password}
+						placeholder="비밀번호"
+						onChange={onChange}
+						type="password"
+					/>
+				</InputContainer>
+				<Button onClick={onClickLogin}>login</Button>
+				<SignupButton onClick={onClickSignup}>Sign up</SignupButton>
+				<FailureModal
+					isOpen={isOpenFailureModal}
+					setOpen={setOpenFailureModal}
+					modalType={ModalType.Error}
 				>
-					{modalText}
-					<FlexMiddleDiv>
-						<ModalButton onClick={() => setModalIsOpen(false)}>Modal Close</ModalButton>
-					</FlexMiddleDiv>
-				</Modal>
+					<p>{failureModalText}</p>
+				</FailureModal>
 			</LoginContainer>
-		</LoginBackground>
+		</>
 	);
 };
 
-const LoginBackground = styled.div`
-	background-color: ${(props) => props.theme.color.PrimaryBG};
-	border-radius: 20px;
-	width: 640px;
-	height: 546px;
+const LoginContainer = styled.div`
+	position: absolute;
+	top: 300px;
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
 	align-items: center;
 `;
 
-const LoginContainer = styled.div`
-	width: 465px;
-	height: 269px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
+const LogoIcon = styled(Logo)`
+	margin-bottom: 80px;
+`;
+
+const AccountIcon = styled(Account)`
+	position: absolute;
+	transform: translate(10px, 50%);
+`;
+
+const PasswordIcon = styled(Password)`
+	position: absolute;
+	transform: translate(10px, 50%);
 `;
 
 const Button = styled.button`
-	width: 159px;
-	height: 57px;
+	width: 300px;
+	height: 45px;
 	background-color: ${(props) => props.theme.color.Primary};
 	border: none;
-	border-radius: 12px;
+	border-radius: 8px;
 	color: ${(props) => props.theme.color.PrimaryBG};
-	font-size: 24px;
+	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
+	margin-top: 20px;
 `;
 
-const FlexDiv = styled.div`
-	display: flex;
-	justify-content: space-evenly;
+const SignupButton = styled.button`
+	width: fit-content;
+	border: none;
+	background-color: rgba(0, 0, 0, 0);
+	color: ${(props) => props.theme.color.Primary};
+	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
+	margin-top: 20px;
+	align-self: flex-end;
 `;
-const FlexMiddleDiv = styled.div`
-	display: flex;
-	justify-content: center;
-	
-	margin-top: 30px;
+
+const InputContainer = styled.div`
+	position: relative;
 `;
 
 const Input = styled.input`
-	width: 465px;
-	height: 78px;
-	border: solid 1px ${(props) => props.theme.color.Line};
-	border-radius: 10px;
-	font-size: 20px;
+	width: 300px;
+	height: 45px;
+	border: solid 1px ${(props) => props.theme.color.Primary};
+	border-radius: 8px;
+	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
+	padding: 20px 20px 20px 40px;
+	margin-bottom: 20px;
+	&:focus {
+		outline: none;
+	}
 `;
 
-Modal.defaultStyles={
-	overlay: {
-		position: 'fixed',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(255, 255, 255, 0.75)'
-	},
-	content: {
-		top: '50%',
-		left: '50%',
-		right: 'auto',
-		bottom: 'auto',
-		marginRight: '-50%',
-		transform: 'translate(-50%, -50%)',
-		position: 'absolute',
-		width: '400px',
-		height: '200px',
-		border: '1px solid #ccc',
-		background: '#fff',
-		overflow: 'auto',
-		WebkitOverflowScrolling: 'touch',
-		borderRadius: '4px',
-		outline: 'none',
-		padding: '30px'
-	}
-}
+const FailureModal = styled(ModalComponent)``;
 
 export default LoginComponent;

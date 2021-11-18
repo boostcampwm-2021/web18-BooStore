@@ -6,6 +6,7 @@ import {
 	getFilteredFiles,
 	FilesArg,
 	FilteredFilesArg,
+	getDirectoryList
 } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
 
@@ -23,16 +24,6 @@ router.get('/', isAuthenticated, (req, res) => {
 });
 
 router.get('/capacity', isAuthenticated, async (req, res) => {
-	/*
-	// 세션을 사용하는게 좋을까? 아니면 디비에 다시 접근하는게 좋을까...
-	// 고민해보자
-	const { maxCapacity, currentCapacity } = req.user;
-	const data = {
-		currentCapacity,
-		maxCapacity,
-	};
-	*/
-
 	const { loginId } = req.user;
 	const data = await getCapacity({ loginId });
 
@@ -40,7 +31,7 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 });
 
 router.get('/files', isAuthenticated, async (req, res) => {
-	const { path } = req.query;
+	const { path, isAscending, isDeleted } = req.query;
 	const { loginId } = req.user;
 	if (path === undefined) {
 		return res.status(400).send();
@@ -51,8 +42,9 @@ router.get('/files', isAuthenticated, async (req, res) => {
 
 	const filesArg: FilesArg = {
 		loginId: loginId,
-		path: path as string,
 		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
+		isAscending: isAscending === 'true',
+		isDeleted: isDeleted === 'true'
 	};
 
 	const tempFiles = await getFiles(filesArg);
@@ -65,4 +57,10 @@ router.get('/files', isAuthenticated, async (req, res) => {
 	const files = getFilteredFiles(filteredFilesArg);
 	return res.status(200).json(files);
 });
+
+router.get('/directory', isAuthenticated, async(req,res)=>{
+	const { loginId } = req.user;
+	const directoryList = await getDirectoryList(loginId);
+	return res.json(directoryList);
+})
 export default router;

@@ -1,126 +1,164 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import FileList from '../component/FileList';
+import React, { Key, useCallback, useEffect, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 
-import FileMenu from '../component/FileMenu';
-import Sidebar from '../component/Sidebar';
-import { User } from '../model';
-import { Capacity } from '../model';
-import folderup from '../asset/image/folderup.svg';
-import { FileDTO } from '../DTO';
-import { getFiles } from '../util';
+import FileList from '@component/fileManagement/FileList';
+import FileMenu from '@component/fileManagement/FileMenuForMain';
+import Sidebar from '@component/layout/Sidebar';
+import Header from '@component/layout/Header';
+import { User } from '@model';
+import { Capacity } from '@model';
+import { FileDTO } from '@DTO';
+import { getFiles } from '@util';
+import { getCapacity } from 'api';
 
-interface Props {
+import { ReactComponent as ArrowSvg } from '@asset/image/icons/icon_left_arrow.svg';
+
+interface MainPageProps {
 	user: User;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
-const MainPage: React.FC<Props> = () => {
+interface DirectoryProps {
+	idx: number;
+	name: string;
+	currentDir: string;
+	onClickDirectory: (relativePath: string) => Promise<void>;
+}
+
+const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDirectory }) => {
+	let relativePath: string = currentDir
+		.split('/')
+		.slice(0, idx + 1)
+		.join('/');
+	if (relativePath === '') {
+		relativePath = '/';
+	}
+
+	return (
+		<>
+			{idx != 0 && <ArrowSvg style={{ verticalAlign: 'middle' }} />}
+			<span onClick={() => onClickDirectory(relativePath)} style={{ cursor: 'pointer' }}>
+				{name}
+			</span>
+		</>
+	);
+};
+
+const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	const [currentDir, setCurrentDir] = useState('/');
-	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 });
+	const [capacity, setCapacity] = useState<Capacity>({
+		currentCapacity: 0,
+		maxCapacity: 1024 * 1024 * 1024,
+	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
-	const [tempUpload, setTempUpload] = useState(false);
+	const [isAscending, setIsAscending] = useState<boolean>(true);
 
-	const parentDir = (currentDirectory: string) => {
-		let parentDir = currentDirectory.split('/').slice(0, -1).join('/');
-		parentDir === '' ? (parentDir = '/') : '';
-		return parentDir;
-	};
-
-	const getCapacity = async () => {
-		await fetch('/user/capacity', {
-			credentials: 'include',
-		})
-			.then((res) => {
-				if (res.ok) {
-					return res.json();
-				} else {
-					throw new Error('something wrong');
-				}
-			})
-			.then((data) => {
-				setCapacity(data);
-			})
-			.catch((err) => {
-				console.error(err);
-			});
-	};
-
-	const onClickParentButton = async () => {
-		const files = await getFiles(parentDir(currentDir));
+	const onClickDirectory = async (relativePath: string) => {
+		const files = await getFiles(relativePath, isAscending);
 		setFiles(files);
-		setCurrentDir(parentDir(currentDir));
+		setCurrentDir(relativePath);
 		setSelectedFiles([]);
 	};
 
+	const updateFiles = async () => {
+		setSelectedFiles([]);
+		setFiles(await getFiles(currentDir, isAscending));
+		setCapacity(await getCapacity());
+	};
+
+	const getCurDirectoryComponent = useCallback(() => {
+		if (currentDir === '/') {
+			return;
+		}
+		return currentDir
+			.split('/')
+			.slice(1)
+			.map((el, idx) => (
+				<Directory
+					idx={idx + 1}
+					name={el}
+					currentDir={currentDir}
+					onClickDirectory={onClickDirectory}
+					key={idx + 1}
+				/>
+			));
+	}, [currentDir]);
+
 	useEffect(() => {
-		const callFile = async () => {
-			setFiles(await getFiles(currentDir));
-		};
-		callFile();
-		getCapacity();
-	}, [tempUpload]);
+		updateFiles();
+	}, [currentDir, isAscending]);
 
 	return (
-		<Container>
-			<Sidebar capacity={capacity} />
-			<InnerContainer>
-				<Directory>
-					{currentDir === '/' ? (
-						<ParentButton src={folderup} style={{ opacity: 0.5 }}></ParentButton>
-					) : (
-						<ParentButton src={folderup} onClick={onClickParentButton}></ParentButton>
-					)}
-					{`내 디렉토리${currentDir === '/' ? '' : currentDir.split('/').join(' > ')}`}
-				</Directory>
-				<Section>
+		<>
+			<Header user={user} setUser={setUser} setCurrentDir={setCurrentDir} />
+			<Container>
+				<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir} />
+				<InnerContainer>
+					<DirectorySection>
+						<Directory
+							idx={0}
+							name={'내 스토어'}
+							currentDir={currentDir}
+							onClickDirectory={onClickDirectory}
+							key={0}
+						/>
+						{getCurDirectoryComponent()}
+					</DirectorySection>
 					<FileMenu
 						showShareButton
 						capacity={capacity}
 						setCapacity={setCapacity}
 						selectedFiles={selectedFiles}
-						currentDir={currentDir}
-						setTempUpload={setTempUpload}
-					/>
-					<FileList
-						files={files}
 						setSelectedFiles={setSelectedFiles}
+						currentDir={currentDir}
 						setFiles={setFiles}
+						files={files}
+						updateFiles={updateFiles}
+					/>
+					<StyledFileList
+						files={files}
+						selectedFiles={selectedFiles}
+						setSelectedFiles={setSelectedFiles}
 						setCurrentDir={setCurrentDir}
 						currentDirectory={currentDir}
+						isAscending={isAscending}
+						setIsAscending={setIsAscending}
 					/>
-				</Section>
-			</InnerContainer>
-		</Container>
+				</InnerContainer>
+			</Container>
+		</>
 	);
 };
 
 const Container = styled.div`
 	display: flex;
 	height: calc(100vh - ${(props) => props.theme.HeaderHeight});
+	overflow-y: hidden;
+`;
+
+const SidebarForMain = styled(Sidebar)`
+	flex: 1;
 `;
 
 const InnerContainer = styled.div`
+	flex: 4;
 	background-color: ${(props) => props.theme.color.PrimaryBG};
-	padding: 25px 35px;
-	width: 100%;
+	height: 100%;
+	overflow-y: hidden;
+
+	display: flex;
+	flex-direction: column;
 `;
 
-const Directory = styled.p`
-	font-size: 24px;
-	border-bottom: 2px solid ${(props) => props.theme.color.Line};
-
-	margin: 0;
-	padding-bottom: 20px;
+const DirectorySection = styled.div`
+	font-family: ${(props) => props.theme.FontFamily.Medium};
+	font-size: ${(props) => props.theme.fontSize.Title};
+	border-bottom: 1px solid ${(props) => props.theme.color.Line};
+	padding: ${(props) => props.theme.padding.Content};
 `;
-
-const Section = styled.section`
-	padding: 10px;
-`;
-
-const ParentButton = styled.img`
-	width: 20px;
-	height: 20px;
+const StyledFileList = styled(FileList)`
+	flex: 1;
 `;
 
 export default MainPage;

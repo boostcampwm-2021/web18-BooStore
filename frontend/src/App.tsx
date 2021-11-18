@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Router from './Router';
-import Header from './component/Header';
 import { User } from './model';
+
+import './asset/css/font.css';
 
 const App: React.FC = () => {
 	const localStorageUser = localStorage.getItem('user');
@@ -38,7 +39,6 @@ const App: React.FC = () => {
 	return (
 		<>
 			<BrowserRouter>
-				<Header user={user} setUser={setUser} />
 				<Router user={user} setUser={setUser} />
 			</BrowserRouter>
 		</>
