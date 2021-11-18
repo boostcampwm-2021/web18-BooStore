@@ -1,12 +1,11 @@
-import React, { Children } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import LoginComponent from '../component/LoginComponent';
 import { User } from '../model';
 
 interface Props {
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
+	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
-
 
 const LoginPage: React.FC<Props> = ({ setUser }) => {
 	return (
