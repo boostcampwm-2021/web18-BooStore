@@ -67,6 +67,48 @@ const FileMenuForMain: React.FC<Props> = ({
 		setSelectedUploadFiles(event.target.files);
 	};
 
+	const onClickDownload = async () => {
+		// const targetIds = selectedFiles
+		// 	.filter((file) => file.contentType !== 'folder')
+		// 	.map((file) => file._id);
+		// console.log(
+		// 	targetIds.reduce((acc, cur) => {
+		// 		return (acc += cur + '&');
+		// 	}, 'files=')
+		// );
+		// const directories = selectedFiles
+		// 	.filter((file) => file.contentType === 'folder')
+		// 	.map((file) => {
+		// 		return file.name;
+		// 	});
+
+		const queryString = `current_dir=/depth0&files=61948cbe933d7d418587fd5e&files=61948cbe933d7d418587fd56&folders=depth1`;
+		fetch(`/cloud/download?${queryString}`, {
+			credentials: 'include',
+		})
+			.then(async (res) => {
+				const fileName = /attachment; filename="(?<fileName>[^"]+)"/.exec(
+					res.headers.get('Content-Disposition') as string
+				)?.groups?.fileName;
+				const blob = await res.blob();
+				return { fileName: fileName, blob: blob };
+			})
+			.then(({ fileName, blob }) => {
+				console.log(fileName, blob);
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = fileName as string;
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+			})
+			.catch((err) => console.log(err));
+
+		// console.log('targetIds', targetIds);
+		// console.log('directories', directories);
+	};
+
 	const onClickDelete = () => {
 		const ids = selectedFiles.map((file) => file._id);
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
@@ -96,7 +138,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			},
 			body: JSON.stringify(body),
 		});
-		
+
 		setSelectedFiles([]);
 	};
 
@@ -198,7 +240,7 @@ const FileMenuForMain: React.FC<Props> = ({
 				<ToggleOffSvg />
 			</SelectAllBtn>
 			{selectedFiles.length > 0 ? (
-				<DownloadButton> 다운로드 </DownloadButton>
+				<DownloadButton onClick={onClickDownload}> 다운로드 </DownloadButton>
 			) : (
 				<UploadButton nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			)}
