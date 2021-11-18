@@ -11,12 +11,7 @@ interface Props {
 	currentDirectory: string;
 }
 
-const File: React.FC<Props> = ({
-	file,
-	setSelectedFiles,
-	setCurrentDir,
-	currentDirectory,
-}) => {
+const File: React.FC<Props> = ({ file, setSelectedFiles, setCurrentDir, currentDirectory }) => {
 	const [isSelected, setSelected] = useState(false);
 
 	const { contentType, name, createdAt, updatedAt, size, _id } = file;
@@ -53,14 +48,16 @@ const File: React.FC<Props> = ({
 		setSelected(false);
 	}, [currentDirectory]);
 
-
 	return (
 		<Container onClick={onClickFile} isSelected={isSelected}>
 			<p>{isFolder}</p>
 			<FileIcon type={contentType} />
-			<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
-				{name}
-			</FileName>
+			<FileNameBox>
+				<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
+					{name}
+				</FileName>
+			</FileNameBox>
+
 			<MetaData> {getDate(createdAt)} </MetaData>
 			<MetaData> {getDate(updatedAt)} </MetaData>
 			<MetaData> {isFolder ? '-' : getConvertedSize} </MetaData>
@@ -78,8 +75,15 @@ const Container = styled.div<{ isSelected: boolean }>`
 		background-color: ${({ theme }) => theme.color.SecondaryBG};
 	}
 `;
+const FileNameBox = styled.div`
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	
+	padding-right: 10%;
+`;
 
-const FileName = styled.p<{ isFolder: boolean }>`
+const FileName = styled.span<{ isFolder: boolean }>`
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
 	color: ${(props) => props.theme.color.Content};
 	&:hover {

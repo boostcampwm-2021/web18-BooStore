@@ -95,6 +95,9 @@ const Title = styled.p`
 
 const Content = styled.div`
 	text-align: center;
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
 `;
 
 const FlexMiddleDiv = styled.div`

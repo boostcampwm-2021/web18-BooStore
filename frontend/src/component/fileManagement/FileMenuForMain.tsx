@@ -282,10 +282,8 @@ const FileMenuForMain: React.FC<Props> = ({
 				setOpen={setOpenProgreeModal}
 				modalType={ModalType.Upload}
 			>
-				<div>
-					<p> {progressModalText} </p>
-					<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
-				</div>
+				<span> {progressModalText} </span>
+				<ProgressBar value={processedFileSize} maxValue={totalFileSize} />
 			</ProgressModal>
 		</Container>
 	);
