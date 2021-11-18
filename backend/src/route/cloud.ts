@@ -18,6 +18,8 @@ import {
 	restoreTrashFiles,
 	restoreTrashFolders,
 	removeFolders,
+	createZipFile,
+	deleteZipFile,
 } from '../service/cloud';
 
 const router = express.Router();
@@ -63,24 +65,27 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 
 router.get('/download', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
-	const { current_dir } = req.query;
-	const { files } = req.query;
-	const { folders } = req.query;
+	const { current_dir, files, folders } = req.query;
 
 	if (current_dir === undefined || files === undefined || folders === undefined) {
 		return res.status(400).send();
 	}
 
-	const fileMetas = await getDownloadListMetadata({
+	const metadataList = await getDownloadListMetadata({
 		loginId: loginId,
 		currentDir: current_dir as string,
 		fileIds: typeof files === 'string' ? [files] : (files as Array<string>),
 		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
 	});
+	await downloadFiles({ downloadList: metadataList });
+	const targetFolderPath = path.join(path.resolve(), 'temp/', loginId);
+	const zipFolderPath = path.join(path.resolve(), 'temp/', `${loginId}.zip`);
 
-	await downloadFiles({ downloadList: fileMetas });
+	createZipFile({ targetFolderPath, zipFolderPath });
+	res.download(zipFolderPath, `${loginId}.zip`);
+	deleteZipFile({ targetFolderPath, zipFolderPath });
 
-	return res.download(path.join(path.resolve(), 'temp/', loginId, '/'), 'test0-1.txt');
+	return;
 });
 
 router.put('/files', isAuthenticated, async (req, res) => {

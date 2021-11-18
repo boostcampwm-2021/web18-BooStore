@@ -9,6 +9,7 @@
     "dev": "tsc-watch --onSuccess \"node ./bin/www\""
   },
   "dependencies": {
+    "adm-zip": "^0.5.9",
     "aws-sdk": "^2.1023.0",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.4",
@@ -24,6 +25,7 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.4.34",
     "@types/aws-sdk": "^2.7.0",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.2",

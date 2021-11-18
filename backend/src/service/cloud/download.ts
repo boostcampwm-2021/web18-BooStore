@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 import { Cloud, ICloud } from '../../model';
-import { increaseCurrentCapacity } from '.';
 import { isValidObjectId } from 'mongoose';
+import AdmZip = require('adm-zip');
 
 const bucketName = process.env.S3_BUCKET_NAME;
 const OBJECT_STORAGE_BASE = 'https://kr.object.ncloudstorage.com';
@@ -30,7 +30,10 @@ export const getDownloadListMetadata = async ({
 	);
 	const folders = Promise.all(
 		directories.map((directory) => {
-			return getDownloadFolderMetadata({ directory: currentDir + '/' + directory, loginId });
+			return getDownloadFolderMetadata({
+				directory: (currentDir === '/' ? currentDir : currentDir + '/') + directory,
+				loginId,
+			});
 		})
 	);
 
@@ -84,27 +87,46 @@ export interface DownloadFilesArg {
 }
 
 export const downloadFiles = async ({ downloadList }: DownloadFilesArg) => {
-	downloadList.map(async (file) => {
-		const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
-		const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-		const key = file.osLink.replace(pattern, '').replace(patternTest, '');
-		await mkdirp(path.join(path.resolve(), 'temp/', file.ownerId, '/', file.directory, '/'));
+	return Promise.all(
+		downloadList.map(async (file) => {
+			const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
+			const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+			const key = file.osLink.replace(pattern, '').replace(patternTest, '');
+			await mkdirp(
+				path.join(path.resolve(), 'temp/', file.ownerId, '/', file.directory, '/')
+			);
 
-		const localPath = path.join(
-			path.resolve(),
-			'temp/',
-			file.ownerId,
-			'/',
-			file.directory,
-			'/',
-			file.name
-		);
+			const localPath = path.join(
+				path.resolve(),
+				'temp/',
+				file.ownerId,
+				'/',
+				file.directory,
+				'/',
+				file.name
+			);
 
-		const outStream = fs.createWriteStream(localPath);
-		const inStream = S3.getObject({
-			Bucket: bucketName,
-			Key: key,
-		}).createReadStream();
-		inStream.pipe(outStream);
-	});
+			const outStream = fs.createWriteStream(localPath);
+			const inStream = S3.getObject({
+				Bucket: bucketName,
+				Key: key,
+			}).createReadStream();
+			inStream.pipe(outStream);
+		})
+	);
+};
+export interface ZipFileFunctionArg {
+	targetFolderPath: string;
+	zipFolderPath: string;
+}
+
+export const createZipFile = ({ targetFolderPath, zipFolderPath }: ZipFileFunctionArg) => {
+	const zip = new AdmZip();
+	zip.addLocalFolder(targetFolderPath);
+	zip.writeZip(zipFolderPath);
+};
+
+export const deleteZipFile = ({ targetFolderPath, zipFolderPath }: ZipFileFunctionArg) => {
+	fs.rm(targetFolderPath, { recursive: true }, () => {});
+	fs.rm(zipFolderPath, { recursive: true }, () => {});
 };

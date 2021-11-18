@@ -67,6 +67,61 @@ const FileMenuForMain: React.FC<Props> = ({
 		setSelectedUploadFiles(event.target.files);
 	};
 
+	const onClickDownload = async () => {
+		const targetIds = selectedFiles
+			.filter((file) => file.contentType !== 'folder')
+			.map((file) => file._id)
+			.reduce((acc, cur) => {
+				return (acc += 'files=' + cur + '&');
+			}, '');
+		const filesQuery = targetIds === '' ? 'files=&' : targetIds;
+
+		const directories = selectedFiles
+			.filter((file) => file.contentType === 'folder')
+			.map((file) => {
+				return file.name;
+			})
+			.reduce((acc, cur) => {
+				return (acc += 'folders=' + cur + '&');
+			}, '');
+		const directoriesQuery =
+			directories === '' ? 'folders=' : directories.substr(0, directories.length - 1);
+
+		const queryString = `current_dir=${currentDir}&${filesQuery}${directoriesQuery}`;
+		fetch(`/cloud/download?${queryString}`, {
+			credentials: 'include',
+		})
+			.then((res) => {
+				if (res.ok) {
+					return res;
+				} else if (res.status === 401) {
+					throw new Error('올바른 사용자가 아닙니다. 로그인 후 사용해주십시오.');
+				} else {
+					throw new Error('올바른 요청이 아닙니다.');
+				}
+			})
+			.then(async (res) => {
+				const fileName = /attachment; filename="(?<fileName>[^"]+)"/.exec(
+					res.headers.get('Content-Disposition') as string
+				)?.groups?.fileName;
+				const blob = await res.blob();
+				return { fileName: fileName, blob: blob };
+			})
+			.then(({ fileName, blob }) => {
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = fileName as string;
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+			})
+			.catch((err) => {
+				setFailureModalText((err as Error).message);
+				setOpenFailureModal(true);
+			});
+	};
+
 	const onClickDelete = () => {
 		const ids = selectedFiles.map((file) => file._id);
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
@@ -96,7 +151,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			},
 			body: JSON.stringify(body),
 		});
-		
+
 		setSelectedFiles([]);
 	};
 
@@ -198,7 +253,7 @@ const FileMenuForMain: React.FC<Props> = ({
 				<ToggleOffSvg />
 			</SelectAllBtn>
 			{selectedFiles.length > 0 ? (
-				<DownloadButton> 다운로드 </DownloadButton>
+				<DownloadButton onClick={onClickDownload}> 다운로드 </DownloadButton>
 			) : (
 				<UploadButton nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			)}
