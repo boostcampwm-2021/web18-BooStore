@@ -92,6 +92,13 @@ const FileMenuForMain: React.FC<Props> = ({
 		fetch(`/cloud/download?${queryString}`, {
 			credentials: 'include',
 		})
+			.then((res) => {
+				if (res.ok) {
+					return res;
+				} else {
+					throw new Error('올바른 요청이 아닙니다.');
+				}
+			})
 			.then(async (res) => {
 				const fileName = /attachment; filename="(?<fileName>[^"]+)"/.exec(
 					res.headers.get('Content-Disposition') as string
@@ -109,7 +116,10 @@ const FileMenuForMain: React.FC<Props> = ({
 				a.click();
 				a.remove();
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => {
+				setFailureModalText((err as Error).message);
+				setOpenFailureModal(true);
+			});
 	};
 
 	const onClickDelete = () => {
