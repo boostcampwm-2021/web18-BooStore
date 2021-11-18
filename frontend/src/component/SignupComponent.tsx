@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import Modal from 'react-modal';
-
+import ModalComponent, { ModalType } from '@component/common/ModalComponent';
 import { ReactComponent as Account } from '@asset/image/icons/icon_login_user.svg';
 import { ReactComponent as Password } from '@asset/image/icons/icon_login_password.svg';
 import { ReactComponent as Logo } from '@asset/image/icons/logo_big.svg';
@@ -25,8 +24,10 @@ const SignupComponent: React.FC<Props> = () => {
 	});
 
 	const [isWarning, setIsWarning] = useState(false);
-	const [modalIsOpen, setModalIsOpen] = useState(false);
-	const [modalText, setModalText] = useState('유효하지 않은 아이디 또는 비밀번호 입니다.');
+	const [failureModalText, setFailureModalText] = useState(
+		'올바르지 않은 아이디 또는 비밀번호 입니다.'
+	);
+	const [isOpenFailureModal, setOpenFailureModal] = useState(false);
 
 	const { id, password, passwordCheck } = inputs;
 
@@ -70,19 +71,19 @@ const SignupComponent: React.FC<Props> = () => {
 						pathname: '/login',
 					});
 				} else if (response.status === 400) {
-					setModalText('유효하지 않은 아이디 또는 비밀번호 입니다.');
-					setModalIsOpen(true);
+					setFailureModalText('올바르지 않은 아이디 또는 비밀번호 입니다.');
+					setOpenFailureModal(true);
 				} else if (response.status === 409) {
-					setModalText('중복된 아이디 입니다.');
-					setModalIsOpen(true);
+					setFailureModalText('중복된 아이디 입니다.');
+					setOpenFailureModal(true);
 				} else {
-					setModalText('회원가입 안됨');
-					setModalIsOpen(true);
+					setFailureModalText('회원가입이 불가합니다.');
+					setOpenFailureModal(true);
 				}
 			});
 		} else {
-			setModalText('유효하지 않은 아이디 또는 비밀번호 입니다.');
-			setModalIsOpen(true);
+			setFailureModalText('올바르지 않은 아이디 또는 비밀번호 입니다.');
+			setOpenFailureModal(true);
 		}
 	};
 
@@ -137,16 +138,13 @@ const SignupComponent: React.FC<Props> = () => {
 					Sign up
 				</Button>
 				<LoginButton onClick={onClickBack}>login</LoginButton>
-				<Modal
-					isOpen={modalIsOpen}
-					onRequestClose={() => setModalIsOpen(false)}
-					ariaHideApp={false}
+				<FailureModal
+					isOpen={isOpenFailureModal}
+					setOpen={setOpenFailureModal}
+					modalType={ModalType.Error}
 				>
-					{modalText}
-					<FlexMiddleDiv>
-						<ModalButton onClick={() => setModalIsOpen(false)}>Modal Close</ModalButton>
-					</FlexMiddleDiv>
-				</Modal>
+					<p>{failureModalText}</p>
+				</FailureModal>
 			</SignupContainer>
 		</>
 	);
@@ -226,47 +224,6 @@ const WarningBox = styled.div`
 	color: #ff0000;
 	font-size: 12px;
 `;
-const FlexMiddleDiv = styled.div`
-	display: flex;
-	justify-content: center;
-	margin-top: 30px;
-`;
 
-Modal.defaultStyles = {
-	overlay: {
-		position: 'fixed',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(255, 255, 255, 0.75)',
-	},
-	content: {
-		top: '50%',
-		left: '50%',
-		right: 'auto',
-		bottom: 'auto',
-		marginRight: '-50%',
-		transform: 'translate(-50%, -50%)',
-		position: 'absolute',
-		width: '400px',
-		height: '200px',
-		border: '1px solid #ccc',
-		background: '#fff',
-		overflow: 'auto',
-		WebkitOverflowScrolling: 'touch',
-		borderRadius: '4px',
-		outline: 'none',
-		padding: '30px',
-	},
-};
-
-export const ModalButton = styled.div`
-	background-color: ${(props) => props.theme.color.Primary};
-	border: none;
-	border-radius: 6px;
-	color: ${(props) => props.theme.color.PrimaryBG};
-	font-size: 12px;
-	padding: 10px;
-`;
+const FailureModal = styled(ModalComponent)``;
 export default SignupComponent;
