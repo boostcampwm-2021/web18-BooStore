@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import File from './File';
@@ -27,17 +27,22 @@ const Selection: React.FC<SelectionProps> = ({ children }) => {
 		endY: 0,
 	});
 	const [isDraging, setDraging] = useState(false);
+	const container = useRef<HTMLDivElement>(null);
 
-	const getOffsetPosition = (event: React.MouseEvent<HTMLDivElement>) => {
+	const getOffsetPosition = (target: HTMLDivElement, pageX: number, pageY: number) => {
 		return {
-			offsetX: event.pageX - event.currentTarget.offsetLeft,
-			offsetY: event.pageY - event.currentTarget.offsetTop,
+			offsetX: pageX - target.offsetLeft,
+			offsetY: pageY - target.offsetTop,
 		};
 	};
 
-	const onStartDrag = (event: React.MouseEvent<HTMLDivElement>) => {
-		const { offsetX, offsetY } = getOffsetPosition(event);
-
+	const onStartDrag = (event: MouseEvent) => {
+		if (!container.current || !container.current.contains(event.target as Element)) {
+			return;
+		}
+		const { pageX, pageY } = event;
+		const { offsetX, offsetY } = getOffsetPosition(container.current, pageX, pageY);
+		
 		setPoint({
 			startX: offsetX,
 			startY: offsetY,
@@ -46,27 +51,56 @@ const Selection: React.FC<SelectionProps> = ({ children }) => {
 		});
 		setDraging(true);
 	};
-	const onEndDrag = (event: React.MouseEvent<HTMLDivElement>) => {
+	const onEndDrag = (event: MouseEvent) => {
 		setDraging(false);
 	};
 	const onChangeBox = useCallback(
-		(event: React.MouseEvent<HTMLDivElement>) => {
-			if (!isDraging) {
+		(event: MouseEvent) => {
+			if (!container.current || !isDraging) {
 				return;
 			}
-
-			const { offsetX, offsetY } = getOffsetPosition(event);
+			const { pageX, pageY } = event;
+			const { offsetWidth, offsetHeight } = container.current;
+			let { offsetX, offsetY } = getOffsetPosition(container.current, pageX, pageY);
+			
+			if (offsetX < 0) {
+				offsetX = 0;
+			}
+			else if (offsetX > offsetWidth) {
+				offsetX = offsetWidth;
+			}
+			if (offsetY < 0) {
+				offsetY = 0;
+			}
+			else if (offsetY > offsetHeight) {
+				offsetY = offsetHeight;
+			}
+			
 			setPoint((prev) => ({ ...prev, endX: offsetX, endY: offsetY }));
 		},
 		[isDraging]
 	);
+	
+	useEffect(() => {
+		window.addEventListener('mousemove', onChangeBox);
+		
+		return () => {
+			window.removeEventListener('mousemove', onChangeBox);
+		}
+	}, [isDraging]);
+	
+	useEffect(() => {
+		window.addEventListener('mousedown', onStartDrag);
+		window.addEventListener('mouseup', onEndDrag);
+		
+		return () => {
+			window.removeEventListener('mousedown', onStartDrag);
+			window.removeEventListener('mouseup', onEndDrag);
+		}
+	}, []);
 
 	return (
-		<SelectionContainer
-			onMouseDown={onStartDrag}
-			onMouseUp={onEndDrag}
-			onMouseMove={onChangeBox}
-		>
+		<SelectionContainer ref={container}>
 			{isDraging && (
 				<DragBox
 					ltX={Math.min(point.startX, point.endX)}
@@ -82,12 +116,18 @@ const Selection: React.FC<SelectionProps> = ({ children }) => {
 const SelectionContainer = styled.div`
 	position: relative;
 `;
-const DragBox = styled.div<{ ltX: number; ltY: number; rbX: number; rbY: number }>`
+const DragBox = styled.div.attrs<{ ltX: number; ltY: number; rbX: number; rbY: number }>(
+	({ltY, ltX, rbY, rbX}) => ({
+		style: {
+			top: `${ltY}px`,
+			left: `${ltX}px`,
+			width: `${rbX - ltX}px`,
+			height: `${rbY - ltY}px`,
+			zIndex: 99,
+		}
+	})
+)<{ ltX: number; ltY: number; rbX: number; rbY: number }>`
 	position: absolute;
-	top: ${({ ltY }) => ltY}px;
-	left: ${({ ltX }) => ltX}px;
-	width: ${({ ltX, rbX }) => rbX - ltX}px;
-	height: ${({ ltY, rbY }) => rbY - ltY}px;
 
 	background-color: rgba(155, 193, 239, 0.4);
 `;
@@ -137,6 +177,7 @@ const FileList: React.FC<Props> = ({
 
 const Container = styled.div`
 	overflow-y: auto;
+	overflow-x: hidden;
 `;
 
 const FileHeader = styled.div`
