@@ -1,11 +1,11 @@
-import React,{ useEffect, useState } from 'react';
+import React,{  Fragment, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FileDTO } from '@DTO';
 
 import Directory from './Directory';
 
 import { getDirectoryList } from '../../api'; 
-import { makeTree } from '@util';
+import { makeTree, treeNode } from '@util';
 
 const makeDirectoryTree = (directories: string[]) =>{
 	const splitDirectories: Array<string[]> = []; 
@@ -17,8 +17,7 @@ const makeDirectoryTree = (directories: string[]) =>{
 		else if(a.length === b.length) return 0;
 		else return -1;
 	})
-	console.log(splitDirectories);
-	makeTree(splitDirectories);
+	 return makeTree(splitDirectories);
 }
 
 interface Props {
@@ -26,25 +25,46 @@ interface Props {
 }
 
 const DirectoryList: React.FC<Props> = ({ className }) => {
+	
+	const [folderStructure,setFolderStructure] = useState(
+		{
+			relativeDirectory: '/',
+			parentDirectory: '',
+			children: new Map()
+		});
 
-	
-	//const tree = makeDirectoryTree(directories);
-	
-	const makeTree = async()=>{
+	const makeFolderStructure = async()=>{
 		const directories = await getDirectoryList();
-		const tree = makeDirectoryTree(directories);
+		return makeDirectoryTree(directories);
 	}
 
 	useEffect(()=>{
-		makeTree();
-	},[]);
+		const handleFolderStructure = async()=>{
+			setFolderStructure(await makeFolderStructure());
+		}
+		handleFolderStructure();
+	},[folderStructure]);
 
+
+	const getFolderStructure = ( treeNode : treeNode ) => 
+		{
+			const childrenToArr = Array.from(treeNode.children.values());
+			let curDir = treeNode.relativeDirectory.split('/').splice(-1)[0];
+			curDir===''? curDir='내 스토어':'';
+			return (
+				<Directory 
+				name={curDir} 
+				key={treeNode.relativeDirectory}
+				>
+					{childrenToArr.map((treeNode: treeNode)=>{
+						return <Fragment key={treeNode.relativeDirectory}>{getFolderStructure(treeNode)}</Fragment>
+					})}
+				</Directory>
+				)
+		}
 	return (
 		<Container className={className}>
-			<Directory name={"내 스토어"} isIncludeCurPath={true} >
-				<Directory name={"Folder"} isIncludeCurPath={true} />
-				<Directory name={"Folder22"} />
-			</Directory>
+			{getFolderStructure(folderStructure)}
 		</Container>
 	);
 };
