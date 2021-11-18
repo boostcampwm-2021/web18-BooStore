@@ -94,6 +94,8 @@ const FileMenuForMain: React.FC<Props> = ({
 			.then((res) => {
 				if (res.ok) {
 					return res;
+				} else if (res.status === 401) {
+					throw new Error('올바른 사용자가 아닙니다. 로그인 후 사용해주십시오.');
 				} else {
 					throw new Error('올바른 요청이 아닙니다.');
 				}
