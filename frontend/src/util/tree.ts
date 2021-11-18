@@ -5,13 +5,13 @@ import { isParseTreeNode } from "typescript"
 interface treeNode{
     relativeDirectory: string; 
     parentDirectory: string;
-    children : treeNode[];
+    children : Map<string,treeNode>;
 }
 
 const root: treeNode = {
     relativeDirectory: '/',
     parentDirectory: '',
-    children: []
+    children: new Map()
 }
 
 export const makeTree = (arr : Array<string[]>)=>{
@@ -29,7 +29,7 @@ export const makeTree = (arr : Array<string[]>)=>{
 const insertNode = (node : treeNode) => {
     const copiedNode = {...node};
     const parent = findParent(root,node);
-    parent.children.push(copiedNode);
+    parent.children.set(copiedNode.relativeDirectory,copiedNode);
     console.log('parent:'+parent.relativeDirectory+'\n'+"child:"+copiedNode.relativeDirectory);
 }
 
@@ -39,10 +39,11 @@ const findParent = (parent: treeNode,node: treeNode) => {
         console.log('found!');
         return parent;
     }
-    for(let i=0; i<parent.children.length;i++){
-        parent= findParent(parent.children[i],node);
-        return parent;
-    }
+
+    parent.children.forEach((el)=>{
+        parent= findParent(el,node);
+        return false;
+    })
     return parent;
 }
 
@@ -54,6 +55,6 @@ const arrToNode = (arr : string[] ) => {
     return ({
         relativeDirectory: arr.join('/'),
         parentDirectory: arr.length==2? '/' : arr.slice(0,-1).join('/'),
-        children: []
+        children: new Map()
     })
 }
