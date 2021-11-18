@@ -4,6 +4,7 @@ export interface FilesArg {
 	loginId: string;
 	regex: string;
 	isAscending: boolean;
+	isDeleted: boolean;
 }
 
 export interface FilteredFilesArg {
@@ -11,11 +12,12 @@ export interface FilteredFilesArg {
 	originFiles: ICloud[];
 }
 
-export const getFiles = async ({ loginId, regex, isAscending }: FilesArg) => {
+export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: FilesArg) => {
 	const files = Cloud.find(
 		{
 			directory: { $regex: regex },
 			ownerId: loginId,
+			isDeleted
 		},
 		{
 			directory: true,

@@ -10,7 +10,6 @@ import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.sv
 interface Props {
 	files: FileDTO[];
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
-	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 	isAscending: boolean;
@@ -20,7 +19,6 @@ interface Props {
 const FileList: React.FC<Props> = ({
 	files,
 	setSelectedFiles,
-	setFiles,
 	setCurrentDir,
 	currentDirectory,
 	isAscending,
@@ -48,7 +46,6 @@ const FileList: React.FC<Props> = ({
 						key={index}
 						file={file}
 						setSelectedFiles={setSelectedFiles}
-						setFiles={setFiles}
 						setCurrentDir={setCurrentDir}
 						currentDirectory={currentDirectory}
 					/>

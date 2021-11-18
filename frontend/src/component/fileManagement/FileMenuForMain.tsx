@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { FileDTO } from '@DTO';
+import { FileDTO, FileEditAction } from '@DTO';
 import { Capacity } from '@model';
 import DropBox, { DropBoxItem } from '@component/common/DropBox';
 import ModalComponent, { ModalType } from '@component/common/ModalComponent';
@@ -15,17 +15,21 @@ interface Props {
 	capacity: Capacity;
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
 	selectedFiles: FileDTO[];
+	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	currentDir: string;
-	setTempUpload: React.Dispatch<React.SetStateAction<boolean>>;
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	updateFiles?: Function;
 }
 
-const FileMenu: React.FC<Props> = ({
+const FileMenuForMain: React.FC<Props> = ({
 	showShareButton,
 	capacity,
 	setCapacity,
 	selectedFiles,
+	setSelectedFiles,
 	currentDir,
-	setTempUpload
+	setFiles,
+	updateFiles = () => {},
 }) => {
 	const inputFileRef = useRef<HTMLInputElement>(null);
 	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
@@ -35,7 +39,7 @@ const FileMenu: React.FC<Props> = ({
 	const [processedFileSize, setProcessedFileSize] = useState(0);
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
-	const [selectedFile, setSelectedFile] = useState<FileList | null>(null);
+	const [selectedUploadFiles, setSelectedUploadFiles] = useState<FileList | null>(null);
 
 	const onclickFileUploadButton = () => {
 		inputFileRef.current?.removeAttribute('webkitdirectory');
@@ -60,17 +64,50 @@ const FileMenu: React.FC<Props> = ({
 	];
 
 	const onChangeFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setSelectedFile(event.target.files ? event.target.files : null);
+		setSelectedUploadFiles(event.target.files);
+	};
+
+	const onClickDelete = () => {
+		const ids = selectedFiles.map((file) => file._id);
+		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
+
+		const targetIds = selectedFiles
+			.filter((file) => file.contentType !== 'folder')
+			.map((file) => file._id);
+		const directorys = selectedFiles
+			.filter((file) => file.contentType === 'folder')
+			.map((file) => {
+				const { directory, name } = file;
+				if (directory.endsWith('/')) {
+					return directory + name;
+				}
+				return `${directory}/${name}`;
+			});
+		const body = {
+			targetIds: targetIds,
+			directorys: directorys,
+			action: FileEditAction.trash,
+		};
+		fetch('/cloud/files', {
+			method: 'PUT',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(body),
+		});
+		
+		setSelectedFiles([]);
 	};
 
 	useEffect(() => {
-		if (selectedFile === null || selectedFile.length === 0) {
+		if (selectedUploadFiles === null || selectedUploadFiles.length === 0) {
 			return;
 		}
 
 		handleFileUpload();
-		setSelectedFile(null);
-	}, [selectedFile]);
+		setSelectedUploadFiles(null);
+	}, [selectedUploadFiles]);
 
 	const validateSize = async (totalSize: number) => {
 		const { currentCapacity, maxCapacity } = capacity;
@@ -85,14 +122,14 @@ const FileMenu: React.FC<Props> = ({
 		return res.ok;
 	};
 
-	const sendFiles = async (selectedFiles: File[], totalSize: number) => {
+	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
 		const formData = new FormData();
 
 		formData.append('rootDirectory', currentDir);
 		let metaData: any = {};
 		let sectionSize = 0;
 		let processedSize = 0;
-		for await (const file of selectedFiles) {
+		for await (const file of selectedUploadFiles) {
 			const { size, name } = file;
 			processedSize += size;
 			sectionSize += size;
@@ -129,8 +166,8 @@ const FileMenu: React.FC<Props> = ({
 	};
 
 	const handleFileUpload = async () => {
-		const selectedFiles = [...(selectedFile as FileList)];
-		const totalSize = selectedFiles.reduce((prev, file) => prev + file.size, 0);
+		const uploadFiles = [...(selectedUploadFiles as FileList)];
+		const totalSize = uploadFiles.reduce((prev, file) => prev + file.size, 0);
 
 		try {
 			if (!(await validateSize(totalSize))) {
@@ -142,8 +179,8 @@ const FileMenu: React.FC<Props> = ({
 			setIsCompleteSend(false);
 			setOpenProgreeModal(true);
 
-			await sendFiles(selectedFiles, totalSize);
-			setTempUpload((prev) => !prev);
+			await sendFiles(uploadFiles, totalSize);
+			updateFiles();
 
 			setProgressModalText('Complete!');
 			setIsCompleteSend(true);
@@ -165,7 +202,9 @@ const FileMenu: React.FC<Props> = ({
 			) : (
 				<UploadButton nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			)}
-			{selectedFiles.length > 0 && <DeleteButton> 삭제하기 </DeleteButton>}
+			{selectedFiles.length > 0 && (
+				<DeleteButton onClick={onClickDelete}> 삭제하기 </DeleteButton>
+			)}
 			{showShareButton && <ShareButton> 공유하기 </ShareButton>}
 
 			<UploadInput
@@ -236,4 +275,4 @@ const UploadInput = styled.input`
 const FailureModal = styled(ModalComponent)``;
 const ProgressModal = styled(ModalComponent)``;
 
-export default React.memo(FileMenu);
+export default React.memo(FileMenuForMain);
