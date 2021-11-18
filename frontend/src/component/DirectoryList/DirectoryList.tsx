@@ -49,7 +49,9 @@ const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => 
 	const getFolderStructure = (treeNode: treeNode) => {
 		const childrenToArr = Array.from(treeNode.children.values());
 		let curDir = treeNode.relativeDirectory.split('/').splice(-1)[0];
-		curDir === '' ? (curDir = '내 스토어') : '';
+		if(curDir === ''){
+			curDir = '내 스토어';
+		}
 		
 		const onClickNav = () => {
 			setCurrentDir(treeNode.relativeDirectory);
