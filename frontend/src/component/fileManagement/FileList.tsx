@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import File from './File';
@@ -9,6 +9,7 @@ import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.sv
 
 interface Props {
 	files: FileDTO[];
+	selectedFiles: FileDTO[];
 	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
@@ -22,6 +23,7 @@ const FileList: React.FC<Props> = ({
 	setCurrentDir,
 	currentDirectory,
 	isAscending,
+	selectedFiles,
 	setIsAscending,
 }) => {
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -45,6 +47,7 @@ const FileList: React.FC<Props> = ({
 					<File
 						key={index}
 						file={file}
+						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
 						setCurrentDir={setCurrentDir}
 						currentDirectory={currentDirectory}
@@ -59,12 +62,12 @@ const Container = styled.div`
 	overflow-y: auto;
 `;
 
-const FileHeader = styled.div`	
+const FileHeader = styled.div`
 	display: grid;
 	grid-template-columns: 20px 60px minmax(100px, 7fr) 3fr 3fr 2fr;
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	background-color: ${(props) => props.theme.color.PrimaryBG};
-	
+
 	position: sticky;
 	top: 0;
 `;

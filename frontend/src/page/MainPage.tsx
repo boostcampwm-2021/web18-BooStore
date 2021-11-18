@@ -106,10 +106,12 @@ const MainPage: React.FC<MainPageProps> = ({ user }) => {
 					setSelectedFiles={setSelectedFiles}
 					currentDir={currentDir}
 					setFiles={setFiles}
+					files={files}
 					updateFiles={updateFiles}
 				/>
 				<FileList
 					files={files}
+					selectedFiles={selectedFiles}
 					setSelectedFiles={setSelectedFiles}
 					setCurrentDir={setCurrentDir}
 					currentDirectory={currentDir}

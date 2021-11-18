@@ -25,14 +25,17 @@ interface DirectoryProps {
 
 const TrashPage: React.FC<TrashPageProps> = ({user}) => {
 	const [currentDir, setCurrentDir] = useState('/');
-	const [capacity, setCapacity] = useState<Capacity>({ currentCapacity: 0, maxCapacity: 1024 * 1024 * 1024 });
+	const [capacity, setCapacity] = useState<Capacity>({
+		currentCapacity: 0,
+		maxCapacity: 1024 * 1024 * 1024,
+	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 
 	const onClickDirectory = async (relativePath: string) => {
 		setSelectedFiles([]);
-		
+
 		const files = await getFiles(relativePath, isAscending, true);
 		setFiles(files);
 		setCurrentDir(relativePath);
@@ -55,7 +58,7 @@ const TrashPage: React.FC<TrashPageProps> = ({user}) => {
 				/>
 			));
 	}, [currentDir]);
-	
+
 	const updateFiles = async () => {
 		setSelectedFiles([]);
 		setFiles(await getFiles(currentDir, isAscending, true));
@@ -85,9 +88,11 @@ const TrashPage: React.FC<TrashPageProps> = ({user}) => {
 					selectedFiles={selectedFiles}
 					setSelectedFiles={setSelectedFiles}
 					setFiles={setFiles}
+					files={files}
 				/>
 				<FileList
 					files={files}
+					selectedFiles={selectedFiles}
 					setSelectedFiles={setSelectedFiles}
 					setCurrentDir={setCurrentDir}
 					currentDirectory={currentDir}
@@ -117,7 +122,6 @@ const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDir
 		</>
 	);
 };
-
 
 const Container = styled.div`
 	display: flex;
