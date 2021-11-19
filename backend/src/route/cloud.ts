@@ -82,7 +82,11 @@ router.get('/download', isAuthenticated, async (req, res) => {
 	const zipFolderPath = path.join(path.resolve(), 'temp/', `${loginId}.zip`);
 
 	createZipFile({ targetFolderPath, zipFolderPath });
-	res.download(zipFolderPath, `${loginId}.zip`);
+	res.download(zipFolderPath, `${loginId}.zip`, (err) => {
+		if (!err) {
+			res.send();
+		}
+	});
 	deleteZipFile({ targetFolderPath, zipFolderPath });
 
 	return;
