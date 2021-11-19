@@ -89,9 +89,8 @@ export interface DownloadFilesArg {
 export const downloadFiles = async ({ downloadList }: DownloadFilesArg) => {
 	return Promise.all(
 		downloadList.map(async (file) => {
-			const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
-			const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-			const key = file.osLink.replace(pattern, '').replace(patternTest, '');
+			const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+			const key = file.osLink.replace(pattern, '');
 			await mkdirp(
 				path.join(path.resolve(), 'temp/', file.ownerId, '/', file.directory, '/')
 			);
@@ -106,15 +105,30 @@ export const downloadFiles = async ({ downloadList }: DownloadFilesArg) => {
 				file.name
 			);
 
-			const outStream = fs.createWriteStream(localPath);
-			const inStream = S3.getObject({
-				Bucket: bucketName,
-				Key: key,
-			}).createReadStream();
-			inStream.pipe(outStream);
+			await downloadObjectStorageFiles(localPath, key);
 		})
 	);
 };
+
+const downloadObjectStorageFiles = (localPath, key) => {
+	return new Promise((res, rej) => {
+		const outStream = fs.createWriteStream(localPath);
+		const inStream = S3.getObject({
+			Bucket: bucketName,
+			Key: key,
+		}).createReadStream();
+		const stream = inStream.pipe(outStream);
+		
+		stream.on('error', (err) => {
+			rej(err);
+		})
+		
+		stream.on('finish', () => {
+			res(true);
+		})
+	})
+}
+
 export interface ZipFileFunctionArg {
 	targetFolderPath: string;
 	zipFolderPath: string;
