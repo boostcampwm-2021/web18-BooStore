@@ -89,9 +89,8 @@ export interface DownloadFilesArg {
 export const downloadFiles = async ({ downloadList }: DownloadFilesArg) => {
 	return Promise.all(
 		downloadList.map(async (file) => {
-			const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
-			const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-			const key = file.osLink.replace(pattern, '').replace(patternTest, '');
+			const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+			const key = file.osLink.replace(pattern, '');
 			await mkdirp(
 				path.join(path.resolve(), 'temp/', file.ownerId, '/', file.directory, '/')
 			);
