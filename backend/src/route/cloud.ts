@@ -77,7 +77,7 @@ router.get('/download', isAuthenticated, async (req, res) => {
 		fileIds: typeof files === 'string' ? [files] : (files as Array<string>),
 		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
 	});
-	await downloadFiles({ downloadList: metadataList });
+	await downloadFiles({ downloadList: metadataList, currentDir: current_dir as string });
 	const targetFolderPath = path.join(path.resolve(), 'temp/', loginId);
 	const zipFolderPath = path.join(path.resolve(), 'temp/', `${loginId}.zip`);
 
