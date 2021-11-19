@@ -28,8 +28,10 @@ export const getDownloadListMetadata = async ({
 			return getDownloadFileMetadata({ fileId, loginId });
 		})
 	);
+
 	const folders = Promise.all(
 		directories.map((directory) => {
+			if (directory === '') return [];
 			return getDownloadFolderMetadata({
 				directory: (currentDir === '/' ? currentDir : currentDir + '/') + directory,
 				loginId,
@@ -73,7 +75,7 @@ export interface DownloadFolderMetadataArg {
 }
 
 const getDownloadFolderMetadata = async ({ directory, loginId }: DownloadFolderMetadataArg) => {
-	const folderMetadata = Cloud.find({
+	const folderMetadata = await Cloud.find({
 		directory: { $regex: `^${directory}(\/.*)?$` },
 		ownerId: loginId,
 	}).exec();
@@ -82,25 +84,37 @@ const getDownloadFolderMetadata = async ({ directory, loginId }: DownloadFolderM
 
 // 실제 파일 다운로드
 
+const getDownloadPath = (currentDirectory: string, fileDirectory: string) => {
+	const slicedDirectory = fileDirectory.slice(currentDirectory.length);
+	return slicedDirectory === '' ? '/' : slicedDirectory;
+};
+
 export interface DownloadFilesArg {
 	downloadList: ICloud[];
+	currentDir: string;
 }
 
-export const downloadFiles = async ({ downloadList }: DownloadFilesArg) => {
+export const downloadFiles = async ({ downloadList, currentDir }: DownloadFilesArg) => {
 	return Promise.all(
 		downloadList.map(async (file) => {
 			const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
 			const key = file.osLink.replace(pattern, '');
 			await mkdirp(
-				path.join(path.resolve(), 'temp/', file.ownerId, '/', file.directory, '/')
+				path.join(
+					path.resolve(),
+					'temp/',
+					file.ownerId,
+					'/',
+					getDownloadPath(currentDir, file.directory),
+					'/'
+				)
 			);
-
 			const localPath = path.join(
 				path.resolve(),
 				'temp/',
 				file.ownerId,
 				'/',
-				file.directory,
+				getDownloadPath(currentDir, file.directory),
 				'/',
 				file.name
 			);
@@ -118,16 +132,16 @@ const downloadObjectStorageFiles = (localPath, key) => {
 			Key: key,
 		}).createReadStream();
 		const stream = inStream.pipe(outStream);
-		
+
 		stream.on('error', (err) => {
 			rej(err);
-		})
-		
+		});
+
 		stream.on('finish', () => {
 			res(true);
-		})
-	})
-}
+		});
+	});
+};
 
 export interface ZipFileFunctionArg {
 	targetFolderPath: string;
