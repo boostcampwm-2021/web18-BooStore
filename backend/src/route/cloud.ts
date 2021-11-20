@@ -6,11 +6,9 @@ import { FileEditAction } from '../DTO';
 import { isAuthenticated, upload } from '../middleware';
 import {
 	canIncreaseCurrentCapacity,
-	DownloadListMetadataArg,
 	getDownloadListMetadata,
 	UploadArg,
 	uploadFile,
-	DownloadFilesArg,
 	downloadFiles,
 	moveTrashFiles,
 	moveTrashFolders,

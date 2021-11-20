@@ -144,7 +144,7 @@ export const moveTrashFolders = async ({ directorys, userLoginId }: FoldersFunct
 				Cloud.updateMany(
 					{
 						ownerId: userLoginId,
-						directory: { $regex: `^${directory}(\/.*)?$` },
+						directory: { $regex: `^${directory}(\\/.*)?$` },
 					},
 					{
 						deletedAt: new Date(),
@@ -163,7 +163,7 @@ export const restoreTrashFolders = async ({ directorys, userLoginId }: FoldersFu
 				Cloud.updateMany(
 					{
 						ownerId: userLoginId,
-						directory: { $regex: `^${directory}(\/.*)?$` },
+						directory: { $regex: `^${directory}(\\/.*)?$` },
 					},
 					{
 						isDeleted: false,
@@ -181,7 +181,7 @@ export const removeFolders = async ({ directorys, userLoginId }: FoldersFunction
 				const files = await Cloud.find(
 					{
 						ownerId: userLoginId,
-						directory: { $regex: `^${directory}(\/.*)?$` },
+						directory: { $regex: `^${directory}(\\/.*)?$` },
 					},
 					{ osLink: true, size: true, ownerId: true }
 				).exec();
@@ -201,7 +201,7 @@ export const removeFolders = async ({ directorys, userLoginId }: FoldersFunction
 
 				await Cloud.deleteMany({
 					ownerId: userLoginId,
-					directory: { $regex: `^${directory}(\/.*)?$` },
+					directory: { $regex: `^${directory}(\\/.*)?$` },
 				});
 			})
 	);

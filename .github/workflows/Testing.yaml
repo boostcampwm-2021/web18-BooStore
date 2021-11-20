@@ -17,10 +17,10 @@ jobs:
           node-version: '14.17'
       - run: cd frontend
       - run: npm install
-      - run: eslint '**/*.{ts,tsx}'
+      - run: npx eslint '**/*.{ts,tsx}'
       - run: cd ../backend
       - run: npm install
-      - run: eslint '**/*.{ts}'
+      - run: npx eslint '**/*.{ts}'
   tsc:
     runs-on: ubuntu-latest
     name: Check Typescript

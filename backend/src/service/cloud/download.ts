@@ -76,7 +76,7 @@ export interface DownloadFolderMetadataArg {
 
 const getDownloadFolderMetadata = async ({ directory, loginId }: DownloadFolderMetadataArg) => {
 	const folderMetadata = await Cloud.find({
-		directory: { $regex: `^${directory}(\/.*)?$` },
+		directory: { $regex: `^${directory}(\\/.*)?$` },
 		ownerId: loginId,
 	}).exec();
 	return folderMetadata;

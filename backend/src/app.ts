@@ -21,14 +21,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(path.resolve(), '../frontend/build')));
 
-app.use(session({ 
-	secret: process.env.SESSION_SECRET, 
-	resave: true, 
-	saveUninitialized: false,
-	store: MongoStore.create({
-		mongoUrl: process.env.MONGO_URI
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET,
+		resave: true,
+		saveUninitialized: false,
+		store: MongoStore.create({
+			mongoUrl: process.env.MONGO_URI,
+		}),
 	})
-}));
+);
 app.use(passport.initialize());
 app.use(passport.session());
 passportConfig();
@@ -36,7 +38,7 @@ passportConfig();
 // 1시간마다 체크하여, 7일이상 지난 쓰레기통의 파일을 제거함
 clearTrashFileScheduler('0 * * * *', 7);
 
-fs.mkdir(path.join(path.resolve(), 'temp/'), ()=>{});
+fs.mkdir(path.join(path.resolve(), 'temp/'), () => {});
 
 app.use('/', authRouter);
 app.use('/user', userRouter);

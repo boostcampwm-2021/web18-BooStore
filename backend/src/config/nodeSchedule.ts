@@ -6,7 +6,7 @@ import { removeFiles } from '../service/cloud';
  *	cron: '* * * * *'
  *	durationDay: 7  (unit: day)
  **/
-export const clearTrashFileScheduler = (cron: string, durationDay: number = 7) => {
+export const clearTrashFileScheduler = (cron: string, durationDay = 7) => {
 	if (typeof cron === 'undefined') {
 		throw new Error('부적절한 인자');
 	}
@@ -31,7 +31,7 @@ export const clearTrashFileScheduler = (cron: string, durationDay: number = 7) =
 			if (prev.hasOwnProperty(ownerId)) {
 				return prev[ownerId].push(_id);
 			}
-			prev[ownerId] = [_id]
+			prev[ownerId] = [_id];
 			return prev;
 		}, {});
 

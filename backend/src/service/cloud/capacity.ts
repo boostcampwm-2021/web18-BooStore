@@ -25,20 +25,20 @@ export const canIncreaseCurrentCapacity = async ({ loginId, value }: CCFunctionP
 	if (!user) {
 		return false;
 	}
-	
+
 	const { maxCapacity, currentCapacity } = user;
 	return currentCapacity + value <= maxCapacity;
-}
+};
 
 export const canDecreaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
 	if (!user) {
 		return false;
 	}
-	
+
 	const { currentCapacity } = user;
 	return currentCapacity - value >= 0;
-}
+};
 
 export const increaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
@@ -49,8 +49,8 @@ export const increaseCurrentCapacity = async ({ loginId, value }: CCFunctionPara
 	if (currentCapacity + value > maxCapacity) {
 		throw new Error(`Can't increase CurrentCapacity`);
 	}
-	
-	const res = await User.updateOne({ loginId }, { $inc: { currentCapacity: value }});
+
+	await User.updateOne({ loginId }, { $inc: { currentCapacity: value } });
 
 	return true;
 };
@@ -64,7 +64,7 @@ export const decreaseCurrentCapacity = async ({ loginId, value }: CCFunctionPara
 		throw new Error(`Can't decrease CurrentCapacity`);
 	}
 
-	const res = await User.updateOne({ loginId }, { $inc: { currentCapacity: -value }});
+	await User.updateOne({ loginId }, { $inc: { currentCapacity: -value } });
 
 	return true;
 };
@@ -73,8 +73,8 @@ export const updateMaxCapacity = async ({ loginId, maxCapacity }) => {
 	if (maxCapacity < 0) {
 		throw new Error('maxCapacity must be positive');
 	}
-	
-	const res = await User.updateOne({ loginId }, { maxCapacity });
+
+	await User.updateOne({ loginId }, { maxCapacity });
 
 	return true;
 };

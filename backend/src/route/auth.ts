@@ -1,7 +1,6 @@
 import * as express from 'express';
 import * as passport from 'passport';
 import { createUser, isExistsUser } from '../service';
-import upload from '../model/object-storage';
 import { ResponseUser } from '../DTO';
 
 const router = express.Router();
@@ -26,7 +25,7 @@ router.post('/signup', async (req, res) => {
 	}
 
 	try {
-		const user = await createUser({ loginId: id, password });
+		await createUser({ loginId: id, password });
 
 		return res.status(200).send();
 	} catch (err) {

@@ -9,7 +9,6 @@ import {
 	getDirectoryList,
 } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
-import { User } from '../model';
 
 const router = express.Router();
 
