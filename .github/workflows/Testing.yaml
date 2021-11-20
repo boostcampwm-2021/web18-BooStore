@@ -15,12 +15,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14.17'
-      - run: cd frontend
-      - run: npm install
-      - run: npx eslint '**/*.{ts,tsx}'
-      - run: cd ../backend
-      - run: npm install
-      - run: npx eslint '**/*.{ts}'
+      - run: |
+          chmod +x ./script/lint.sh
+          ./script/lint.sh
   tsc:
     runs-on: ubuntu-latest
     name: Check Typescript
@@ -29,9 +26,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14.17'
-      - run: cd frontend
-      - run: npm install
-      - run: npm run build
-      - run: cd ../backend
-      - run: npm install
-      - run: npm run build
+      - run: |
+          chmod +x ./script/tsc.sh
+          ./script/tsc.sh
