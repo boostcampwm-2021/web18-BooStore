@@ -1,0 +1,27 @@
+name: Deploy Action
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          script: |
+            cd /home/admin/boostore
+            git fetch origin main
+            git reset --hard origin/main
+            git pull origin main
+            chmod +x ./script/*.sh
+            ./script/build.sh
+            ./script/deploy.sh 

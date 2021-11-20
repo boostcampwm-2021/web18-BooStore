@@ -1,0 +1,31 @@
+name: Testing Action
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Check Eslint
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.17'
+      - run: |
+          chmod +x ./script/lint.sh
+          ./script/lint.sh
+  tsc:
+    runs-on: ubuntu-latest
+    name: Check Typescript
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.17'
+      - run: |
+          chmod +x ./script/tsc.sh
+          ./script/tsc.sh

@@ -6,19 +6,16 @@ import {
 	getFilteredFiles,
 	FilesArg,
 	FilteredFilesArg,
-	getDirectoryList
+	getDirectoryList,
 } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
 
 const router = express.Router();
 
 router.get('/', isAuthenticated, (req, res) => {
-	const { loginId, directoryId } = req.user;
+	const { loginId } = req.user;
 
-	const data: ResponseUser = {
-		loginId,
-		directoryId,
-	};
+	const data: ResponseUser = { loginId };
 
 	return res.json(data);
 });
@@ -44,7 +41,7 @@ router.get('/files', isAuthenticated, async (req, res) => {
 		loginId: loginId,
 		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
 		isAscending: isAscending === 'true',
-		isDeleted: isDeleted === 'true'
+		isDeleted: isDeleted === 'true',
 	};
 
 	const tempFiles = await getFiles(filesArg);
@@ -58,9 +55,9 @@ router.get('/files', isAuthenticated, async (req, res) => {
 	return res.status(200).json(files);
 });
 
-router.get('/directory', isAuthenticated, async(req,res)=>{
+router.get('/directory', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const directoryList = await getDirectoryList(loginId);
 	return res.json(directoryList);
-})
+});
 export default router;

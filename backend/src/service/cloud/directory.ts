@@ -60,14 +60,6 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 	return filteredFolders.concat(filteredFiles);
 };
 
-const getFormattedDate = (date: string) => {
-	return new Date(Date.parse(date))
-		.toLocaleString()
-		.replace('.', '년')
-		.replace('.', '월')
-		.replace('.', '일');
-};
-
 export const getDirectoryList = async (loginId: string) => {
 	const allFiles = await Cloud.find(
 		{
@@ -85,9 +77,11 @@ export const getDirectoryList = async (loginId: string) => {
 };
 
 const makeDirectoryToArrFormat = (allFiles: Directory[]) => {
-	let directorySet = new Set();
-	allFiles.filter(file => file.directory.length > 1).forEach((file) => {
-		directorySet.add(file.directory);
-	});
+	const directorySet = new Set();
+	allFiles
+		.filter((file) => file.directory.length > 1)
+		.forEach((file) => {
+			directorySet.add(file.directory);
+		});
 	return Array.from(directorySet);
 };

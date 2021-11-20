@@ -3,7 +3,6 @@ import { Document, Schema, model } from 'mongoose';
 export interface IUser {
 	loginId: string;
 	password: string;
-	directoryId: string;
 	maxCapacity: number;
 	currentCapacity: number;
 }
@@ -22,11 +21,6 @@ const userSchema: Schema<IUserDoc> = new Schema(
 			type: String,
 			require: true,
 			trim: true,
-		},
-		directoryId: {
-			type: String,
-			require: true,
-			unique: true,
 		},
 		maxCapacity: {
 			type: Number,

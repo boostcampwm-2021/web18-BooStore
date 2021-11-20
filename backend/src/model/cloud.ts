@@ -47,7 +47,7 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 		},
 		deletedAt: {
 			type: Date,
-		}
+		},
 	},
 	{
 		versionKey: false,

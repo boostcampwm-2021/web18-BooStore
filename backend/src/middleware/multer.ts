@@ -12,7 +12,6 @@ const storage = multer.diskStorage({
 	filename: (req, file, cb) => {
 		cb(null, `${Date.now()}${req.user.loginId}-${file.originalname}`);
 	},
-	
 });
 
 export const upload = multer({ storage });

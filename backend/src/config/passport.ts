@@ -13,11 +13,11 @@ const localLoginStrategy = new LocalStrategy(
 	async (id, password, done) => {
 		try {
 			const user = await User.findOne({ loginId: id }).exec();
-			
+
 			if (!user) {
 				return done(null, false, { message: 'wrong loginId' });
 			}
-			
+
 			if (bcrypt.compareSync(password, user.password)) {
 				return done(null, user);
 			} else {
@@ -28,7 +28,6 @@ const localLoginStrategy = new LocalStrategy(
 		}
 	}
 );
-
 
 export default () => {
 	passport.serializeUser((user: IUser, done) => {
