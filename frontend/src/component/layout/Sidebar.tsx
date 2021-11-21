@@ -58,7 +58,6 @@ const Container = styled.div`
 	height: 100%;
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	border-right: 1px solid ${(props) => props.theme.color.Line};
-	
 	display: flex;
 	flex-direction: column;
 	

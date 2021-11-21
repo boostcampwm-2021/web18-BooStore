@@ -10,7 +10,7 @@ export interface treeNode{
 
 
 export const makeTree = (arr : Array<string[]>)=>{
-    console.log(arr);
+    //console.log(arr);
     const root: treeNode = {
         relativeDirectory: '/',
         parentDirectory: '',
@@ -27,13 +27,13 @@ export const makeTree = (arr : Array<string[]>)=>{
 const insertNode = (root: treeNode, node : treeNode) => {
     const copiedNode = {...node};
     const parent = findParent(root,copiedNode);
-    console.log("curNode: "+JSON.stringify(copiedNode));
-    console.log("parentNode: "+JSON.stringify(parent));
+    //console.log("curNode: "+JSON.stringify(copiedNode));
+    //console.log("parentNode: "+JSON.stringify(parent));
     parent.children.set(copiedNode.relativeDirectory,copiedNode);
 }
 
 const findParent = (parent: treeNode,node: treeNode) => {
-    console.log("tree traverse:" + " parent:"+parent.relativeDirectory);
+    //console.log("tree traverse:" + " parent:"+parent.relativeDirectory);
     if(parent.relativeDirectory === node.parentDirectory){
         console.log("check!!    parent:"+parent.relativeDirectory + "  cur:"+node.relativeDirectory);
         return parent;
