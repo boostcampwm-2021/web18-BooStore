@@ -5,6 +5,9 @@ import File from './File';
 import { FileDTO } from '@DTO';
 import Selection from './Selection';
 
+import useContextMenu from '@util/useContextMenu';
+import ContextMenu from '@component/common/ContextMenu';
+
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
 
