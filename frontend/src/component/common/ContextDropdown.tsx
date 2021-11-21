@@ -5,9 +5,9 @@ interface Props{
     left: number;
 }
 
-const ContextMenu = styled.ul<Props>`
+const ContextDropdown = styled.ul<Props>`
     top: ${(props) => props.top};
     left: ${(props) => props.left};
 `;
 
-export default ContextMenu;
+export default ContextDropdown;
