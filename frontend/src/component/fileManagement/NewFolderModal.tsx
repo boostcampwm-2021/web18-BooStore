@@ -27,7 +27,7 @@ const NewFolderModal: React.FC<Props> = ({
 		setNewFolderName(value);
 	};
 
-	const onRequestClose = useCallback(() => {
+    const onRequestClose = useCallback(() => {
 		if (onCloseButton) {
 			setIsOpenNewFolder(false);
 		}
@@ -106,8 +106,13 @@ ReactModal.defaultStyles = {
 		justifyContent: 'center',
 	},
 	content: {
+<<<<<<< HEAD
 		width: '400px',
 		minHeight: '180px',
+=======
+		width: '600px',
+		minHeight: '275px',
+>>>>>>> 85ac602 ([Feat] 새 폴더 추가하는 모달 구현)
 		border: '1px solid #ccc',
 		background: '#fff',
 		overflow: 'auto',
@@ -121,6 +126,7 @@ ReactModal.defaultStyles = {
 	},
 };
 
+<<<<<<< HEAD
 const InputContainer = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -144,3 +150,9 @@ const MakeFolderButton = styled(Button)`
 `;
 
 export default NewFolderModal;
+=======
+
+
+export default NewFolderModal;
+
+>>>>>>> 85ac602 ([Feat] 새 폴더 추가하는 모달 구현)
