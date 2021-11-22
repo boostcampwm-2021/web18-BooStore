@@ -15,8 +15,9 @@ import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
-	selectedFiles: Map<string, FileDTO>;
-	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>
+	selectedFiles: FileDTO[];
+	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 	isAscending: boolean;
@@ -26,6 +27,7 @@ interface Props {
 
 const FileList: React.FC<Props> = ({
 	files,
+	setFiles,
 	setSelectedFiles,
 	setCurrentDir,
 	currentDirectory,
@@ -77,7 +79,7 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
 				<HeaderContextMenu setIsOpenNewFolder={setIsOpenNewFolder}/>
-				<NewFolderModal isOpenNewFolder={isOpenNewFolder} setIsOpenNewFolder={setIsOpenNewFolder}/>
+				<NewFolderModal isOpenNewFolder={isOpenNewFolder} setIsOpenNewFolder={setIsOpenNewFolder} setFiles={setFiles}/>
 			</FileHeader>
 			<Files>
 				<Selection selector={'.file'} addSelcted={addSelect} removeSelected={removeSelect} scrollFrame={container.current ?? undefined}>
