@@ -29,6 +29,8 @@ const FileList: React.FC<Props> = ({
 	setIsAscending,
 	className,
 }) => {
+	const container = useRef<HTMLDivElement>(null);
+	
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsAscending(!isAscending);
 	};
@@ -53,7 +55,7 @@ const FileList: React.FC<Props> = ({
 	}
 
 	return (
-		<Container className={className}>
+		<Container className={className} ref={container}>
 			<FileHeader>
 				<p></p>
 				<p></p>
@@ -65,7 +67,7 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
 			</FileHeader>
 			<Files>
-				<Selection addSelcted={addSelect} removeSelect={removeSelect}>
+				<Selection selector={'.file'} addSelcted={addSelect} removeSelected={removeSelect} scrollFrame={container.current ?? undefined}>
 					{files.map((file, index) => (
 						<File
 							className="file"
@@ -120,4 +122,4 @@ const Files = styled.ul`
 		margin: auto;
 	}
 `;
-export default React.memo(FileList);
+export default FileList;

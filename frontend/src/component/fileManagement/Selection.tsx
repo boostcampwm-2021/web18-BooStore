@@ -1,9 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
+
+/*
+* selector: 선택 대상의 query selector
+* addSelected: 선택 대상이 포함되면 실행되는 함수
+* removeSelect: 선택 대상이 포함되지않은 경우 실행되는 함수
+* scrollFrame: 만약 스크롤이 적용된 경우, 스크롤이 실행되는 엘리먼트
+*/
 interface SelectionProps {
+	selector: string;
 	addSelcted: (id: string) => void;
-	removeSelect: (id: string) => void;
+	removeSelected: (id: string) => void;
+	scrollFrame?: HTMLElement;
 }
 interface OffsetPosition {
 	ltX: number;
@@ -12,7 +21,7 @@ interface OffsetPosition {
 	rbY: number;
 }
 
-const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelect }) => {
+const Selection: React.FC<SelectionProps> = ({ children, selector, addSelcted, removeSelected, scrollFrame }) => {
 	const [point, setPoint] = useState({
 		startX: 0,
 		startY: 0,
@@ -22,11 +31,11 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 	const [isDraging, setDraging] = useState(false);
 	const container = useRef<HTMLDivElement>(null);
 
-	const getFileElements = () => container.current?.querySelectorAll('.file');
+	const getElements = () => container.current?.querySelectorAll(selector);
 	const getOffsetPosition = (target: HTMLDivElement, pageX: number, pageY: number) => {
 		return {
-			offsetX: pageX - target.offsetLeft,
-			offsetY: pageY - target.offsetTop,
+			offsetX: pageX - target.offsetLeft + (scrollFrame?.scrollLeft ?? 0),
+			offsetY: pageY - target.offsetTop + (scrollFrame?.scrollTop ?? 0),
 		};
 	};
 
@@ -36,7 +45,7 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 		}
 		const { pageX, pageY } = event;
 		const { offsetX, offsetY } = getOffsetPosition(container.current, pageX, pageY);
-
+		
 		setPoint({
 			startX: offsetX,
 			startY: offsetY,
@@ -79,7 +88,7 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 		[isDraging, children, point]
 	);
 	const selectRange = ({ ltY, ltX, rbY, rbX }: OffsetPosition) => {
-		const fileElements = getFileElements();
+		const fileElements = getElements();
 
 		fileElements?.forEach((tmp) => {
 			const ele = tmp as HTMLElement;
@@ -91,7 +100,7 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 				offsetLeft > rbX ||
 				offsetLeft + offsetWidth < ltX
 			) {
-				return removeSelect(ele.dataset.id!);
+				return removeSelected(ele.dataset.id!);
 			}
 
 			addSelcted(ele.dataset.id!);
