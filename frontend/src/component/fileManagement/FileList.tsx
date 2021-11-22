@@ -15,10 +15,16 @@ import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
+<<<<<<< HEAD
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	canDirectoryClick?: boolean;
 	selectedFiles: Map<string, FileDTO>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
+=======
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>
+	selectedFiles: FileDTO[];
+	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+>>>>>>> 3c449f8 ([Feat] 새 폴더에 필요한 fetch 요청 추가)
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 	isAscending: boolean;

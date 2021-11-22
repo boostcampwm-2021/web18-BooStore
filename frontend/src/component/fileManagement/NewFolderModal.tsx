@@ -5,6 +5,7 @@ import ModalComponent, { ModalType } from '@component/common/ModalComponent';
 import Button from '@component/common/Button';
 import { FileDTO } from '@DTO';
 
+<<<<<<< HEAD
 interface Props {
 	onCloseButton?: boolean;
 	isOpenNewFolder: boolean;
@@ -21,6 +22,17 @@ const NewFolderModal: React.FC<Props> = ({
 	curDir,
 }) => {
 	const [newFolderName, setNewFolderName] = useState('제목없는 폴더');
+=======
+interface Props{
+    onCloseButton?: boolean;
+    isOpenNewFolder: boolean;
+    setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
+    setFiles : React.Dispatch<React.SetStateAction<FileDTO[]>>;
+ }
+
+const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder, setIsOpenNewFolder,setFiles }) => {   
+    const [newFolderName, setNewFolderName] = useState('제목없는 폴더');
+>>>>>>> 3c449f8 ([Feat] 새 폴더에 필요한 fetch 요청 추가)
 
 	const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = target;
@@ -107,12 +119,17 @@ ReactModal.defaultStyles = {
 	},
 	content: {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		width: '400px',
 		minHeight: '180px',
 =======
 		width: '600px',
 		minHeight: '275px',
 >>>>>>> 85ac602 ([Feat] 새 폴더 추가하는 모달 구현)
+=======
+		width: '400px',
+		minHeight: '180px',
+>>>>>>> 3c449f8 ([Feat] 새 폴더에 필요한 fetch 요청 추가)
 		border: '1px solid #ccc',
 		background: '#fff',
 		overflow: 'auto',
@@ -126,6 +143,7 @@ ReactModal.defaultStyles = {
 	},
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 const InputContainer = styled.div`
 	display: flex;
@@ -151,6 +169,30 @@ const MakeFolderButton = styled(Button)`
 
 export default NewFolderModal;
 =======
+=======
+const InputContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+`;
+
+const ButtonContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+`;
+
+const MakeFolderButton = styled(Button)`
+    background-color: ${(props) => props.theme.color.Primary};
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
+    color: white;
+    padding: 10px;
+    border: none;
+    box-shadow: 3px 1px 3px grey;
+    font-size: ${(props) => props.theme.fontSize.Content};
+    float: 'right';
+    `;
+
+>>>>>>> 3c449f8 ([Feat] 새 폴더에 필요한 fetch 요청 추가)
 
 
 export default NewFolderModal;
