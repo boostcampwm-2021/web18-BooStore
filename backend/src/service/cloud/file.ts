@@ -48,15 +48,16 @@ export const uploadFile = async ({
 		.split(/\\\\|\\/)
 		.join('/');
 
-	await S3.upload({
+	const s3Promise = S3.upload({
 		Bucket: bucketName,
 		Key: objectStorageKey,
 		ACL: 'public-read',
-		// ACL을 지우면 전체공개가 되지 않습니다.
 		Body: fs.createReadStream(diskFilePath),
 	}).promise();
 
-	const metadata = new Cloud({
+	const cafPromise = createAncestorsFolder(cloudDirectory, userLoginId);
+
+	const cloudPromise = Cloud.create({
 		name: originalName,
 		size: size,
 		ownerId: userLoginId,
@@ -65,9 +66,55 @@ export const uploadFile = async ({
 		osLink: `${OBJECT_STORAGE_BASE}/${bucketName}/${objectStorageKey}`,
 	});
 
-	await metadata.save();
+	await Promise.all([cafPromise, s3Promise, cloudPromise]);
 
 	await increaseCurrentCapacity({ loginId: userLoginId, value: size });
+};
+
+// /test2/폴더어/폴더어2/test.txt -> /test2/폴더어/폴더어2
+const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
+	if (curDirectory === '/') {
+		return;
+	}
+
+	const folders = curDirectory
+		.split('/')
+		.slice(1)
+		.reduce(
+			(prev, cur) => {
+				const { directory, name } = prev[prev.length - 1];
+
+				const curFolder = {
+					directory: directory === '/' ? `/${name}` : `${directory}/${name}`,
+					name: cur,
+				};
+
+				return prev.concat([curFolder]);
+			},
+			[{ directory: '', name: '' }]
+		)
+		.slice(1);
+
+	return await Promise.all(
+		folders.map(async (folder) => {
+			const { directory, name } = folder;
+			return await Cloud.findOneAndUpdate(
+				{
+					directory,
+					name,
+					ownerId: userLoginId,
+				},
+				{
+					size: 0,
+					contentType: 'folder',
+				},
+				{
+					new: true,
+					upsert: true,
+				}
+			).exec();
+		})
+	);
 };
 
 const removeObjectStorageObjects = async (keys) => {

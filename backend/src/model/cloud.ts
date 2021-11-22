@@ -19,6 +19,7 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 	{
 		osLink: {
 			type: String,
+			default: '',
 		},
 		directory: {
 			type: String,
