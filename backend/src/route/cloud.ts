@@ -40,25 +40,31 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 	const body = req.body;
 	const relativePath = JSON.parse(body.relativePath);
 
-	for await (const file of files) {
-		const { path, size, originalname, mimetype, filename, destination } = file;
-		const uploadArg: UploadArg = {
-			originalName: originalname,
-			mimetype: mimetype,
-			fileName: filename,
-			destination: destination,
-			rootDirectory: body.rootDirectory,
-			relativePath: relativePath[originalname],
-			size: size,
-			userLoginId: loginId,
-		};
+	try {
+		await Promise.all(
+			files.map(async (file) => {
+				const { path, size, originalname, mimetype, filename, destination } = file;
+				const uploadArg: UploadArg = {
+					originalName: originalname,
+					mimetype: mimetype,
+					fileName: filename,
+					destination: destination,
+					rootDirectory: body.rootDirectory,
+					relativePath: relativePath[originalname],
+					size: size,
+					userLoginId: loginId,
+				};
 
-		await uploadFile(uploadArg);
+				await uploadFile(uploadArg);
 
-		fs.rm(path);
+				fs.rm(path);
+			})
+		);
+
+		res.status(200).send();
+	} catch (err) {
+		res.status(500).send();
 	}
-
-	res.status(200).send();
 });
 
 router.get('/download', isAuthenticated, async (req, res) => {
