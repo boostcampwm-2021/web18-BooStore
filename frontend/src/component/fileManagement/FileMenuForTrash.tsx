@@ -13,8 +13,8 @@ import { getCapacity } from 'api';
 
 interface Props {
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
-	selectedFiles: FileDTO[];
-	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	selectedFiles: Map<string, FileDTO>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	files: FileDTO[];
 }
@@ -29,13 +29,13 @@ const FileMenuForTrash: React.FC<Props> = ({
 	const [isOnSelectAll, setOnSelectAll] = useState(false);
 
 	const onClickDelete = () => {
-		const ids = selectedFiles.map((file) => file._id);
+		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = selectedFiles
+		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id);
-		const directories = selectedFiles
+		const directories = [...selectedFiles.values()]
 			.filter((file) => file.contentType === 'folder')
 			.map((file) => {
 				const { directory, name } = file;
@@ -63,17 +63,17 @@ const FileMenuForTrash: React.FC<Props> = ({
 				console.error(err);
 			});
 
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const onClickRestore = () => {
-		const ids = selectedFiles.map((file) => file._id);
+		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = selectedFiles
+		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id);
-		const directories = selectedFiles
+		const directories = [...selectedFiles.values()]
 			.filter((file) => file.contentType === 'folder')
 			.map((file) => {
 				const { directory, name } = file;
@@ -96,15 +96,19 @@ const FileMenuForTrash: React.FC<Props> = ({
 			body: JSON.stringify(body),
 		});
 
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const onClickSelectAll = useCallback(() => {
 		if (isOnSelectAll) {
-			setSelectedFiles([]);
+			setSelectedFiles(new Map());
 		}
 		else {
-			setSelectedFiles([ ...files ]);
+			const newMap = files.reduce((prev, file) => {
+				prev.set(file._id, file);
+				return prev;
+			}, new Map<string, FileDTO>());
+			setSelectedFiles(newMap);
 		}
 		
 		setOnSelectAll(prev => !prev);
@@ -115,10 +119,10 @@ const FileMenuForTrash: React.FC<Props> = ({
 			<SelectAllBtn onClick={onClickSelectAll}>
 				{isOnSelectAll ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			</SelectAllBtn>
-			<DownloadButton onClick={onClickRestore} disabled={selectedFiles.length === 0}>
+			<DownloadButton onClick={onClickRestore} disabled={selectedFiles.size === 0}>
 				복원하기
 			</DownloadButton>
-			<DeleteButton onClick={onClickDelete} disabled={selectedFiles.length === 0}>
+			<DeleteButton onClick={onClickDelete} disabled={selectedFiles.size === 0}>
 				삭제하기
 			</DeleteButton>
 		</Container>

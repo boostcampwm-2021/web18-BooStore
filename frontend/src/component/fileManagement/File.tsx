@@ -6,10 +6,10 @@ import FileIcon from './FileIcon';
 
 interface Props {
 	file: FileDTO;
-	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
-	selectedFiles: FileDTO[];
+	selectedFiles: Map<string, FileDTO>;
 	className?: string;
 }
 
@@ -29,17 +29,15 @@ const File: React.FC<Props> = ({
 
 	const onClickFile = (event: React.MouseEvent<HTMLDivElement>) => {
 		setSelectedFiles((selectedFiles) => {
-			const result = [...selectedFiles];
-			const element = selectedFiles.find((ele) => {
-				return ele._id == _id;
-			});
-
-			if (typeof element === 'undefined') {
-				result.push({ ...file });
-				return result;
+			const result = new Map(selectedFiles);
+			if (result.has(_id)) {
+				result.delete(_id);
+			}
+			else {
+				result.set(_id, file);
 			}
 
-			return result.filter((ele) => ele._id !== _id);
+			return result;
 		});
 	};
 
@@ -52,7 +50,7 @@ const File: React.FC<Props> = ({
 	};
 
 	useEffect(() => {
-		if (selectedFiles.find((ele) => ele._id === _id)) {
+		if (selectedFiles.has(_id)) {
 			setSelected(true);
 		} else {
 			setSelected(false);

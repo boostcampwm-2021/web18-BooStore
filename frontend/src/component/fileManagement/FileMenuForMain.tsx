@@ -14,11 +14,11 @@ interface Props {
 	showShareButton?: boolean;
 	capacity: Capacity;
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
-	selectedFiles: FileDTO[];
-	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	selectedFiles: Map<string, FileDTO>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	currentDir: string;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
-	files: FileDTO[]
+	files: FileDTO[];
 	updateFiles?: Function;
 }
 
@@ -71,7 +71,7 @@ const FileMenuForMain: React.FC<Props> = ({
 	};
 
 	const onClickDownload = async () => {
-		const targetIds = selectedFiles
+		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)
 			.reduce((acc, cur) => {
@@ -79,7 +79,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			}, '');
 		const filesQuery = targetIds === '' ? 'files=&' : targetIds;
 
-		const directories = selectedFiles
+		const directories = [...selectedFiles.values()]
 			.filter((file) => file.contentType === 'folder')
 			.map((file) => {
 				return file.name;
@@ -126,13 +126,13 @@ const FileMenuForMain: React.FC<Props> = ({
 	};
 
 	const onClickDelete = () => {
-		const ids = selectedFiles.map((file) => file._id);
+		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = selectedFiles
+		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id);
-		const directorys = selectedFiles
+		const directorys = [...selectedFiles.values()]
 			.filter((file) => file.contentType === 'folder')
 			.map((file) => {
 				const { directory, name } = file;
@@ -155,7 +155,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			body: JSON.stringify(body),
 		});
 
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const validateSize = async (totalSize: number) => {
@@ -243,14 +243,17 @@ const FileMenuForMain: React.FC<Props> = ({
 
 	const onClickSelectAll = useCallback(() => {
 		if (isOnSelectAll) {
-			setSelectedFiles([]);
+			setSelectedFiles(new Map());
+		} else {
+			const newMap = files.reduce((prev, file) => {
+				prev.set(file._id, file);
+				return prev;
+			}, new Map<string, FileDTO>());
+			setSelectedFiles(newMap);
 		}
-		else {
-			setSelectedFiles([ ...files ]);
-		}
-		
-		setOnSelectAll(prev => !prev);
-	}, [ files, isOnSelectAll ]);
+
+		setOnSelectAll((prev) => !prev);
+	}, [files, isOnSelectAll]);
 
 	useEffect(() => {
 		if (selectedUploadFiles === null || selectedUploadFiles.length === 0) {
@@ -260,30 +263,28 @@ const FileMenuForMain: React.FC<Props> = ({
 		handleFileUpload();
 		setSelectedUploadFiles(null);
 	}, [selectedUploadFiles]);
-	
+
 	useEffect(() => {
 		if (files.length === 0) {
 			setOnSelectAll(false);
-		}
-		else if (selectedFiles.length === files.length) {
+		} else if (selectedFiles.size === files.length) {
 			setOnSelectAll(true);
-		}
-		else {
+		} else {
 			setOnSelectAll(false);
 		}
 	}, [selectedFiles, files]);
-	
+
 	return (
 		<Container>
 			<SelectAllBtn onClick={onClickSelectAll}>
 				{isOnSelectAll ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			</SelectAllBtn>
-			{selectedFiles.length > 0 ? (
+			{selectedFiles.size > 0 ? (
 				<DownloadButton onClick={onClickDownload}> 다운로드 </DownloadButton>
 			) : (
 				<UploadButton nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			)}
-			{selectedFiles.length > 0 && (
+			{selectedFiles.size > 0 && (
 				<DeleteButton onClick={onClickDelete}> 삭제하기 </DeleteButton>
 			)}
 			{showShareButton && <ShareButton> 공유하기 </ShareButton>}

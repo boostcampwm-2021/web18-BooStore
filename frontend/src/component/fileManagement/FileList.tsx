@@ -10,8 +10,8 @@ import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.sv
 
 interface Props {
 	files: FileDTO[];
-	selectedFiles: FileDTO[];
-	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	selectedFiles: Map<string, FileDTO>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 	isAscending: boolean;
@@ -37,20 +37,24 @@ const FileList: React.FC<Props> = ({
 
 	const addSelect = (id: string) => {
 		setSelectedFiles((selectedFiles) => {
-			const result = [...selectedFiles];
-			const element = selectedFiles.find((ele) => ele._id == id);
-			if (element) {
+			if (selectedFiles.has(id)) {
 				return selectedFiles;
 			}
 			
+			const result = new Map(selectedFiles);
 			const file = files.find((ele) => ele._id === id);
-			result.push({ ...file as FileDTO });
+			result.set(id, file!);
 			return result;
 		});
 	};
 	const removeSelect = (id: string) => {
 		setSelectedFiles((selectedFiles) => {
-			return [...selectedFiles].filter((ele) => ele._id !== id);
+			if (!selectedFiles.has(id)) {
+				return selectedFiles;
+			}
+			const result = new Map(selectedFiles);
+			result.delete(id);
+			return result;
 		});
 	}
 

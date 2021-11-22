@@ -32,11 +32,11 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 		maxCapacity: 1024 * 1024 * 1024,
 	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
-	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
+	const [selectedFiles, setSelectedFiles] = useState<Map<string, FileDTO>>(new Map());
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 
 	const onClickDirectory = async (relativePath: string) => {
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 
 		const files = await getFiles(relativePath, isAscending, true);
 		setFiles(files);
@@ -62,7 +62,7 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 	}, [currentDir]);
 
 	const updateFiles = async () => {
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 		setFiles(await getFiles(currentDir, isAscending, true));
 		setCapacity(await getCapacity());
 	};

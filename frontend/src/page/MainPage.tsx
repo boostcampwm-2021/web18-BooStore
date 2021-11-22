@@ -52,7 +52,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 		maxCapacity: 1024 * 1024 * 10,
 	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
-	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
+	const [selectedFiles, setSelectedFiles] = useState<Map<string, FileDTO>>(new Map());
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 	const location = useLocation<{ currentDirectory: string|undefined}>();
 
@@ -60,11 +60,11 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 		const files = await getFiles(relativePath, isAscending);
 		setFiles(files);
 		setCurrentDir(relativePath);
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const updateFiles = async () => {
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 		setFiles(await getFiles(currentDir, isAscending));
 		setCapacity(await getCapacity());
 	};
