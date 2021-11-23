@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Cloud } from '../../model';
 import { decreaseCurrentCapacity, increaseCurrentCapacity } from '.';
+import { applyEscapeString } from '../../util';
 
 const bucketName = process.env.S3_BUCKET_NAME;
 const OBJECT_STORAGE_BASE = 'https://kr.object.ncloudstorage.com';
@@ -47,25 +48,10 @@ export const uploadFile = async ({
 		.split(/\\\\|\\/)
 		.join('/');
 	const diskFilePath = path.join(destination, fileName);
-	let cloudDirectory = '';
-
-	if (relativePath.length > 0) {
-		const newFolderName = await getNotOverlappedName(
-			rootDirectory,
-			relativePath.split('/')[0],
-			userLoginId
-		);
-
-		cloudDirectory = path
-			.join(rootDirectory, newFolderName, relativePath.split('/').slice(1, -1).join('/'))
-			.split(/\\\\|\\/)
-			.join('/');
-	} else {
-		cloudDirectory = path
-			.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'))
-			.split(/\\\\|\\/)
-			.join('/');
-	}
+	const cloudDirectory = path
+		.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'))
+		.split(/\\\\|\\/)
+		.join('/');
 
 	const s3Promise = S3.upload({
 		Bucket: bucketName,
@@ -95,7 +81,11 @@ export const uploadFile = async ({
 // 중복된 경우, 파일명 뒷부분에 중복 번호를 붙여준다.
 // 형식은  파일명(숫자).확장자  형태이다.
 // ex) filename.txt,  filename(1).txt,  filename(2).txt
-const getNotOverlappedName = async (directory: string, filename: string, ownerId: string) => {
+export const getNotOverlappedName = async (
+	directory: string,
+	filename: string,
+	ownerId: string
+) => {
 	const fileDoc = await Cloud.findOne({
 		name: filename,
 		directory: directory,
@@ -212,7 +202,7 @@ export const getTrashFiles = async (userLoginId: string) => {
 
 	const foldersOutsideFolder = directories.reduce(
 		(result, directory) => {
-			const regex = new RegExp(`^${directory}(\\/.*)?$`);
+			const regex = new RegExp(`^${applyEscapeString(directory)}(\\/.*)?$`);
 
 			return result.filter((folder) => !regex.test(folder.directory));
 		},
@@ -220,7 +210,7 @@ export const getTrashFiles = async (userLoginId: string) => {
 	);
 	const filesOutsideFolder = directories.reduce(
 		(result, directory) => {
-			const regex = new RegExp(`^${directory}(\\/.*)?$`);
+			const regex = new RegExp(`^${applyEscapeString(directory)}(\\/.*)?$`);
 
 			return result.filter((file) => !regex.test(file.directory));
 		},
@@ -303,7 +293,9 @@ export const moveFoldersToTrash = async ({ directories, userLoginId }: FoldersFu
 	return Promise.all(
 		directories.flatMap((ele) => {
 			const { directory, name } = ele;
-			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
+			const path = applyEscapeString(
+				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
+			);
 
 			const moveFolderPromise = Cloud.updateOne(
 				{
@@ -338,7 +330,9 @@ export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersF
 	return Promise.all(
 		directories.map(async (ele) => {
 			const { directory, name } = ele;
-			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
+			const path = applyEscapeString(
+				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
+			);
 
 			const files = await Cloud.find({
 				ownerId: userLoginId,
@@ -385,8 +379,11 @@ export const removeFolders = async ({ directories, userLoginId }: FoldersFunctio
 	return Promise.all(
 		directories.map(async (ele) => {
 			const { directory, name } = ele;
-			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
+			const path = applyEscapeString(
+				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
+			);
 
+			console.log(path);
 			const files = await Cloud.find(
 				{
 					ownerId: userLoginId,
