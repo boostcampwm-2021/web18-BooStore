@@ -237,7 +237,6 @@ export const moveFilesToTrash = async ({ targetIds, userLoginId }: FilesFunction
 			isDeleted: true,
 		}
 	);
-
 	return result.matchedCount;
 };
 

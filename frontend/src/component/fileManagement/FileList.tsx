@@ -21,6 +21,7 @@ interface Props {
 	isAscending: boolean;
 	setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
 	className?: string;
+	updateFiles?: Function;
 }
 
 const FileList: React.FC<Props> = ({
@@ -34,9 +35,9 @@ const FileList: React.FC<Props> = ({
 	selectedFiles,
 	setIsAscending,
 	className,
+	updateFiles = () => {},
 }) => {
 	const container = useRef<HTMLDivElement>(null);
-
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsAscending(!isAscending);
 	};
@@ -80,7 +81,11 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
-				<HeaderContextMenu setIsOpenNewFolder={setIsOpenNewFolder} />
+				<HeaderContextMenu
+					setIsOpenNewFolder={setIsOpenNewFolder}
+					selectedFiles={selectedFiles}
+					updateFiles={updateFiles}
+				/>
 				<NewFolderModal
 					isOpenNewFolder={isOpenNewFolder}
 					setIsOpenNewFolder={setIsOpenNewFolder}
@@ -105,6 +110,7 @@ const FileList: React.FC<Props> = ({
 							setSelectedFiles={setSelectedFiles}
 							setCurrentDir={canDirectoryClick ? setCurrentDir : () => {}}
 							currentDirectory={currentDirectory}
+							initStarState={file.isStar}
 						/>
 					))}
 				</Selection>

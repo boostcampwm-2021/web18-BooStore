@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled, { ThemeConsumer } from 'styled-components';
 import { convertByteToUnitString, getDate, getFiles } from '@util';
-import { FileDTO } from '@DTO';
+import { FileDTO, FileEditAction } from '@DTO';
 import FileIcon from './FileIcon';
 import { useLocation } from 'react-router';
 import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
@@ -13,6 +13,7 @@ interface Props {
 	currentDirectory: string;
 	selectedFiles: Map<string, FileDTO>;
 	className?: string;
+	initStarState: boolean;
 }
 
 const File: React.FC<Props> = ({
@@ -22,11 +23,12 @@ const File: React.FC<Props> = ({
 	currentDirectory,
 	selectedFiles,
 	className,
+	initStarState,
 }) => {
 	const [isSelected, setSelected] = useState(false);
 	const location = useLocation();
 	const { contentType, name, createdAt, updatedAt, size, _id, directory } = file;
-	const [isStar, setIsStar] = useState(false);
+	const [isStar, setIsStar] = useState(initStarState);
 	const isFolder = contentType === 'folder';
 	const getConvertedSize = convertByteToUnitString(size);
 	const path = useMemo(() => `${directory}/${name}`.replace('//', '/'), [file]);
@@ -46,8 +48,18 @@ const File: React.FC<Props> = ({
 
 	const onClickStar = (event: React.MouseEvent<SVGSVGElement>) => {
 		event.stopPropagation();
-		setIsStar((isStar) => {
-			return !isStar;
+		setIsStar(false);
+		const body = {
+			targetIds: file._id,
+			action: FileEditAction.removeStar,
+		};
+		fetch('/cloud/files', {
+			method: 'PUT',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(body),
 		});
 	};
 
@@ -85,7 +97,7 @@ const File: React.FC<Props> = ({
 				<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
 					{location.pathname === '/trash' ? path : name}
 				</FileName>
-				{isStar || <Star onMouseDown={onClickStar} />}
+				{isStar && <Star onMouseDown={onClickStar} />}
 			</FileNameBox>
 
 			<MetaData> {getDate(createdAt)} </MetaData>
