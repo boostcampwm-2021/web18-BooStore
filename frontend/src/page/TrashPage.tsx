@@ -96,6 +96,7 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 					/>
 					<StyledFileList
 						files={files}
+						setFiles={setFiles}
 						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
 						setCurrentDir={setCurrentDir}

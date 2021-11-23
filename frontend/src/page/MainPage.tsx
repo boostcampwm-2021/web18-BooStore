@@ -125,6 +125,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 					/>
 					<StyledFileList
 						files={files}
+						setFiles={setFiles}
 						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
 						setCurrentDir={setCurrentDir}

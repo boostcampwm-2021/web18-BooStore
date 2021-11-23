@@ -5,11 +5,17 @@ import File from './File';
 import { FileDTO } from '@DTO';
 import Selection from './Selection';
 
+import useContextMenu from '@component/hook/useContextMenu';
+import ContextMenu from '@component/HeaderContextMenu';
+
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
+import HeaderContextMenu from '@component/HeaderContextMenu';
+import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>
 	selectedFiles: Map<string, FileDTO>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
@@ -21,6 +27,7 @@ interface Props {
 
 const FileList: React.FC<Props> = ({
 	files,
+	setFiles,
 	setSelectedFiles,
 	setCurrentDir,
 	currentDirectory,
@@ -30,7 +37,7 @@ const FileList: React.FC<Props> = ({
 	className,
 }) => {
 	const container = useRef<HTMLDivElement>(null);
-	
+
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsAscending(!isAscending);
 	};
@@ -58,6 +65,8 @@ const FileList: React.FC<Props> = ({
 		});
 	}
 
+	const [isOpenNewFolder,setIsOpenNewFolder] = useState(false);
+
 	return (
 		<Container className={className} ref={container}>
 			<FileHeader>
@@ -69,6 +78,13 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
+				<HeaderContextMenu setIsOpenNewFolder={setIsOpenNewFolder}/>
+				<NewFolderModal 
+					isOpenNewFolder={isOpenNewFolder} 
+					setIsOpenNewFolder={setIsOpenNewFolder} 
+					setFiles={setFiles}
+					curDir={currentDirectory}
+				/>
 			</FileHeader>
 			<Files>
 				<Selection selector={'.file'} addSelcted={addSelect} removeSelected={removeSelect} scrollFrame={container.current ?? undefined}>
@@ -102,6 +118,7 @@ const FileHeader = styled.div`
 	grid-template-columns: 20px 60px minmax(100px, 7fr) 3fr 3fr 2fr;
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	background-color: ${(props) => props.theme.color.PrimaryBG};
+	position: absolute;
 
 	z-index: 1;
 	position: sticky;

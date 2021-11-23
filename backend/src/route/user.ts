@@ -60,4 +60,5 @@ router.get('/directory', isAuthenticated, async (req, res) => {
 	const directoryList = await getDirectoryList(loginId);
 	return res.json(directoryList);
 });
+
 export default router;
