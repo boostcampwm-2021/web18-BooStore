@@ -23,8 +23,12 @@ interface FilesFunctionArgs {
 	userLoginId: string;
 }
 
+interface Directory {
+	directory: string;
+	name: string;
+}
 interface FoldersFunctionArgs {
-	directorys: string[];
+	directories: Directory[];
 	userLoginId: string;
 }
 
@@ -168,7 +172,7 @@ export const getTrashFiles = async (userLoginId: string) => {
 	return [...filesOutsideFolder, ...foldersOutsideFolder];
 };
 
-export const moveTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
+export const moveFilesToTrash = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
 	const result = await Cloud.updateMany(
 		{
 			ownerId: userLoginId,
@@ -224,47 +228,82 @@ export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs)
 	});
 };
 
-export const moveTrashFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
+export const moveFoldersToTrash = async ({ directories, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
-		directorys
-			.map((directory) => directory.replace(/\//g, '\\/'))
-			.map(async (directory) =>
-				Cloud.updateMany(
-					{
-						ownerId: userLoginId,
-						directory: { $regex: `^${directory}(\\/.*)?$` },
-					},
-					{
-						deletedAt: new Date(),
-						isDeleted: true,
-					}
-				)
-			)
+		directories.flatMap((ele) => {
+			const { directory, name } = ele;
+			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
+
+			const promise1 = Cloud.updateOne(
+				{
+					ownerId: userLoginId,
+					directory: directory,
+					name: name,
+				},
+				{
+					deletedAt: new Date(),
+					isDeleted: true,
+				}
+			).exec();
+			const promise2 = Cloud.updateMany(
+				{
+					ownerId: userLoginId,
+					directory: { $regex: `^${path}(\\/.*)?$` },
+				},
+				{
+					deletedAt: new Date(),
+					isDeleted: true,
+				}
+			).exec();
+
+			return [promise1, promise2];
+		})
 	);
 };
 
-export const restoreTrashFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
+export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
-		directorys
-			.map((directory) => directory.replace(/\//g, '\\/'))
-			.map(async (directory) =>
-				Cloud.updateMany(
-					{
-						ownerId: userLoginId,
-						directory: { $regex: `^${directory}(\\/.*)?$` },
-					},
-					{
-						isDeleted: false,
-					}
-				)
-			)
+		directories.map(async (ele) => {
+			const { directory, name } = ele;
+			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
+
+			const promise1 = Cloud.updateOne(
+				{
+					ownerId: userLoginId,
+					directory: directory,
+					name: name,
+				},
+				{
+					deletedAt: new Date(),
+					isDeleted: false,
+				}
+			).exec();
+			const promise2 = Cloud.updateMany(
+				{
+					ownerId: userLoginId,
+					directory: { $regex: `^${path}(\\/.*)?$` },
+				},
+				{
+					deletedAt: new Date(),
+					isDeleted: false,
+				}
+			).exec();
+
+			return [promise1, promise2];
+		})
 	);
 };
 
-export const removeFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
+export const removeFolders = async ({ directories, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
-		directorys
-			.map((directory) => directory.replace(/\//g, '\\/'))
+		directories
+			.map((ele) => {
+				const { directory, name } = ele;
+				return {
+					directory: directory.replace(/\//g, '\\/'),
+					name: name,
+				};
+			})
 			.map(async (directory) => {
 				const files = await Cloud.find(
 					{

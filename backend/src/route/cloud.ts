@@ -10,8 +10,8 @@ import {
 	UploadArg,
 	uploadFile,
 	downloadFiles,
-	moveTrashFiles,
-	moveTrashFolders,
+	moveFilesToTrash,
+	moveFoldersToTrash,
 	removeFiles,
 	restoreTrashFiles,
 	restoreTrashFolders,
@@ -100,18 +100,18 @@ router.get('/download', isAuthenticated, async (req, res) => {
 });
 
 router.put('/files', isAuthenticated, async (req, res) => {
-	const { targetIds = [], directorys = [], action } = req.body;
+	const { targetIds = [], directories = [], action } = req.body;
 	const { loginId } = req.user;
 
 	try {
 		switch (action) {
 			case FileEditAction.trash:
-				await moveTrashFiles({ targetIds, userLoginId: loginId });
-				await moveTrashFolders({ directorys, userLoginId: loginId });
+				await moveFilesToTrash({ targetIds, userLoginId: loginId });
+				await moveFoldersToTrash({ directories, userLoginId: loginId });
 				break;
 			case FileEditAction.restore:
 				await restoreTrashFiles({ targetIds, userLoginId: loginId });
-				await restoreTrashFolders({ directorys, userLoginId: loginId });
+				await restoreTrashFolders({ directories, userLoginId: loginId });
 				break;
 			case FileEditAction.move:
 				break;
@@ -124,12 +124,12 @@ router.put('/files', isAuthenticated, async (req, res) => {
 });
 
 router.delete('/files', isAuthenticated, async (req, res) => {
-	const { targetIds = [], directorys = [] } = req.body;
+	const { targetIds = [], directories = [] } = req.body;
 	const { loginId } = req.user;
 
 	try {
 		await removeFiles({ targetIds, userLoginId: loginId });
-		await removeFolders({ directorys, userLoginId: loginId });
+		await removeFolders({ directories, userLoginId: loginId });
 
 		res.send();
 	} catch (err) {
