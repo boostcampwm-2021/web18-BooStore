@@ -8,8 +8,7 @@ import Header from '@component/layout/Header';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
-import { getFiles } from '@util';
-import { getCapacity } from 'api';
+import { getCapacity, getTrashFiles } from 'api';
 
 import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
@@ -38,7 +37,7 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 	const onClickDirectory = async (relativePath: string) => {
 		setSelectedFiles(new Map());
 
-		const files = await getFiles(relativePath, isAscending, true);
+		const files = await getTrashFiles();
 		setFiles(files);
 		setCurrentDir(relativePath);
 	};
@@ -63,7 +62,7 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 
 	const updateFiles = async () => {
 		setSelectedFiles(new Map());
-		setFiles(await getFiles(currentDir, isAscending, true));
+		setFiles(await getTrashFiles());
 		setCapacity(await getCapacity());
 	};
 
@@ -97,6 +96,7 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 					<StyledFileList
 						files={files}
 						setFiles={setFiles}
+						canDirectoryClick={false}
 						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
 						setCurrentDir={setCurrentDir}

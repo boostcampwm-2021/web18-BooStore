@@ -16,6 +16,7 @@ import NewFolderModal from '@component/fileManagement/NewFolderModal';
 interface Props {
 	files: FileDTO[];
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>
+	canDirectoryClick?: boolean;
 	selectedFiles: Map<string, FileDTO>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
@@ -28,6 +29,7 @@ interface Props {
 const FileList: React.FC<Props> = ({
 	files,
 	setFiles,
+	canDirectoryClick = true,
 	setSelectedFiles,
 	setCurrentDir,
 	currentDirectory,
@@ -95,7 +97,7 @@ const FileList: React.FC<Props> = ({
 							file={file}
 							selectedFiles={selectedFiles}
 							setSelectedFiles={setSelectedFiles}
-							setCurrentDir={setCurrentDir}
+							setCurrentDir={canDirectoryClick ? setCurrentDir : () => {}}
 							currentDirectory={currentDirectory}
 						/>
 					))}
