@@ -130,7 +130,7 @@ const FileHeader = styled.div`
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	position: absolute;
 
-	z-index: 1;
+	z-index: 4;
 	position: sticky;
 	top: 0;
 `;

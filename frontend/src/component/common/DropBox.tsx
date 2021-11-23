@@ -64,7 +64,7 @@ const DropBox: React.FC<Props> = ({ items, nameOfToggleButton, className }) => {
 
 const Container = styled.div`
 	position: relative;
-	z-index: 2;
+	z-index: 6;
 `;
 const ToggleButton = styled(Button)`
 	height: 100%;
