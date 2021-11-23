@@ -16,6 +16,7 @@ import NewFolderModal from '@component/fileManagement/NewFolderModal';
 interface Props {
 	files: FileDTO[];
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	canDirectoryClick?: boolean;
 	selectedFiles: Map<string, FileDTO>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
@@ -29,6 +30,7 @@ interface Props {
 const FileList: React.FC<Props> = ({
 	files,
 	setFiles,
+	canDirectoryClick = true,
 	setSelectedFiles,
 	setCurrentDir,
 	currentDirectory,
@@ -43,18 +45,21 @@ const FileList: React.FC<Props> = ({
 		setIsAscending(!isAscending);
 	};
 
-	const addSelect = (id: string) => {
-		setSelectedFiles((selectedFiles) => {
-			if (selectedFiles.has(id)) {
-				return selectedFiles;
-			}
+	const addSelect = useCallback(
+		(id: string) => {
+			setSelectedFiles((selectedFiles) => {
+				if (selectedFiles.has(id)) {
+					return selectedFiles;
+				}
 
-			const result = new Map(selectedFiles);
-			const file = files.find((ele) => ele._id === id);
-			result.set(id, file!);
-			return result;
-		});
-	};
+				const result = new Map(selectedFiles);
+				const file = files.find((ele) => ele._id === id);
+				result.set(id, file!);
+				return result;
+			});
+		},
+		[files]
+	);
 	const removeSelect = (id: string) => {
 		setSelectedFiles((selectedFiles) => {
 			if (!selectedFiles.has(id)) {
@@ -79,11 +84,13 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
+
 				<HeaderContextMenu
 					setIsOpenNewFolder={setIsOpenNewFolder}
 					selectedFiles={selectedFiles}
 					updateFiles={updateFiles}
 				/>
+
 				<NewFolderModal
 					isOpenNewFolder={isOpenNewFolder}
 					setIsOpenNewFolder={setIsOpenNewFolder}
@@ -105,7 +112,7 @@ const FileList: React.FC<Props> = ({
 							file={file}
 							selectedFiles={selectedFiles}
 							setSelectedFiles={setSelectedFiles}
-							setCurrentDir={setCurrentDir}
+							setCurrentDir={canDirectoryClick ? setCurrentDir : () => {}}
 							currentDirectory={currentDirectory}
 							initStarState={file.isStar}
 						/>
@@ -131,7 +138,7 @@ const FileHeader = styled.div`
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	position: absolute;
 
-	z-index: 1;
+	z-index: 4;
 	position: sticky;
 	top: 0;
 `;

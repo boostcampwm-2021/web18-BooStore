@@ -9,6 +9,7 @@ import {
 	getDirectoryList,
 } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
+import { applyEscapeString } from '../util';
 
 const router = express.Router();
 
@@ -39,7 +40,9 @@ router.get('/files', isAuthenticated, async (req, res) => {
 
 	const filesArg: FilesArg = {
 		loginId: loginId,
-		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
+		regex: `(^${applyEscapeString(path as string)}$)|(^${
+			path === '/' ? '' : applyEscapeString(path as string)
+		}/(.*)?$)`,
 		isAscending: isAscending === 'true',
 		isDeleted: isDeleted === 'true',
 		isStar: isStar === 'true',

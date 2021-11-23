@@ -38,7 +38,6 @@ const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => 
 
 	const makeFolderStructure = async () => {
 		const directories = await getDirectoryList();
-		// console.log(directories);
 		return makeDirectoryTree(directories);
 	};
 
