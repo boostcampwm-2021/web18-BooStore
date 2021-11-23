@@ -383,7 +383,6 @@ export const removeFolders = async ({ directories, userLoginId }: FoldersFunctio
 				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
 			);
 
-			console.log(path);
 			const files = await Cloud.find(
 				{
 					ownerId: userLoginId,
