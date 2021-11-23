@@ -9,6 +9,7 @@ import Button from '@component/common/Button';
 
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
+import { moveFileToTrash } from '@api';
 
 interface Props {
 	showShareButton?: boolean;
@@ -125,35 +126,11 @@ const FileMenuForMain: React.FC<Props> = ({
 			});
 	};
 
-	const onClickDelete = () => {
+	const onClickDelete = async () => {
 		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = [...selectedFiles.values()]
-			.filter((file) => file.contentType !== 'folder')
-			.map((file) => file._id);
-		const directorys = [...selectedFiles.values()]
-			.filter((file) => file.contentType === 'folder')
-			.map((file) => {
-				const { directory, name } = file;
-				if (directory.endsWith('/')) {
-					return directory + name;
-				}
-				return `${directory}/${name}`;
-			});
-		const body = {
-			targetIds: targetIds,
-			directorys: directorys,
-			action: FileEditAction.trash,
-		};
-		fetch('/cloud/files', {
-			method: 'PUT',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+		await moveFileToTrash(selectedFiles);
 
 		setSelectedFiles(new Map());
 	};

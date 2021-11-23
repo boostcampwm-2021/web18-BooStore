@@ -9,7 +9,7 @@ import Button from '@component/common/Button';
 
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
-import { getCapacity } from 'api';
+import { getCapacity, restoreTrashFile } from 'api';
 
 interface Props {
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
@@ -70,31 +70,7 @@ const FileMenuForTrash: React.FC<Props> = ({
 		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = [...selectedFiles.values()]
-			.filter((file) => file.contentType !== 'folder')
-			.map((file) => file._id);
-		const directories = [...selectedFiles.values()]
-			.filter((file) => file.contentType === 'folder')
-			.map((file) => {
-				const { directory, name } = file;
-				if (directory.endsWith('/')) {
-					return directory + name;
-				}
-				return `${directory}/${name}`;
-			});
-		const body = {
-			targetIds: targetIds,
-			directorys: directories,
-			action: FileEditAction.restore,
-		};
-		fetch('/cloud/files', {
-			method: 'PUT',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+		restoreTrashFile(selectedFiles);
 
 		setSelectedFiles(new Map());
 	};
