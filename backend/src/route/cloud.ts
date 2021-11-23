@@ -18,6 +18,7 @@ import {
 	removeFolders,
 	createZipFile,
 	deleteZipFile,
+	updateStarStatus,
 } from '../service/cloud';
 
 const router = express.Router();
@@ -99,7 +100,6 @@ router.get('/download', isAuthenticated, async (req, res) => {
 router.put('/files', isAuthenticated, async (req, res) => {
 	const { targetIds = [], directorys = [], action } = req.body;
 	const { loginId } = req.user;
-
 	try {
 		switch (action) {
 			case FileEditAction.trash:
@@ -111,6 +111,16 @@ router.put('/files', isAuthenticated, async (req, res) => {
 				await restoreTrashFolders({ directorys, userLoginId: loginId });
 				break;
 			case FileEditAction.move:
+				break;
+			case FileEditAction.addStar:
+				await updateStarStatus({ userLoginId: loginId, targetIds: targetIds, state: true });
+				break;
+			case FileEditAction.removeStar:
+				await updateStarStatus({
+					userLoginId: loginId,
+					targetIds: targetIds,
+					state: false,
+				});
 				break;
 		}
 

@@ -28,6 +28,12 @@ interface FoldersFunctionArgs {
 	userLoginId: string;
 }
 
+interface updateStarStateArg {
+	userLoginId: string;
+	targetIds: string;
+	state: boolean;
+}
+
 export const uploadFile = async ({
 	originalName,
 	mimetype,
@@ -252,4 +258,17 @@ export const removeFolders = async ({ directorys, userLoginId }: FoldersFunction
 				});
 			})
 	);
+};
+
+export const updateStarStatus = async ({ userLoginId, targetIds, state }: updateStarStateArg) => {
+	const result = await Cloud.updateMany(
+		{
+			ownerId: userLoginId,
+			_id: { $in: targetIds },
+		},
+		{
+			isStar: state,
+		}
+	);
+	return result.matchedCount;
 };
