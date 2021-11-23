@@ -61,8 +61,10 @@ export const uploadFile = async ({
 
 	const cafPromise = createAncestorsFolder(cloudDirectory, userLoginId);
 
+	const notOverlappedName = await getNotOverlappedName(cloudDirectory, originalName, userLoginId);
+
 	const cloudPromise = Cloud.create({
-		name: originalName,
+		name: notOverlappedName,
 		size: size,
 		ownerId: userLoginId,
 		directory: cloudDirectory,
