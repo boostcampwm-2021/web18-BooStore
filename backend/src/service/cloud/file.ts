@@ -47,10 +47,25 @@ export const uploadFile = async ({
 		.split(/\\\\|\\/)
 		.join('/');
 	const diskFilePath = path.join(destination, fileName);
-	const cloudDirectory = path
-		.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'))
-		.split(/\\\\|\\/)
-		.join('/');
+	let cloudDirectory = '';
+
+	if (relativePath.length > 0) {
+		const newFolderName = await getNotOverlappedName(
+			rootDirectory,
+			relativePath.split('/')[0],
+			userLoginId
+		);
+
+		cloudDirectory = path
+			.join(rootDirectory, newFolderName, relativePath.split('/').slice(1, -1).join('/'))
+			.split(/\\\\|\\/)
+			.join('/');
+	} else {
+		cloudDirectory = path
+			.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'))
+			.split(/\\\\|\\/)
+			.join('/');
+	}
 
 	const s3Promise = S3.upload({
 		Bucket: bucketName,
@@ -164,14 +179,14 @@ export const createAncestorsFolder = async (curDirectory: string, userLoginId: s
 	);
 };
 
-export const getNewFolder = async(loginId: string, parentDir: string, curDir: string) => {
+export const getNewFolder = async (loginId: string, parentDir: string, curDir: string) => {
 	const newFolder = await Cloud.findOne({
 		ownerId: loginId,
 		directory: parentDir,
-		name: curDir
+		name: curDir,
 	});
 	return newFolder;
-}
+};
 
 const removeObjectStorageObjects = async (keys) => {
 	return await S3.deleteObjects({
