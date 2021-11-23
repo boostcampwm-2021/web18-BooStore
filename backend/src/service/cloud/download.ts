@@ -39,6 +39,11 @@ export const getDownloadListMetadata = async ({
 		})
 	);
 
+	const emptyFolders = await getDownloadEmptyFolderMetadata({
+		directory: currentDir === '/' ? currentDir : currentDir + '/',
+		loginId,
+	});
+
 	const reducer = function (acc, cur) {
 		acc.push(...cur);
 		return acc;
@@ -47,7 +52,7 @@ export const getDownloadListMetadata = async ({
 	const transFiles = (await files).reduce(reducer, []);
 	const transFolders = (await folders).reduce(reducer, []);
 
-	return [...transFiles, ...transFolders];
+	return [...emptyFolders, ...transFiles, ...transFolders];
 };
 
 function isValidObjectIdHandle(fileId: string) {
@@ -61,7 +66,7 @@ export interface DownloadFileMetadataArg {
 }
 
 const getDownloadFileMetadata = async ({ fileId, loginId }: DownloadFileMetadataArg) => {
-	const fileMetadata = Cloud.find({
+	const fileMetadata = await Cloud.find({
 		_id: fileId,
 		ownerId: loginId,
 	}).exec();
@@ -82,6 +87,24 @@ const getDownloadFolderMetadata = async ({ directory, loginId }: DownloadFolderM
 	return folderMetadata;
 };
 
+// 전체 다운로드 리스트 중 빈 폴더만
+export interface DownloadEmptyFolderMetadataArg {
+	directory: string;
+	loginId: string;
+}
+
+const getDownloadEmptyFolderMetadata = async ({
+	directory,
+	loginId,
+}: DownloadEmptyFolderMetadataArg) => {
+	const folderMetadata = await Cloud.find({
+		directory: { $regex: `^${directory}?$` },
+		contentType: 'folder',
+		ownerId: loginId,
+	}).exec();
+	return folderMetadata;
+};
+
 // 실제 파일 다운로드
 
 const getDownloadPath = (currentDirectory: string, fileDirectory: string) => {
@@ -97,6 +120,19 @@ export interface DownloadFilesArg {
 export const downloadFiles = async ({ downloadList, currentDir }: DownloadFilesArg) => {
 	return Promise.all(
 		downloadList.map(async (file) => {
+			if (file.contentType === 'folder') {
+				await mkdirp(
+					path.join(
+						path.resolve(),
+						'temp/',
+						file.ownerId,
+						'/',
+						getDownloadPath(currentDir, file.directory + '/' + file.name),
+						'/'
+					)
+				);
+				return;
+			}
 			const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
 			const key = file.osLink.replace(pattern, '');
 			await mkdirp(
