@@ -16,8 +16,8 @@ import NewFolderModal from '@component/fileManagement/NewFolderModal';
 interface Props {
 	files: FileDTO[];
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>
-	selectedFiles: FileDTO[];
-	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	selectedFiles: Map<string, FileDTO>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 	isAscending: boolean;
