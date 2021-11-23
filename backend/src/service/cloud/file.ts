@@ -75,6 +75,47 @@ export const uploadFile = async ({
 	await increaseCurrentCapacity({ loginId: userLoginId, value: size });
 };
 
+// 중복된 경우, 파일명 뒷부분에 중복 번호를 붙여준다.
+// 형식은  파일명(숫자).확장자  형태이다.
+// ex) filename.txt,  filename(1).txt,  filename(2).txt
+const getNotOverlappedName = async (directory: string, filename: string, ownerId: string) => {
+	const fileDoc = await Cloud.findOne({
+		name: filename,
+		directory: directory,
+		ownerId: ownerId,
+	}).exec();
+	if (!fileDoc) {
+		return filename;
+	}
+
+	let extIndex = filename.lastIndexOf('.');
+	if (extIndex === -1) {
+		extIndex = filename.length;
+	}
+	const name = filename.slice(0, extIndex);
+	const ext = filename.slice(extIndex);
+	const leftBracketIndex = name.lastIndexOf('(');
+	const rightBracketIndex = name.lastIndexOf(')');
+
+	if (
+		leftBracketIndex === -1 ||
+		rightBracketIndex === -1 ||
+		rightBracketIndex !== name.length - 1 ||
+		leftBracketIndex + 1 >= rightBracketIndex
+	) {
+		return await getNotOverlappedName(directory, `${name}(1)${ext}`, ownerId);
+	}
+
+	const strInsideBracket = name.slice(leftBracketIndex + 1, rightBracketIndex);
+	const overlapNumber = Number(strInsideBracket);
+	if (isNaN(overlapNumber)) {
+		return await getNotOverlappedName(directory, `${name}(1)${ext}`, ownerId);
+	}
+
+	const newFilename = `${name.slice(0, leftBracketIndex)}(${overlapNumber + 1})${ext}`;
+	return await getNotOverlappedName(directory, newFilename, ownerId);
+};
+
 // /test2/폴더어/폴더어2/test.txt -> /test2/폴더어/폴더어2
 export const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
 	if (curDirectory === '/') {
