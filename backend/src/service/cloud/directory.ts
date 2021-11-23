@@ -35,8 +35,6 @@ export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: Files
 		},
 		{ sort: { name: isAscending ? 'asc' : 'desc' } }
 	).exec();
-	console.log('getFiles()');
-	console.log(files);
 	return files;
 };
 
@@ -59,12 +57,12 @@ export const getDirectoryList = async (loginId: string) => {
 	const allFiles = await Cloud.find(
 		{
 			ownerId: loginId,
-			contentType: "folder"
+			contentType: 'folder',
 		},
 		{
 			_id: false,
 			directory: true,
-			name: true
+			name: true,
 		}
 	);
 
@@ -74,14 +72,12 @@ export const getDirectoryList = async (loginId: string) => {
 
 const makeDirectoryToArrFormat = (allFiles: Directory[]) => {
 	const directorySet = new Set();
-	allFiles
-		.forEach((file) => {
-			if(file.directory=='/'){
-				directorySet.add(file.directory+file.name);
-			}
-			else{
-				directorySet.add(file.directory+'/'+file.name);
-			}
-		});
+	allFiles.forEach((file) => {
+		if (file.directory == '/') {
+			directorySet.add(file.directory + file.name);
+		} else {
+			directorySet.add(file.directory + '/' + file.name);
+		}
+	});
 	return Array.from(directorySet);
 };
