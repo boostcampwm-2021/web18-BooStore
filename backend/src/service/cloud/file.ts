@@ -188,7 +188,21 @@ export const moveFilesToTrash = async ({ targetIds, userLoginId }: FilesFunction
 };
 
 export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
-	const result = await Cloud.updateMany(
+	const files = await Cloud.find({
+		ownerId: userLoginId,
+		_id: { $in: targetIds },
+	});
+
+	const directories = files.reduce((result, file) => {
+		result.add(file.directory);
+		return result;
+	}, new Set<string>());
+
+	const createDirPromise = Promise.all(
+		[...directories].map((directory) => createAncestorsFolder(directory, userLoginId))
+	);
+
+	const resultPromise = Cloud.updateMany(
 		{
 			ownerId: userLoginId,
 			_id: { $in: targetIds },
@@ -196,9 +210,9 @@ export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctio
 		{
 			isDeleted: false,
 		}
-	);
+	).exec();
 
-	return result.matchedCount;
+	await Promise.all([createDirPromise, resultPromise]);
 };
 
 export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
@@ -214,8 +228,7 @@ export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs)
 	}
 
 	const keys = files.map(({ osLink }) => {
-		const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-		return { Key: osLink.replace(pattern, '') };
+		return { Key: osLink.replace(`${OBJECT_STORAGE_BASE}/${bucketName}/`, '') };
 	});
 	removeObjectStorageObjects(keys);
 
@@ -234,21 +247,23 @@ export const moveFoldersToTrash = async ({ directories, userLoginId }: FoldersFu
 			const { directory, name } = ele;
 			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
 
-			const promise1 = Cloud.updateOne(
+			const moveFolderPromise = Cloud.updateOne(
 				{
 					ownerId: userLoginId,
 					directory: directory,
 					name: name,
+					isDeleted: false,
 				},
 				{
 					deletedAt: new Date(),
 					isDeleted: true,
 				}
 			).exec();
-			const promise2 = Cloud.updateMany(
+			const moveFilesPromise = Cloud.updateMany(
 				{
 					ownerId: userLoginId,
 					directory: { $regex: `^${path}(\\/.*)?$` },
+					isDeleted: false,
 				},
 				{
 					deletedAt: new Date(),
@@ -256,7 +271,7 @@ export const moveFoldersToTrash = async ({ directories, userLoginId }: FoldersFu
 				}
 			).exec();
 
-			return [promise1, promise2];
+			return [moveFolderPromise, moveFilesPromise];
 		})
 	);
 };
@@ -267,68 +282,78 @@ export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersF
 			const { directory, name } = ele;
 			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
 
-			const promise1 = Cloud.updateOne(
+			const files = await Cloud.find({
+				ownerId: userLoginId,
+				directory: { $regex: `^${path}(\\/.*)?$` },
+				isDeleted: true,
+			});
+			const directories = files.reduce((result, file) => {
+				result.add(file.directory);
+				return result;
+			}, new Set<string>());
+
+			const createDirPromise = Promise.all(
+				[...directories].map((directory) => createAncestorsFolder(directory, userLoginId))
+			);
+
+			const moveFolderPromise = Cloud.updateOne(
 				{
 					ownerId: userLoginId,
 					directory: directory,
 					name: name,
+					isDeleted: true,
 				},
 				{
-					deletedAt: new Date(),
 					isDeleted: false,
 				}
 			).exec();
-			const promise2 = Cloud.updateMany(
+			const moveFilesPromise = Cloud.updateMany(
 				{
 					ownerId: userLoginId,
 					directory: { $regex: `^${path}(\\/.*)?$` },
+					isDeleted: true,
 				},
 				{
-					deletedAt: new Date(),
 					isDeleted: false,
 				}
 			).exec();
 
-			return [promise1, promise2];
+			return [moveFolderPromise, moveFilesPromise, createDirPromise];
 		})
 	);
 };
 
 export const removeFolders = async ({ directories, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
-		directories
-			.map((ele) => {
-				const { directory, name } = ele;
-				return {
-					directory: directory.replace(/\//g, '\\/'),
-					name: name,
-				};
-			})
-			.map(async (directory) => {
-				const files = await Cloud.find(
-					{
-						ownerId: userLoginId,
-						directory: { $regex: `^${directory}(\\/.*)?$` },
-					},
-					{ osLink: true, size: true, ownerId: true }
-				).exec();
-				if (files.length === 0) {
-					return;
-				}
+		directories.map(async (ele) => {
+			const { directory, name } = ele;
+			const path = `${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/');
 
-				const keys = files.map(({ osLink }) => {
-					const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-					return { Key: osLink.replace(pattern, '') };
-				});
-				removeObjectStorageObjects(keys);
-
-				const totalSize = files.reduce((prev, { size }) => prev + size, 0);
-				await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
-
-				await Cloud.deleteMany({
+			const files = await Cloud.find(
+				{
 					ownerId: userLoginId,
-					directory: { $regex: `^${directory}(\\/.*)?$` },
-				});
-			})
+					directory: { $regex: `^${path}(\\/.*)?$` },
+				},
+				{ osLink: true, size: true, ownerId: true }
+			).exec();
+
+			const keys = files.map(({ osLink }) => {
+				return { Key: osLink.replace(`${OBJECT_STORAGE_BASE}/${bucketName}/`, '') };
+			});
+			removeObjectStorageObjects(keys);
+
+			const totalSize = files.reduce((prev, { size }) => prev + size, 0);
+			await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
+
+			Cloud.deleteOne({
+				ownerId: userLoginId,
+				directory: directory,
+				name: name,
+			}).exec();
+			await Cloud.deleteMany({
+				ownerId: userLoginId,
+				directory: { $regex: `^${path}(\\/.*)?$` },
+			});
+		})
 	);
 };

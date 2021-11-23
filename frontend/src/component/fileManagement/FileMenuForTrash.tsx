@@ -9,7 +9,7 @@ import Button from '@component/common/Button';
 
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
-import { getCapacity, restoreTrashFile } from 'api';
+import { getCapacity, removeFile, restoreTrashFile } from 'api';
 
 interface Props {
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
@@ -32,30 +32,7 @@ const FileMenuForTrash: React.FC<Props> = ({
 		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = [...selectedFiles.values()]
-			.filter((file) => file.contentType !== 'folder')
-			.map((file) => file._id);
-		const directories = [...selectedFiles.values()]
-			.filter((file) => file.contentType === 'folder')
-			.map((file) => {
-				const { directory, name } = file;
-				if (directory.endsWith('/')) {
-					return directory + name;
-				}
-				return `${directory}/${name}`;
-			});
-		const body = {
-			targetIds: targetIds,
-			directorys: directories,
-		};
-		fetch('/cloud/files', {
-			method: 'DELETE',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		})
+		removeFile(selectedFiles)
 			.then(async () => {
 				setCapacity(await getCapacity());
 			})
@@ -78,17 +55,16 @@ const FileMenuForTrash: React.FC<Props> = ({
 	const onClickSelectAll = useCallback(() => {
 		if (isOnSelectAll) {
 			setSelectedFiles(new Map());
-		}
-		else {
+		} else {
 			const newMap = files.reduce((prev, file) => {
 				prev.set(file._id, file);
 				return prev;
 			}, new Map<string, FileDTO>());
 			setSelectedFiles(newMap);
 		}
-		
-		setOnSelectAll(prev => !prev);
-	}, [ files, selectedFiles, isOnSelectAll ]);
+
+		setOnSelectAll((prev) => !prev);
+	}, [files, selectedFiles, isOnSelectAll]);
 
 	return (
 		<Container>

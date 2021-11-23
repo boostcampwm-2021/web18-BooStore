@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled, { ThemeConsumer } from 'styled-components';
 import { convertByteToUnitString, getDate, getFiles } from '@util';
 import { FileDTO } from '@DTO';
 import FileIcon from './FileIcon';
+import { useLocation } from 'react-router';
 
 interface Props {
 	file: FileDTO;
@@ -22,10 +23,12 @@ const File: React.FC<Props> = ({
 	className,
 }) => {
 	const [isSelected, setSelected] = useState(false);
+	const location = useLocation();
 
-	const { contentType, name, createdAt, updatedAt, size, _id } = file;
+	const { contentType, name, createdAt, updatedAt, size, _id, directory } = file;
 	const isFolder = contentType === 'folder';
 	const getConvertedSize = convertByteToUnitString(size);
+	const path = useMemo(() => `${directory}/${name}`.replace('//', '/'), [file]);
 
 	const onClickFile = (event: React.MouseEvent<HTMLDivElement>) => {
 		setSelectedFiles((selectedFiles) => {
@@ -73,7 +76,7 @@ const File: React.FC<Props> = ({
 			<FileIcon type={contentType} />
 			<FileNameBox>
 				<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
-					{name}
+					{location.pathname === '/trash' ? path : name}
 				</FileName>
 			</FileNameBox>
 

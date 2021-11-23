@@ -51,3 +51,28 @@ export const restoreTrashFile = async (selectedFiles: Map<string, FileDTO>) => {
 		body: JSON.stringify(body),
 	});
 };
+
+export const removeFile = async (selectedFiles: Map<string, FileDTO>) => {
+	const targetIds = [...selectedFiles.values()]
+		.filter((file) => file.contentType !== 'folder')
+		.map((file) => file._id);
+	const directories = [...selectedFiles.values()]
+		.filter((file) => file.contentType === 'folder')
+		.map((file) => ({
+			directory: file.directory,
+			name: file.name,
+		}));
+
+	const body = {
+		targetIds: targetIds,
+		directories: directories,
+	};
+	await fetch('/cloud/files', {
+		method: 'DELETE',
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(body),
+	});
+};
