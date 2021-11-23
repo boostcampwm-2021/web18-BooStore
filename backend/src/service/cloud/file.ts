@@ -125,7 +125,6 @@ export const getNotOverlappedName = async (
 
 // /test2/폴더어/폴더어2/test.txt -> /test2/폴더어/폴더어2
 export const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
-	console.log("here:"+curDirectory);
 	if (curDirectory === '/') {
 		return;
 	}

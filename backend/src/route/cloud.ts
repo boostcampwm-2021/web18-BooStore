@@ -19,8 +19,12 @@ import {
 	createZipFile,
 	deleteZipFile,
 	createAncestorsFolder,
+<<<<<<< HEAD
 	getNewFolder,
 	getTrashFiles,
+=======
+	getNewFolder
+>>>>>>> fbe50e0 ([Feat] 새 폴더 추가하면 setFiles 변경)
 } from '../service/cloud';
 
 const router = express.Router();
@@ -162,12 +166,16 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 });
 =======
 router.post('/newfolder',isAuthenticated, async(req, res) => {
-	const { loginId } = req.user;
+	const { loginId } = req.user
 	const { name, curdir } = req.body;
-	console.log(loginId);
-	console.log(curdir);
-	createAncestorsFolder(curdir.curDir+name.newFolderName,loginId);
-	res.status(200).send();
+	try{
+		await createAncestorsFolder(curdir.curDir+name.newFolderName,loginId);
+		const newFolder = await getNewFolder(loginId,curdir.curDir,name.newFolderName);
+		return res.json(newFolder);
+	}
+	catch(err){
+		res.sendStatus(304);
+	}
 })
 >>>>>>> 6e059ff ([Feat] 새 폴더 라우터 완성)
 

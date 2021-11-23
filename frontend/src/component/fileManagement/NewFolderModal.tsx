@@ -92,47 +92,7 @@ const Input = styled.input`
 	}
 `;
 
-ReactModal.defaultStyles = {
-	overlay: {
-		zIndex: 10,
-		position: 'fixed',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(196, 196, 196, 0.5)',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	content: {
-<<<<<<< HEAD
-<<<<<<< HEAD
-		width: '400px',
-		minHeight: '180px',
-=======
-		width: '600px',
-		minHeight: '275px',
->>>>>>> 85ac602 ([Feat] 새 폴더 추가하는 모달 구현)
-=======
-		width: '400px',
-		minHeight: '180px',
->>>>>>> 3c449f8 ([Feat] 새 폴더에 필요한 fetch 요청 추가)
-		border: '1px solid #ccc',
-		background: '#fff',
-		overflow: 'auto',
-		WebkitOverflowScrolling: 'touch',
-		borderRadius: '4px',
-		outline: 'none',
-		padding: '20px',
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-	},
-};
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 const InputContainer = styled.div`
 	display: flex;
 	flex-direction: column;
@@ -156,33 +116,3 @@ const MakeFolderButton = styled(Button)`
 `;
 
 export default NewFolderModal;
-=======
-=======
-const InputContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: left;
-`;
-
-const ButtonContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-`;
-
-const MakeFolderButton = styled(Button)`
-    background-color: ${(props) => props.theme.color.Primary};
-	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
-    color: white;
-    padding: 10px;
-    border: none;
-    box-shadow: 3px 1px 3px grey;
-    font-size: ${(props) => props.theme.fontSize.Content};
-    float: 'right';
-    `;
-
->>>>>>> 3c449f8 ([Feat] 새 폴더에 필요한 fetch 요청 추가)
-
-
-export default NewFolderModal;
-
->>>>>>> 85ac602 ([Feat] 새 폴더 추가하는 모달 구현)
