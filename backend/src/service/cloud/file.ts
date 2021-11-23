@@ -135,6 +135,39 @@ const removeObjectStorageObjects = async (keys) => {
 	}).promise();
 };
 
+export const getTrashFiles = async (userLoginId: string) => {
+	const docs = await Cloud.find({
+		ownerId: userLoginId,
+		isDeleted: true,
+	});
+
+	const folders = docs.filter((doc) => doc.contentType === 'folder');
+	const files = docs.filter((doc) => doc.contentType !== 'folder');
+
+	const directories = folders.map((folder) =>
+		`${folder.directory}/${folder.name}`.replace(/\/\//g, '/').replace(/\//g, '\\/')
+	);
+
+	const foldersOutsideFolder = directories.reduce(
+		(result, directory) => {
+			const regex = new RegExp(`^${directory}(\\/.*)?$`);
+
+			return result.filter((folder) => !regex.test(folder.directory));
+		},
+		[...folders]
+	);
+	const filesOutsideFolder = directories.reduce(
+		(result, directory) => {
+			const regex = new RegExp(`^${directory}(\\/.*)?$`);
+
+			return result.filter((file) => !regex.test(file.directory));
+		},
+		[...files]
+	);
+
+	return [...filesOutsideFolder, ...foldersOutsideFolder];
+};
+
 export const moveTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
 	const result = await Cloud.updateMany(
 		{
@@ -177,9 +210,8 @@ export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs)
 	}
 
 	const keys = files.map(({ osLink }) => {
-		const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
-		const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-		return { Key: osLink.replace(pattern, '').replace(patternTest, '') };
+		const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+		return { Key: osLink.replace(pattern, '') };
 	});
 	removeObjectStorageObjects(keys);
 
@@ -195,7 +227,7 @@ export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs)
 export const moveTrashFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
 		directorys
-			.map((directory) => directory.replace('/', '\\/'))
+			.map((directory) => directory.replace(/\//g, '\\/'))
 			.map(async (directory) =>
 				Cloud.updateMany(
 					{
@@ -214,7 +246,7 @@ export const moveTrashFolders = async ({ directorys, userLoginId }: FoldersFunct
 export const restoreTrashFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
 		directorys
-			.map((directory) => directory.replace('/', '\\/'))
+			.map((directory) => directory.replace(/\//g, '\\/'))
 			.map(async (directory) =>
 				Cloud.updateMany(
 					{
@@ -232,7 +264,7 @@ export const restoreTrashFolders = async ({ directorys, userLoginId }: FoldersFu
 export const removeFolders = async ({ directorys, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
 		directorys
-			.map((directory) => directory.replace('/', '\\/'))
+			.map((directory) => directory.replace(/\//g, '\\/'))
 			.map(async (directory) => {
 				const files = await Cloud.find(
 					{
@@ -246,9 +278,8 @@ export const removeFolders = async ({ directorys, userLoginId }: FoldersFunction
 				}
 
 				const keys = files.map(({ osLink }) => {
-					const pattern = `${OBJECT_STORAGE_BASE}/boostore/`;
-					const patternTest = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
-					return { Key: osLink.replace(pattern, '').replace(patternTest, '') };
+					const pattern = `${OBJECT_STORAGE_BASE}/${bucketName}/`;
+					return { Key: osLink.replace(pattern, '') };
 				});
 				removeObjectStorageObjects(keys);
 

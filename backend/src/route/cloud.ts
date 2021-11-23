@@ -19,7 +19,8 @@ import {
 	createZipFile,
 	deleteZipFile,
 	createAncestorsFolder,
-	getNewFolder
+	getNewFolder,
+	getTrashFiles,
 } from '../service/cloud';
 
 const router = express.Router();
@@ -136,21 +137,27 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 	}
 });
 
-router.post('/newfolder',isAuthenticated, async(req, res) => {
-	const { loginId } = req.user
+router.post('/newfolder', isAuthenticated, async (req, res) => {
+	const { loginId } = req.user;
 	const { name, curdir } = req.body;
-	let newDir = curdir.curDir+name.newFolderName;
-	if(curdir.curDir!='/'){
-		newDir= curdir.curDir+'/'+name.newFolderName;
+	let newDir = curdir.curDir + name.newFolderName;
+	if (curdir.curDir != '/') {
+		newDir = curdir.curDir + '/' + name.newFolderName;
 	}
-	try{
-		await createAncestorsFolder(newDir,loginId);
-		const newFolder = await getNewFolder(loginId,curdir.curDir,name.newFolderName);
+	try {
+		await createAncestorsFolder(newDir, loginId);
+		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
 		return res.json(newFolder);
-	}
-	catch(err){
+	} catch (err) {
 		res.sendStatus(304);
 	}
-})
+});
+router.get('/trash', isAuthenticated, async (req, res) => {
+	const { loginId } = req.user;
+
+	const files = await getTrashFiles(loginId);
+
+	return res.json(files);
+});
 
 export default router;
