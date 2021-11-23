@@ -38,7 +38,7 @@ const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => 
 
 	const makeFolderStructure = async () => {
 		const directories = await getDirectoryList();
-		console.log(directories);
+		// console.log(directories);
 		return makeDirectoryTree(directories);
 	};
 
@@ -52,18 +52,17 @@ const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => 
 	const getFolderStructure = (treeNode: treeNode) => {
 		const childrenToArr = Array.from(treeNode.children.values());
 		let curDir = treeNode.relativeDirectory.split('/').splice(-1)[0];
-		if(curDir === ''){
+		if (curDir === '') {
 			curDir = '내 스토어';
 		}
-		
-		
+
 		const onClickNav = () => {
 			history.push('/', {
-				currentDirectory: treeNode.relativeDirectory
+				currentDirectory: treeNode.relativeDirectory,
 			});
 			setCurrentDir(treeNode.relativeDirectory);
-		}
-		
+		};
+
 		return (
 			<Directory name={curDir} onClickNav={onClickNav}>
 				{childrenToArr.map((treeNode: treeNode) => {

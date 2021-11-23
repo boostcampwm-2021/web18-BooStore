@@ -123,14 +123,14 @@ export const createAncestorsFolder = async (curDirectory: string, userLoginId: s
 	);
 };
 
-export const getNewFolder = async(loginId: string, parentDir: string, curDir: string) => {
+export const getNewFolder = async (loginId: string, parentDir: string, curDir: string) => {
 	const newFolder = await Cloud.findOne({
 		ownerId: loginId,
 		directory: parentDir,
-		name: curDir
+		name: curDir,
 	});
 	return newFolder;
-}
+};
 
 const removeObjectStorageObjects = async (keys) => {
 	return await S3.deleteObjects({
@@ -152,7 +152,6 @@ export const moveTrashFiles = async ({ targetIds, userLoginId }: FilesFunctionAr
 			isDeleted: true,
 		}
 	);
-
 	return result.matchedCount;
 };
 

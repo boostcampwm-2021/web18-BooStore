@@ -28,7 +28,7 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 });
 
 router.get('/files', isAuthenticated, async (req, res) => {
-	const { path, isAscending, isDeleted } = req.query;
+	const { path, isAscending, isDeleted, isStar } = req.query;
 	const { loginId } = req.user;
 	if (path === undefined) {
 		return res.status(400).send();
@@ -42,6 +42,7 @@ router.get('/files', isAuthenticated, async (req, res) => {
 		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
 		isAscending: isAscending === 'true',
 		isDeleted: isDeleted === 'true',
+		isStar: isStar === 'true',
 	};
 
 	const tempFiles = await getFiles(filesArg);
