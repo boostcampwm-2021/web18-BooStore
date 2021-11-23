@@ -17,7 +17,7 @@ interface Directory {
 }
 
 export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: FilesArg) => {
-	const files = Cloud.find(
+	const files = await Cloud.find(
 		{
 			directory: { $regex: regex },
 			ownerId: loginId,
@@ -34,26 +34,20 @@ export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: Files
 		},
 		{ sort: { name: isAscending ? 'asc' : 'desc' } }
 	).exec();
+	console.log('getFiles()');
+	console.log(files);
 	return files;
 };
 
 export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
-	const directories = [];
-	const splittedPath = path === '/' ? [''] : (path as string).split('/');
 	const filteredFiles = [];
 	const filteredFolders = [];
 	originFiles.map((file) => {
 		if (file.directory === path) {
-			filteredFiles.push(file);
-		} else {
-			const splittedDirectory = file.directory.split('/');
-			if (directories.indexOf(splittedDirectory[splittedPath.length]) === -1) {
-				directories.push(splittedDirectory[splittedPath.length]);
-				file.contentType = 'folder';
-				file.size = 0;
-				file.name = splittedDirectory[splittedPath.length];
-				file.directory = path;
+			if (file.contentType === 'folder') {
 				filteredFolders.push(file);
+			} else {
+				filteredFiles.push(file);
 			}
 		}
 	});
