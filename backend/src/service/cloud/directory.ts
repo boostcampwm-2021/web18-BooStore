@@ -34,8 +34,6 @@ export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: Files
 		},
 		{ sort: { name: isAscending ? 'asc' : 'desc' } }
 	).exec();
-	console.log('getFiles()');
-	console.log(files);
 	return files;
 };
 
