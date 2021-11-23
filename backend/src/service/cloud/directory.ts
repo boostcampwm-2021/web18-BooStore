@@ -61,6 +61,7 @@ export const getDirectoryList = async (loginId: string) => {
 		{
 			ownerId: loginId,
 			contentType: 'folder',
+			isDeleted: false,
 		},
 		{
 			_id: false,

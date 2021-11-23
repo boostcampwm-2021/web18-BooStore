@@ -4,12 +4,14 @@ import ReactModal from 'react-modal';
 import ModalComponent, { ModalType } from '@component/common/ModalComponent';
 import Button from '@component/common/Button';
 import { FileDTO } from '@DTO';
+import { handleNewFolder } from 'api';
 
 interface Props {
 	onCloseButton?: boolean;
 	isOpenNewFolder: boolean;
 	setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	files: FileDTO[];
 	curDir: string;
 }
 
@@ -18,9 +20,10 @@ const NewFolderModal: React.FC<Props> = ({
 	isOpenNewFolder,
 	setIsOpenNewFolder,
 	setFiles,
+	files,
 	curDir,
 }) => {
-	const [newFolderName, setNewFolderName] = useState('제목없는 폴더');
+	const [newFolderName, setNewFolderName] = useState('');
 	const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = target;
 		setNewFolderName(value);
@@ -33,24 +36,20 @@ const NewFolderModal: React.FC<Props> = ({
 	}, [onCloseButton]);
 
 	const makeNewFolder = async () => {
-		const addedFolder: FileDTO = await handleNewFolder();
-		setFiles((oldArr) => [...oldArr, addedFolder]);
-		setNewFolderName('제목없는 폴더');
-		onRequestClose();
-	};
-
-	const handleNewFolder = async () => {
-		return fetch(`/cloud/newfolder`, {
-			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				name: { newFolderName },
-				curdir: { curDir },
-			}),
-		}).then((res) => {
-			return res.json();
+		let cnt = 0;
+		files.forEach((file) => {
+			let splitName = file.name.split(newFolderName);
+			if (splitName[0] === '' && splitName.length == 2) {
+				if (splitName[1] === '') {
+					cnt++;
+				}
+				//else if(splitName[1]===)
+			}
 		});
+		const addedFolder: FileDTO = await handleNewFolder(newFolderName, curDir);
+		setFiles((oldArr) => [...oldArr, addedFolder]);
+		setNewFolderName('');
+		onRequestClose();
 	};
 
 	if (isOpenNewFolder) {
@@ -59,6 +58,22 @@ const NewFolderModal: React.FC<Props> = ({
 				isOpen={isOpenNewFolder}
 				onRequestClose={onRequestClose}
 				ariaHideApp={false}
+				style={{
+					content: {
+						width: '400px',
+						minHeight: '180px',
+						border: '1px solid #ccc',
+						background: '#fff',
+						overflow: 'auto',
+						WebkitOverflowScrolling: 'touch',
+						borderRadius: '4px',
+						outline: 'none',
+						padding: '20px',
+						display: 'flex',
+						flexDirection: 'column',
+						justifyContent: 'space-between',
+					},
+				}}
 			>
 				<InputContainer>
 					<p>새 폴더</p>
@@ -84,51 +99,23 @@ const Input = styled.input`
 	border: solid 1px ${(props) => props.theme.color.Primary};
 	border-radius: 8px;
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
-	padding: 20px 20px 20px 40px;
+	padding: 20px 20px 20px 20px;
 	margin-bottom: 20px;
 	&:focus {
 		outline: none;
 	}
 `;
 
-ReactModal.defaultStyles = {
-	overlay: {
-		zIndex: 10,
-		position: 'fixed',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(196, 196, 196, 0.5)',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	content: {
-		width: '400px',
-		minHeight: '180px',
-		border: '1px solid #ccc',
-		background: '#fff',
-		overflow: 'auto',
-		WebkitOverflowScrolling: 'touch',
-		borderRadius: '4px',
-		outline: 'none',
-		padding: '20px',
-		display: 'flex',
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-	},
-};
-
 const InputContainer = styled.div`
 	display: flex;
 	flex-direction: column;
-	justify-content: left;
+	align-items: center;
 `;
 
 const ButtonContainer = styled.div`
 	display: flex;
 	flex-direction: row;
+	justify-content: center;
 `;
 
 const MakeFolderButton = styled(Button)`

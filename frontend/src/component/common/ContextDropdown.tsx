@@ -18,8 +18,8 @@ const ContextDropdown = styled.ul<Props>`
     box-shadow: 0 0 20px 0 #ccc;
     opacity: 1;
     transition: opacity 0.5s linear;
-    top: ${(props) => props.top};
-    left: ${(props) => props.left};
+    top: ${(props) => props.top}px;
+    left: ${(props) => props.left}px;
 `;
 
 export default ContextDropdown;

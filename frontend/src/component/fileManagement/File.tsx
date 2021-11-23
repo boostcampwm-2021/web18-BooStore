@@ -5,6 +5,7 @@ import { FileDTO, FileEditAction } from '@DTO';
 import FileIcon from './FileIcon';
 import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
 import { useLocation } from 'react-router';
+import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
 
 interface Props {
 	file: FileDTO;
@@ -26,10 +27,9 @@ const File: React.FC<Props> = ({
 	initStarState,
 }) => {
 	const [isSelected, setSelected] = useState(false);
-
-	const [isStar, setIsStar] = useState(initStarState);
-	const { contentType, name, createdAt, updatedAt, size, _id, directory } = file;
 	const location = useLocation();
+	const { contentType, name, createdAt, updatedAt, size, _id, directory } = file;
+	const [isStar, setIsStar] = useState(initStarState);
 	const isFolder = contentType === 'folder';
 	const getConvertedSize = convertByteToUnitString(size);
 	const path = useMemo(() => `${directory}/${name}`.replace('//', '/'), [file]);

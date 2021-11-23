@@ -5,9 +5,6 @@ import File from './File';
 import { FileDTO } from '@DTO';
 import Selection from './Selection';
 
-import useContextMenu from '@component/hook/useContextMenu';
-import ContextMenu from '@component/HeaderContextMenu';
-
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
 import HeaderContextMenu from '@component/HeaderContextMenu';
@@ -84,17 +81,16 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
-
 				<HeaderContextMenu
 					setIsOpenNewFolder={setIsOpenNewFolder}
 					selectedFiles={selectedFiles}
 					updateFiles={updateFiles}
 				/>
-
 				<NewFolderModal
 					isOpenNewFolder={isOpenNewFolder}
 					setIsOpenNewFolder={setIsOpenNewFolder}
 					setFiles={setFiles}
+					files={files}
 					curDir={currentDirectory}
 				/>
 			</FileHeader>
