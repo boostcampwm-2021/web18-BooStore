@@ -15,6 +15,7 @@ interface Props{
 
 const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder, setIsOpenNewFolder,setFiles, curDir }) => {   
     const [newFolderName, setNewFolderName] = useState('제목없는 폴더');
+    console.log("curdir: "+curDir);
 
     const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = target;

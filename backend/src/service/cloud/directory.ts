@@ -76,7 +76,12 @@ const makeDirectoryToArrFormat = (allFiles: Directory[]) => {
 	const directorySet = new Set();
 	allFiles
 		.forEach((file) => {
-			directorySet.add(file.directory+'/'+file.name);
+			if(file.directory=='/'){
+				directorySet.add(file.directory+file.name);
+			}
+			else{
+				directorySet.add(file.directory+'/'+file.name);
+			}
 		});
 	return Array.from(directorySet);
 };

@@ -37,7 +37,7 @@ const FileList: React.FC<Props> = ({
 	className,
 }) => {
 	const container = useRef<HTMLDivElement>(null);
-	
+
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
 		setIsAscending(!isAscending);
 	};
