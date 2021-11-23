@@ -177,7 +177,7 @@ const DragBox = styled.div.attrs<OffsetPosition>(({ ltY, ltX, rbY, rbX }) => ({
 		left: `${ltX}px`,
 		width: `${rbX - ltX}px`,
 		height: `${rbY - ltY}px`,
-		zIndex: 99,
+		zIndex: 2,
 	},
 }))<OffsetPosition>`
 	position: absolute;

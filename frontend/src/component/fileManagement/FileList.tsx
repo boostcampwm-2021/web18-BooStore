@@ -103,7 +103,7 @@ const FileHeader = styled.div`
 	border-bottom: 1px solid ${(props) => props.theme.color.Line};
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 
-	z-index: 1;
+	z-index: 4;
 	position: sticky;
 	top: 0;
 `;
