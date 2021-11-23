@@ -135,12 +135,12 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 	}
 });
 
-router.get('/newfolder',isAuthenticated, async(req, res) => {
+router.post('/newfolder',isAuthenticated, async(req, res) => {
 	const { loginId } = req.user;
-	const { name, curdir } = req.params;
-	// createNewFolder(name,curdir);
-	console.log("params : "+ JSON.stringify(req.params));
-	//createAncestorsFolder();
+	const { name, curdir } = req.body;
+	console.log(loginId);
+	console.log(curdir);
+	createAncestorsFolder(curdir.curDir+name.newFolderName,loginId);
 	res.status(200).send();
 })
 

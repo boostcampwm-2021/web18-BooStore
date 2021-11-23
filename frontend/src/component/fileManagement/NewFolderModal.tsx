@@ -47,7 +47,6 @@ const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder,
                 }
             )
         });
-    };
         
         setNewFolderName('제목없는 폴더');
         return addedFolder;
