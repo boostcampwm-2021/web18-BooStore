@@ -28,15 +28,13 @@ const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder,
 	}, [onCloseButton]);
 
     const makeNewFolder = async()=>{
-            const addedFolder = await handleNewFolder();
-            /*if(addedFolder!=[{}]){
-                setFiles(oldArr => [...oldArr,addedFolder]);
-            }*/
-    
+            const addedFolder : FileDTO = await handleNewFolder();
+            setFiles(oldArr => [...oldArr,addedFolder]);
+            setNewFolderName('제목없는 폴더');
     }
 
     const handleNewFolder = async ()=>{
-        const addedFolder = fetch(`/cloud/newfolder`,{
+        return fetch(`/cloud/newfolder`,{
             method: 'POST',
             credentials: 'include',
             headers : {"Content-Type" : "application/json"},
@@ -46,10 +44,11 @@ const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder,
                     "curdir":{curDir}
                 }
             )
-        });
-        
-        setNewFolderName('제목없는 폴더');
-        return addedFolder;
+        })
+            .then((res) => {
+                return res.json();
+                
+            });
     }
     
     if (isOpenNewFolder){

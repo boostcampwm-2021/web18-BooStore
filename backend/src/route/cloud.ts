@@ -18,7 +18,8 @@ import {
 	removeFolders,
 	createZipFile,
 	deleteZipFile,
-	createAncestorsFolder
+	createAncestorsFolder,
+	getNewFolder
 } from '../service/cloud';
 
 const router = express.Router();
@@ -136,12 +137,16 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 });
 
 router.post('/newfolder',isAuthenticated, async(req, res) => {
-	const { loginId } = req.user;
+	const { loginId } = req.user
 	const { name, curdir } = req.body;
-	console.log(loginId);
-	console.log(curdir);
-	createAncestorsFolder(curdir.curDir+name.newFolderName,loginId);
-	res.status(200).send();
+	try{
+		await createAncestorsFolder(curdir.curDir+name.newFolderName,loginId);
+		const newFolder = await getNewFolder(loginId,curdir.curDir,name.newFolderName);
+		return res.json(newFolder);
+	}
+	catch(err){
+		res.sendStatus(304);
+	}
 })
 
 export default router;
