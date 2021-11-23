@@ -14,6 +14,7 @@ export interface FilteredFilesArg {
 
 interface Directory {
 	directory: string;
+	name: string;
 }
 
 export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: FilesArg) => {
@@ -58,11 +59,12 @@ export const getDirectoryList = async (loginId: string) => {
 	const allFiles = await Cloud.find(
 		{
 			ownerId: loginId,
-			isDeleted: false,
+			contentType: "folder"
 		},
 		{
 			_id: false,
 			directory: true,
+			name: true
 		}
 	);
 
@@ -73,9 +75,13 @@ export const getDirectoryList = async (loginId: string) => {
 const makeDirectoryToArrFormat = (allFiles: Directory[]) => {
 	const directorySet = new Set();
 	allFiles
-		.filter((file) => file.directory.length > 1)
 		.forEach((file) => {
-			directorySet.add(file.directory);
+			if(file.directory=='/'){
+				directorySet.add(file.directory+file.name);
+			}
+			else{
+				directorySet.add(file.directory+'/'+file.name);
+			}
 		});
 	return Array.from(directorySet);
 };

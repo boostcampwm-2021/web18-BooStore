@@ -53,11 +53,11 @@ const Sidebar: React.FC<Props> = ({ capacity, className, files, setCurrentDir })
 
 const Container = styled.div`
 	min-width: 250px;
-	max-width: 300px;
+	max-width: 350px;
+	overflow-x: hidden;
 	height: 100%;
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	border-right: 1px solid ${(props) => props.theme.color.Line};
-	
 	display: flex;
 	flex-direction: column;
 	

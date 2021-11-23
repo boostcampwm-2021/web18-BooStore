@@ -72,7 +72,7 @@ export const uploadFile = async ({
 };
 
 // /test2/폴더어/폴더어2/test.txt -> /test2/폴더어/폴더어2
-const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
+export const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
 	if (curDirectory === '/') {
 		return;
 	}
@@ -116,6 +116,15 @@ const createAncestorsFolder = async (curDirectory: string, userLoginId: string) 
 		})
 	);
 };
+
+export const getNewFolder = async(loginId: string, parentDir: string, curDir: string) => {
+	const newFolder = await Cloud.findOne({
+		ownerId: loginId,
+		directory: parentDir,
+		name: curDir
+	});
+	return newFolder;
+}
 
 const removeObjectStorageObjects = async (keys) => {
 	return await S3.deleteObjects({
