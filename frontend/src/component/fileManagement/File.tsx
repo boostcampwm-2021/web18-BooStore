@@ -4,6 +4,7 @@ import { convertByteToUnitString, getDate, getFiles } from '@util';
 import { FileDTO } from '@DTO';
 import FileIcon from './FileIcon';
 import { useLocation } from 'react-router';
+import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
 
 interface Props {
 	file: FileDTO;
@@ -24,8 +25,8 @@ const File: React.FC<Props> = ({
 }) => {
 	const [isSelected, setSelected] = useState(false);
 	const location = useLocation();
-
 	const { contentType, name, createdAt, updatedAt, size, _id, directory } = file;
+	const [isStar, setIsStar] = useState(false);
 	const isFolder = contentType === 'folder';
 	const getConvertedSize = convertByteToUnitString(size);
 	const path = useMemo(() => `${directory}/${name}`.replace('//', '/'), [file]);
@@ -35,12 +36,18 @@ const File: React.FC<Props> = ({
 			const result = new Map(selectedFiles);
 			if (result.has(_id)) {
 				result.delete(_id);
-			}
-			else {
+			} else {
 				result.set(_id, file);
 			}
 
 			return result;
+		});
+	};
+
+	const onClickStar = (event: React.MouseEvent<SVGSVGElement>) => {
+		event.stopPropagation();
+		setIsStar((isStar) => {
+			return !isStar;
 		});
 	};
 
@@ -78,6 +85,7 @@ const File: React.FC<Props> = ({
 				<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
 					{location.pathname === '/trash' ? path : name}
 				</FileName>
+				{isStar || <Star onMouseDown={onClickStar} />}
 			</FileNameBox>
 
 			<MetaData> {getDate(createdAt)} </MetaData>
@@ -101,15 +109,17 @@ const FileNameBox = styled.div`
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-
 	padding-right: 10%;
+	display: flex;
+	width: fit-content;
+	align-self: center;
 `;
 
 const FileName = styled.span<{ isFolder: boolean }>`
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
 	color: ${(props) => props.theme.color.Content};
-	
-	cursor: ${({isFolder}) => isFolder && 'pointer'};
+
+	cursor: ${({ isFolder }) => isFolder && 'pointer'};
 	margin: auto;
 	margin-left: 0;
 `;
