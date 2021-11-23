@@ -19,12 +19,8 @@ import {
 	createZipFile,
 	deleteZipFile,
 	createAncestorsFolder,
-<<<<<<< HEAD
 	getNewFolder,
 	getTrashFiles,
-=======
-	getNewFolder
->>>>>>> fbe50e0 ([Feat] 새 폴더 추가하면 setFiles 변경)
 } from '../service/cloud';
 
 const router = express.Router();
@@ -141,7 +137,6 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 	}
 });
 
-<<<<<<< HEAD
 router.post('/newfolder', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { name, curdir } = req.body;
@@ -164,12 +159,15 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 
 	return res.json(files);
 });
-=======
 router.post('/newfolder',isAuthenticated, async(req, res) => {
 	const { loginId } = req.user
 	const { name, curdir } = req.body;
+	let newDir = curdir.curDir+name.newFolderName;
+	if(curdir.curDir!='/'){
+		newDir= curdir.curDir+'/'+name.newFolderName;
+	}
 	try{
-		await createAncestorsFolder(curdir.curDir+name.newFolderName,loginId);
+		await createAncestorsFolder(newDir,loginId);
 		const newFolder = await getNewFolder(loginId,curdir.curDir,name.newFolderName);
 		return res.json(newFolder);
 	}
@@ -177,6 +175,5 @@ router.post('/newfolder',isAuthenticated, async(req, res) => {
 		res.sendStatus(304);
 	}
 })
->>>>>>> 6e059ff ([Feat] 새 폴더 라우터 완성)
 
 export default router;

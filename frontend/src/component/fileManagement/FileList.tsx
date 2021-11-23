@@ -91,6 +91,7 @@ const FileList: React.FC<Props> = ({
 					isOpenNewFolder={isOpenNewFolder}
 					setIsOpenNewFolder={setIsOpenNewFolder}
 					setFiles={setFiles}
+					files={files}
 					curDir={currentDirectory}
 				/>
 			</FileHeader>

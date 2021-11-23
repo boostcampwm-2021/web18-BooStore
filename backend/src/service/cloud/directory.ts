@@ -57,7 +57,8 @@ export const getDirectoryList = async (loginId: string) => {
 	const allFiles = await Cloud.find(
 		{
 			ownerId: loginId,
-			contentType: 'folder',
+			contentType: "folder",
+			isDeleted: false
 		},
 		{
 			_id: false,

@@ -4,25 +4,20 @@ import ReactModal from 'react-modal';
 import ModalComponent, { ModalType } from '@component/common/ModalComponent';
 import Button from '@component/common/Button';
 import { FileDTO } from '@DTO';
+import { handleNewFolder } from 'api';
 
-interface Props {
-	onCloseButton?: boolean;
-	isOpenNewFolder: boolean;
-	setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
-	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
-	curDir: string;
-}
+interface Props{
+    onCloseButton?: boolean;
+    isOpenNewFolder: boolean;
+    setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
+    setFiles : React.Dispatch<React.SetStateAction<FileDTO[]>>;
+    files: FileDTO[];
+    curDir: string;
+ }
 
-const NewFolderModal: React.FC<Props> = ({
-	onCloseButton = true,
-	isOpenNewFolder,
-	setIsOpenNewFolder,
-	setFiles,
-	curDir,
-}) => {
-	const [newFolderName, setNewFolderName] = useState('제목없는 폴더');
-
-	const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder, setIsOpenNewFolder,setFiles, files, curDir }) => {   
+    const [newFolderName, setNewFolderName] = useState('');
+    const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = target;
 		setNewFolderName(value);
 	};
@@ -33,51 +28,62 @@ const NewFolderModal: React.FC<Props> = ({
 		}
 	}, [onCloseButton]);
 
-	const makeNewFolder = async () => {
-		const addedFolder: FileDTO = await handleNewFolder();
-		setFiles((oldArr) => [...oldArr, addedFolder]);
-		setNewFolderName('제목없는 폴더');
-		onRequestClose();
-	};
-
-	const handleNewFolder = async () => {
-		return fetch(`/cloud/newfolder`, {
-			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				name: { newFolderName },
-				curdir: { curDir },
-			}),
-		}).then((res) => {
-			return res.json();
-		});
-	};
-
-	if (isOpenNewFolder) {
-		return (
-			<ReactModal
-				isOpen={isOpenNewFolder}
-				onRequestClose={onRequestClose}
-				ariaHideApp={false}
-			>
-				<InputContainer>
-					<p>새 폴더</p>
-					<Input
-						name="newFolderName"
-						value={newFolderName}
-						placeholder="제목 없는 폴더"
-						onChange={onChange}
-					/>
-					<ButtonContainer>
-						<MakeFolderButton onClick={makeNewFolder}>만들기</MakeFolderButton>
-					</ButtonContainer>
-				</InputContainer>
-			</ReactModal>
-		);
-	}
-	return <></>;
-};
+    const makeNewFolder = async()=>{
+            let cnt=0;
+            files.forEach((file)=>{
+                let splitName = file.name.split(newFolderName);
+                if(splitName[0]==='' && splitName.length==2){
+                    if(splitName[1]===''){
+                        cnt++;
+                    }
+                    //else if(splitName[1]===)
+                }
+            })
+            const addedFolder : FileDTO = await handleNewFolder(newFolderName,curDir);
+            setFiles(oldArr => [...oldArr,addedFolder]);
+            setNewFolderName('');
+            onRequestClose();
+    }
+    
+    if (isOpenNewFolder){
+        return (
+        <ReactModal isOpen={isOpenNewFolder} onRequestClose={onRequestClose} ariaHideApp={false}
+            style={{
+                content: {
+                    width: '400px',
+                    minHeight: '180px',
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    overflow: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    borderRadius: '4px',
+                    outline: 'none',
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                }
+            }}
+        >
+            <InputContainer>
+                <p>새 폴더</p>
+                <Input
+                    name="newFolderName"
+                    value={newFolderName}
+                    placeholder="제목 없는 폴더"
+                    onChange={onChange}
+                />
+                <ButtonContainer>
+                <MakeFolderButton onClick={makeNewFolder}>
+                    만들기
+                </MakeFolderButton>
+                </ButtonContainer> 
+            </InputContainer>
+        </ReactModal>
+        )
+    }
+    return <></>
+}
 
 const Input = styled.input`
 	width: 300px;
@@ -85,7 +91,7 @@ const Input = styled.input`
 	border: solid 1px ${(props) => props.theme.color.Primary};
 	border-radius: 8px;
 	font: ${(props) => props.theme.fontSize.Content} ${(props) => props.theme.FontFamily.Medium};
-	padding: 20px 20px 20px 40px;
+	padding: 20px 20px 20px 20px;
 	margin-bottom: 20px;
 	&:focus {
 		outline: none;
@@ -94,14 +100,15 @@ const Input = styled.input`
 
 
 const InputContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `;
 
 const ButtonContainer = styled.div`
-	display: flex;
-	flex-direction: row;
+    display: flex;
+    flex-direction: row;
+    justify-content:center;
 `;
 
 const MakeFolderButton = styled(Button)`
