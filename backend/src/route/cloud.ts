@@ -40,8 +40,8 @@ router.get('/validate', isAuthenticated, async (req, res) => {
 router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req, res) => {
 	const files = req.files as Express.Multer.File[];
 	const { loginId } = req.user;
-	const body = req.body;
-	const relativePath = JSON.parse(body.relativePath);
+	const { relativePath, rootDirectory } = req.body;
+	const relativePaths = JSON.parse(relativePath);
 
 	try {
 		await Promise.all(
@@ -52,8 +52,8 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 					mimetype: mimetype,
 					fileName: filename,
 					destination: destination,
-					rootDirectory: body.rootDirectory,
-					relativePath: relativePath[originalname],
+					rootDirectory: rootDirectory,
+					relativePath: relativePaths[originalname],
 					size: size,
 					userLoginId: loginId,
 				};
