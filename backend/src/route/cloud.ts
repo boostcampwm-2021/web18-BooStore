@@ -18,13 +18,9 @@ import {
 	removeFolders,
 	createZipFile,
 	deleteZipFile,
-<<<<<<< HEAD
 	createAncestorsFolder,
 	getNewFolder,
 	getTrashFiles,
-=======
-	createAncestorsFolder
->>>>>>> 87e0ddb ([Feat] 새 폴더 생성 fetch 요청 get 에서 post로 수정)
 } from '../service/cloud';
 
 const router = express.Router();
@@ -141,6 +137,7 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 	}
 });
 
+<<<<<<< HEAD
 router.post('/newfolder', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { name, curdir } = req.body;
@@ -163,5 +160,15 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 
 	return res.json(files);
 });
+=======
+router.post('/newfolder',isAuthenticated, async(req, res) => {
+	const { loginId } = req.user;
+	const { name, curdir } = req.body;
+	console.log(loginId);
+	console.log(curdir);
+	createAncestorsFolder(curdir.curDir+name.newFolderName,loginId);
+	res.status(200).send();
+})
+>>>>>>> 6e059ff ([Feat] 새 폴더 라우터 완성)
 
 export default router;
