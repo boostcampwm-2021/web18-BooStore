@@ -118,7 +118,7 @@ router.put('/files', isAuthenticated, async (req, res) => {
 
 		res.send();
 	} catch (err) {
-		res.send(500).send();
+		res.status(500).send();
 	}
 });
 
@@ -132,7 +132,7 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 
 		res.send();
 	} catch (err) {
-		res.send(500).send();
+		res.status(500).send();
 	}
 });
 
