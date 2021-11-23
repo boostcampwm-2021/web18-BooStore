@@ -159,21 +159,20 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 
 	return res.json(files);
 });
-router.post('/newfolder',isAuthenticated, async(req, res) => {
-	const { loginId } = req.user
+router.post('/newfolder', isAuthenticated, async (req, res) => {
+	const { loginId } = req.user;
 	const { name, curdir } = req.body;
-	let newDir = curdir.curDir+name.newFolderName;
-	if(curdir.curDir!='/'){
-		newDir= curdir.curDir+'/'+name.newFolderName;
+	let newDir = curdir.curDir + name.newFolderName;
+	if (curdir.curDir != '/') {
+		newDir = curdir.curDir + '/' + name.newFolderName;
 	}
-	try{
-		await createAncestorsFolder(newDir,loginId);
-		const newFolder = await getNewFolder(loginId,curdir.curDir,name.newFolderName);
+	try {
+		await createAncestorsFolder(newDir, loginId);
+		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
 		return res.json(newFolder);
-	}
-	catch(err){
+	} catch (err) {
 		res.sendStatus(304);
 	}
-})
+});
 
 export default router;
