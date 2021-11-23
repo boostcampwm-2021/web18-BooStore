@@ -15,7 +15,7 @@ import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
-	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	canDirectoryClick?: boolean;
 	selectedFiles: Map<string, FileDTO>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
@@ -44,18 +44,21 @@ const FileList: React.FC<Props> = ({
 		setIsAscending(!isAscending);
 	};
 
-	const addSelect = (id: string) => {
-		setSelectedFiles((selectedFiles) => {
-			if (selectedFiles.has(id)) {
-				return selectedFiles;
-			}
-			
-			const result = new Map(selectedFiles);
-			const file = files.find((ele) => ele._id === id);
-			result.set(id, file!);
-			return result;
-		});
-	};
+	const addSelect = useCallback(
+		(id: string) => {
+			setSelectedFiles((selectedFiles) => {
+				if (selectedFiles.has(id)) {
+					return selectedFiles;
+				}
+
+				const result = new Map(selectedFiles);
+				const file = files.find((ele) => ele._id === id);
+				result.set(id, file!);
+				return result;
+			});
+		},
+		[files]
+	);
 	const removeSelect = (id: string) => {
 		setSelectedFiles((selectedFiles) => {
 			if (!selectedFiles.has(id)) {
@@ -65,9 +68,9 @@ const FileList: React.FC<Props> = ({
 			result.delete(id);
 			return result;
 		});
-	}
+	};
 
-	const [isOpenNewFolder,setIsOpenNewFolder] = useState(false);
+	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
 
 	return (
 		<Container className={className} ref={container}>
@@ -80,16 +83,21 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
-				<HeaderContextMenu setIsOpenNewFolder={setIsOpenNewFolder}/>
-				<NewFolderModal 
-					isOpenNewFolder={isOpenNewFolder} 
-					setIsOpenNewFolder={setIsOpenNewFolder} 
+				<HeaderContextMenu setIsOpenNewFolder={setIsOpenNewFolder} />
+				<NewFolderModal
+					isOpenNewFolder={isOpenNewFolder}
+					setIsOpenNewFolder={setIsOpenNewFolder}
 					setFiles={setFiles}
 					curDir={currentDirectory}
 				/>
 			</FileHeader>
 			<Files>
-				<Selection selector={'.file'} addSelcted={addSelect} removeSelected={removeSelect} scrollFrame={container.current ?? undefined}>
+				<Selection
+					selector={'.file'}
+					addSelcted={addSelect}
+					removeSelected={removeSelect}
+					scrollFrame={container.current ?? undefined}
+				>
 					{files.map((file, index) => (
 						<File
 							className="file"
