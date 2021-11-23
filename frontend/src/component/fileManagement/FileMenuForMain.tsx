@@ -10,6 +10,7 @@ import Button from '@component/common/Button';
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
 import { moveFileToTrash } from '@api';
+import { getFiles } from '@util';
 
 interface Props {
 	showShareButton?: boolean;
@@ -148,8 +149,70 @@ const FileMenuForMain: React.FC<Props> = ({
 		return res.ok;
 	};
 
+	const getNotOverlappedName = async (folderName: string): Promise<string> => {
+		const trashFiles = await getFiles(currentDir, true, true);
+		let file = files.find((file) => file.name === folderName);
+		if (file === undefined) {
+			file = trashFiles.find((file) => file.name === folderName);
+			if (file === undefined) {
+				return folderName;
+				
+			}
+		}
+
+		const leftBracketIndex = folderName.lastIndexOf('(');
+		const rightBracketIndex = folderName.lastIndexOf(')');
+		if (
+			leftBracketIndex === -1 ||
+			rightBracketIndex === -1 ||
+			rightBracketIndex !== folderName.length - 1 ||
+			leftBracketIndex + 1 >= rightBracketIndex
+		) {
+			return getNotOverlappedName(`${folderName}(1)`);
+		}
+
+		const strInsideBracket = folderName.slice(leftBracketIndex + 1, rightBracketIndex);
+		const overlapNumber = Number(strInsideBracket);
+		if (isNaN(overlapNumber)) {
+			return getNotOverlappedName(`${folderName}(1)`);
+		}
+
+		const newFilename = `${folderName.slice(0, leftBracketIndex)}(${overlapNumber + 1})`;
+		return getNotOverlappedName(newFilename);
+	};
+
 	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
 		const formData = new FormData();
+
+		const relativePaths: Map<string, string> = new Map();
+		if (selectedUploadFiles[0].webkitRelativePath != '') {
+			const relativePath = selectedUploadFiles[0].webkitRelativePath;
+			const createdFolderName = relativePath.split('/')[0];
+			const notOverlappedName = await getNotOverlappedName(createdFolderName);
+
+			if (createdFolderName === notOverlappedName) {
+				selectedUploadFiles.forEach((file) => {
+					const { webkitRelativePath: wRP, name } = file;
+
+					relativePaths.set(name, wRP);
+				});
+			} else {
+				selectedUploadFiles.forEach((file) => {
+					const { webkitRelativePath: wRP, name } = file;
+
+					relativePaths.set(
+						name,
+						`${notOverlappedName}/${wRP.split('/').slice(1).join('/')}`
+					);
+				});
+			}
+		} else {
+			selectedUploadFiles.forEach((file) => {
+				const { webkitRelativePath: wRP, name } = file;
+
+				relativePaths.set(name, wRP);
+			});
+		}
 
 		formData.append('rootDirectory', currentDir);
 		let metaData: any = {};
@@ -163,7 +226,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			setProgressModalText(name);
 			setProcessedFileSize((prev) => prev + size);
 			formData.append('uploadFiles', file, name);
-			metaData[file.name] = file.webkitRelativePath;
+			metaData[name] = relativePaths.get(name);
 
 			// 1MB 단위로 보냄
 			if (sectionSize >= 1024 * 1024 || processedSize == totalSize) {
