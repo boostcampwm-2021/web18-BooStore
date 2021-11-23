@@ -72,7 +72,7 @@ export const uploadFile = async ({
 };
 
 // /test2/폴더어/폴더어2/test.txt -> /test2/폴더어/폴더어2
-const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
+export const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
 	if (curDirectory === '/') {
 		return;
 	}

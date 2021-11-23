@@ -10,9 +10,10 @@ interface Props{
     isOpenNewFolder: boolean;
     setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
     setFiles : React.Dispatch<React.SetStateAction<FileDTO[]>>;
+    curDir: string;
  }
 
-const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder, setIsOpenNewFolder,setFiles }) => {   
+const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder, setIsOpenNewFolder,setFiles, curDir }) => {   
     const [newFolderName, setNewFolderName] = useState('제목없는 폴더');
 
     const onChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,25 +28,28 @@ const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder,
 	}, [onCloseButton]);
 
     const makeNewFolder = async()=>{
-        if(newFolderName!=''){
             const addedFolder = await handleNewFolder();
             /*if(addedFolder!=[{}]){
                 setFiles(oldArr => [...oldArr,addedFolder]);
             }*/
-        }
+    
     }
 
     const handleNewFolder = async ()=>{
-        const addedFolder = fetch(`/user/newfolder?name=${newFolderName}`,{
+        const addedFolder = fetch(`/cloud/newfolder`,{
+            method: 'POST',
             credentials: 'include',
-        })
-            .then(res => {
-                if(!res.ok){
-                    return {};
+            headers : {"Content-Type" : "application/json"},
+            body: JSON.stringify(
+                {
+                    "name":{newFolderName},
+                    "curdir":{curDir}
                 }
-                return res.json();
-            });
+            )
+        });
+    };
         
+        setNewFolderName('제목없는 폴더');
         return addedFolder;
     }
     

@@ -79,7 +79,12 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
 				<HeaderContextMenu setIsOpenNewFolder={setIsOpenNewFolder}/>
-				<NewFolderModal isOpenNewFolder={isOpenNewFolder} setIsOpenNewFolder={setIsOpenNewFolder} setFiles={setFiles}/>
+				<NewFolderModal 
+					isOpenNewFolder={isOpenNewFolder} 
+					setIsOpenNewFolder={setIsOpenNewFolder} 
+					setFiles={setFiles}
+					curDir={currentDirectory}
+				/>
 			</FileHeader>
 			<Files>
 				<Selection selector={'.file'} addSelcted={addSelect} removeSelected={removeSelect} scrollFrame={container.current ?? undefined}>
