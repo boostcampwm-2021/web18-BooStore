@@ -22,7 +22,7 @@ const useContextMenu = () => {
       document.removeEventListener("click", handleClick);
       document.removeEventListener("contextmenu", handleContextMenu);
     };
-  });
+  }, []);
   return { anchorPoint, show };
 };
 
