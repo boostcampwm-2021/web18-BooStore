@@ -31,6 +31,7 @@ const NewFolderModal: React.FC<Props> = ({ onCloseButton = true,isOpenNewFolder,
             const addedFolder : FileDTO = await handleNewFolder();
             setFiles(oldArr => [...oldArr,addedFolder]);
             setNewFolderName('제목없는 폴더');
+            onRequestClose();
     }
 
     const handleNewFolder = async ()=>{
