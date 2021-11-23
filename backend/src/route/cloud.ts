@@ -18,9 +18,13 @@ import {
 	removeFolders,
 	createZipFile,
 	deleteZipFile,
+<<<<<<< HEAD
 	createAncestorsFolder,
 	getNewFolder,
 	getTrashFiles,
+=======
+	createAncestorsFolder
+>>>>>>> 87e0ddb ([Feat] 새 폴더 생성 fetch 요청 get 에서 post로 수정)
 } from '../service/cloud';
 
 const router = express.Router();
