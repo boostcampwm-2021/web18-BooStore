@@ -11,7 +11,6 @@ export const getTrashFiles = () => {
 		})
 		.then((data) => {
 			const files: FileDTO[] = data;
-			console.log(files);
 			return files;
 		})
 		.catch((err) => {

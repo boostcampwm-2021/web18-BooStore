@@ -14,7 +14,6 @@ const HeaderContextMenu: React.FC<Props> = ( { setIsOpenNewFolder } ) => {
   };
   
     if (show) {
-      console.log("anchor.x: "+anchorPoint.x+" anchor.y: "+anchorPoint.y);
       return (
         <ContextDropdown top={anchorPoint.y} left={anchorPoint.x} >
           <li onClick={addNewFolder}>새 폴더 만들기</li>
