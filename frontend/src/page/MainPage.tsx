@@ -93,7 +93,6 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	useEffect(() => {
 		updateFiles();
 	}, [currentDir, isAscending]);
-
 	useEffect(() => {
 		const currentDirectory = location.state?.currentDirectory;
 		setCurrentDir(currentDirectory ?? '/');
@@ -173,6 +172,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						isOpenMoveFile={isOpenMoveFile} 
 						setIsOpenMoveFile={setIsOpenMoveFile}
 						curDir={currentDir}
+						setFiles={setFiles}
 					/>
 				</InnerContainer>
 			</Container>
