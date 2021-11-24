@@ -175,4 +175,11 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 	}
 });
 
+router.post('/update',isAuthenticated, async(req,res)=>{
+	console.log('update arrived');
+	const { files, newdir} = req.body;
+	console.log(newdir);
+
+})
+
 export default router;
