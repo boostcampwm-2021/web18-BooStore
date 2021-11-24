@@ -178,6 +178,16 @@ export const getNewFolder = async (loginId: string, parentDir: string, curDir: s
 	return newFolder;
 };
 
+export const updateFile = async(loginId: string, curDir: string, fileName: string, newDir: string) => {
+	return await Cloud.updateOne({
+		ownerId: loginId,
+		directory: curDir,
+		name: fileName
+	},{
+		directory: newDir
+	})
+}
+
 const removeObjectStorageObjects = async (keys) => {
 	return await S3.deleteObjects({
 		Bucket: bucketName,
