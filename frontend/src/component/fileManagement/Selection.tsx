@@ -51,6 +51,9 @@ const Selection: React.FC<SelectionProps> = ({
 	};
 
 	const onStartDrag = (event: MouseEvent) => {
+		if (event.button !== 0) {
+			return;
+		}
 		if (!container.current || !container.current.contains(event.target as Element)) {
 			return;
 		}
