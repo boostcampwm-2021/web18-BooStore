@@ -45,7 +45,10 @@ const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,s
     }
 
     const moveFile = async()=>{
-        await handleMoveFile(Array.from(selectedFiles.values()),newDirectory);
+        setIsOpenMoveFile(false);
+        if(newDirectory!=''){
+            await handleMoveFile(Array.from(selectedFiles.values()),newDirectory);
+        }
     }
 
     const makeDirectoryList = useCallback(()=>{
