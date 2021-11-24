@@ -17,7 +17,6 @@ const useContextMenu = () => {
 
 	useEffect(() => {
 		document.addEventListener('click', handleClick);
-		console.log('tt');
 		return () => {
 			document.removeEventListener('click', handleClick);
 		};

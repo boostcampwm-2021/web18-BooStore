@@ -8,27 +8,26 @@ import { useLocation } from 'react-router';
 
 interface Props {
 	file: FileDTO;
+	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setCurrentDir: React.Dispatch<React.SetStateAction<string>>;
 	currentDirectory: string;
 	selectedFiles: Map<string, FileDTO>;
 	className?: string;
-	initStarState: boolean;
 }
 
 const File: React.FC<Props> = ({
 	file,
+	setFiles,
 	setSelectedFiles,
 	setCurrentDir,
 	currentDirectory,
 	selectedFiles,
 	className,
-	initStarState,
 }) => {
 	const [isSelected, setSelected] = useState(false);
 	const location = useLocation();
 	const { contentType, name, createdAt, updatedAt, size, _id, directory } = file;
-	const [isStar, setIsStar] = useState(initStarState);
 	const isFolder = contentType === 'folder';
 	const getConvertedSize = convertByteToUnitString(size);
 	const path = useMemo(() => `${directory}/${name}`.replace('//', '/'), [file]);
@@ -48,7 +47,15 @@ const File: React.FC<Props> = ({
 
 	const onClickStar = (event: React.MouseEvent<SVGSVGElement>) => {
 		event.stopPropagation();
-		setIsStar(false);
+		setFiles((files) =>
+			files.map((ele) => {
+				const result = { ...ele };
+				if (result._id === file._id) {
+					result.isStar = false;
+				}
+				return result;
+			})
+		);
 		const body = {
 			targetIds: file._id,
 			action: FileEditAction.removeStar,
@@ -97,7 +104,7 @@ const File: React.FC<Props> = ({
 				<FileName isFolder={isFolder} onClick={changeCurrentDirectory}>
 					{location.pathname === '/trash' ? path : name}
 				</FileName>
-				{isStar && <Star onMouseDown={onClickStar} />}
+				{file.isStar && <Star onMouseDown={onClickStar} />}
 			</FileNameBox>
 
 			<MetaData> {getDate(createdAt)} </MetaData>
