@@ -1,4 +1,4 @@
-export const getDirectoryList = async() => {
+export const getDirectoryList = () => {
     return fetch('/user/directory',{
 		credentials: 'include',
 	})

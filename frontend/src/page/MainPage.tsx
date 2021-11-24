@@ -169,9 +169,10 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						curDir={currentDir}
 					/>
 					<MoveFileModal 
-						files={files}
+						selectedFiles={selectedFiles}
 						isOpenMoveFile={isOpenMoveFile} 
 						setIsOpenMoveFile={setIsOpenMoveFile}
+						curDir={currentDir}
 					/>
 				</InnerContainer>
 			</Container>

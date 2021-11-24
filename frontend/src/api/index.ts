@@ -3,3 +3,4 @@ export * from './getDirectory';
 export * from './getTrashFiles';
 export * from './file';
 export * from './newFolder';
+export * from './moveFile';
