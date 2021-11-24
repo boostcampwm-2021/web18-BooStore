@@ -31,6 +31,10 @@ const File: React.FC<Props> = ({
 	const path = useMemo(() => `${directory}/${name}`.replace('//', '/'), [file]);
 
 	const onClickFile = (event: React.MouseEvent<HTMLDivElement>) => {
+		if (event.button !== 0) {
+			return;
+		}
+		
 		setSelectedFiles((selectedFiles) => {
 			const result = new Map(selectedFiles);
 			if (result.has(_id)) {
