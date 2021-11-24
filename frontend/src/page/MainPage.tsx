@@ -7,6 +7,7 @@ import Sidebar from '@component/layout/Sidebar';
 import Header from '@component/layout/Header';
 import ContextMenu from '@component/common/ContextMenu';
 import NewFolderModal from '@component/fileManagement/NewFolderModal';
+import MoveFileModal from '@component/fileManagement/MoveFileModal';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
@@ -157,6 +158,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						setIsOpenMoveFile={setIsOpenMoveFile}
 						show={show}
 						anchorPoint={anchorPoint}
+						selectedFiles={selectedFiles}
 					/>
 					<NewFolderModal
 						isOpenNewFolder={isOpenNewFolder}
@@ -164,6 +166,11 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						setFiles={setFiles}
 						files={files}
 						curDir={currentDir}
+					/>
+					<MoveFileModal 
+						files={files}
+						isOpenMoveFile={isOpenMoveFile} 
+						setIsOpenMoveFile={setIsOpenMoveFile}
 					/>
 				</InnerContainer>
 			</Container>
