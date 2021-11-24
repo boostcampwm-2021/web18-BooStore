@@ -58,7 +58,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	const [selectedFiles, setSelectedFiles] = useState<Map<string, FileDTO>>(new Map());
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 	const location = useLocation<{ currentDirectory: string | undefined }>();
-
+	
 	const onClickDirectory = async (relativePath: string) => {
 		const files = await getFiles(relativePath, isAscending);
 		setFiles(files);
