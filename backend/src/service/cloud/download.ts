@@ -39,20 +39,26 @@ export const getDownloadListMetadata = async ({
 		})
 	);
 
-	const emptyFolders = await getDownloadEmptyFolderMetadata({
-		directory: currentDir === '/' ? currentDir : currentDir + '/',
-		loginId,
-	});
-
+	const emptyFolders = Promise.all(
+		directories.map((directory) => {
+			if (directory === '') return [];
+			return getDownloadEmptyFolderMetadata({
+				directory: currentDir === '/' ? currentDir : currentDir + '/',
+				loginId,
+				name: directory,
+			});
+		})
+	);
 	const reducer = function (acc, cur) {
 		acc.push(...cur);
 		return acc;
 	};
 
+	const transEmptyFolders = (await emptyFolders).reduce(reducer, []);
 	const transFiles = (await files).reduce(reducer, []);
 	const transFolders = (await folders).reduce(reducer, []);
 
-	return [...emptyFolders, ...transFiles, ...transFolders];
+	return [...transEmptyFolders, ...transFiles, ...transFolders];
 };
 
 function isValidObjectIdHandle(fileId: string) {
@@ -69,6 +75,7 @@ const getDownloadFileMetadata = async ({ fileId, loginId }: DownloadFileMetadata
 	const fileMetadata = await Cloud.find({
 		_id: fileId,
 		ownerId: loginId,
+		isDeleted: false,
 	}).exec();
 	return fileMetadata;
 };
@@ -83,6 +90,7 @@ const getDownloadFolderMetadata = async ({ directory, loginId }: DownloadFolderM
 	const folderMetadata = await Cloud.find({
 		directory: { $regex: `^${directory}(\\/.*)?$` },
 		ownerId: loginId,
+		isDeleted: false,
 	}).exec();
 	return folderMetadata;
 };
@@ -91,16 +99,20 @@ const getDownloadFolderMetadata = async ({ directory, loginId }: DownloadFolderM
 export interface DownloadEmptyFolderMetadataArg {
 	directory: string;
 	loginId: string;
+	name: string;
 }
 
 const getDownloadEmptyFolderMetadata = async ({
 	directory,
 	loginId,
+	name,
 }: DownloadEmptyFolderMetadataArg) => {
 	const folderMetadata = await Cloud.find({
 		directory: { $regex: `^${directory}?$` },
 		contentType: 'folder',
 		ownerId: loginId,
+		isDeleted: false,
+		name: name,
 	}).exec();
 	return folderMetadata;
 };
@@ -124,11 +136,9 @@ export const downloadFiles = async ({ downloadList, currentDir }: DownloadFilesA
 				await mkdirp(
 					path.join(
 						path.resolve(),
-						'temp/',
+						'temp',
 						file.ownerId,
-						'/',
-						getDownloadPath(currentDir, file.directory + '/' + file.name),
-						'/'
+						getDownloadPath(currentDir, file.directory + '/' + file.name)
 					)
 				);
 				return;
@@ -138,20 +148,16 @@ export const downloadFiles = async ({ downloadList, currentDir }: DownloadFilesA
 			await mkdirp(
 				path.join(
 					path.resolve(),
-					'temp/',
+					'temp',
 					file.ownerId,
-					'/',
-					getDownloadPath(currentDir, file.directory),
-					'/'
+					getDownloadPath(currentDir, file.directory)
 				)
 			);
 			const localPath = path.join(
 				path.resolve(),
-				'temp/',
+				'temp',
 				file.ownerId,
-				'/',
 				getDownloadPath(currentDir, file.directory),
-				'/',
 				file.name
 			);
 
