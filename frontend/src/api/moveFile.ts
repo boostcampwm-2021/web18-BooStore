@@ -14,6 +14,6 @@ export const handleMoveFile= (selectedFiles: FileDTO[], newDirectory: string)=>{
         )
     })
         .then((res) => {
-            return res.status;
+            return res.ok;
         });
 }

@@ -58,7 +58,6 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	const [selectedFiles, setSelectedFiles] = useState<Map<string, FileDTO>>(new Map());
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 	const location = useLocation<{ currentDirectory: string|undefined}>();
-	const [isUpdateComplete, setIsUpdateComplete] = useState(false);
 
 	const onClickDirectory = async (relativePath: string) => {
 		const files = await getFiles(relativePath, isAscending);
@@ -93,7 +92,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 
 	useEffect(() => {
 		updateFiles();
-	}, [currentDir, isAscending, isUpdateComplete]);
+	}, [currentDir, isAscending]);
 	
 	useEffect(() => {
 		const currentDirectory = location.state?.currentDirectory;
@@ -173,7 +172,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						isOpenMoveFile={isOpenMoveFile} 
 						setIsOpenMoveFile={setIsOpenMoveFile}
 						curDir={currentDir}
-						setIsUpdateComplete={setIsUpdateComplete}
+						setFiles={setFiles}
 					/>
 				</InnerContainer>
 			</Container>

@@ -179,13 +179,15 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 router.post('/update',isAuthenticated, async(req,res)=>{
 	const { loginId } = req.user;
 	const { files, newdir} = req.body;
-	files.selectedFiles.forEach((file) => {
+	await Promise.all(files.selectedFiles.map(async(file) => {
 		if(file.contentType ==='folder'){
 		}
 		else{
-			updateFile(loginId, file.directory, file.name, newdir.newDirectory);
-		}
-	})
+			await updateFile(loginId, file.directory, file.name, newdir.newDirectory);
+			return res.send();
+		}	
+	}))
+	return res.send(304);
 })
 
 export default router;

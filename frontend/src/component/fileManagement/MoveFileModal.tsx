@@ -4,6 +4,7 @@ import ReactModal from 'react-modal';
 import { getDirectoryList } from 'api';
 import { handleMoveFile } from 'api';
 import { FileDTO } from '@DTO';
+import { getFiles } from '@util';
 import Button from '@component/common/Button';
 
 interface Props{
@@ -11,11 +12,11 @@ interface Props{
     isOpenMoveFile: boolean;
     setIsOpenMoveFile: React.Dispatch<React.SetStateAction<boolean>>;
     selectedFiles: Map<string, FileDTO>;
-    setIsUpdateComplete: React.Dispatch<React.SetStateAction<boolean>>
+    setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
     curDir : string;
 }
 
-const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,setIsOpenMoveFile, selectedFiles, curDir, setIsUpdateComplete })=>{
+const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,setIsOpenMoveFile, selectedFiles, curDir, setFiles })=>{
 
     const [directories, setDirectories] = useState<string[]>([]);
     const [newDirectory, setNewDirectory] = useState<string>('');
@@ -30,13 +31,9 @@ const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,s
         asyncFunc();
     }
 
-    const chooseNewDir= async(directory: string)=>{
+    const chooseNewDir= (directory: string)=>{
         setNewDirectory(directory);
     }
-
-    useEffect(()=>{
-        moveFile();
-    },[newDirectory])
 
     const editDir = (directory: string)=>{
         if(directory==='/') return '내 스토어';
@@ -47,10 +44,12 @@ const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,s
 
     const moveFile = async()=>{
         setIsOpenMoveFile(false);
+        console.log("selectedDir:"+ newDirectory);
         if(newDirectory!=''){
             const status = await handleMoveFile(Array.from(selectedFiles.values()),newDirectory);
+            console.log('status: '+status);
             if(status){
-                setIsUpdateComplete(true);
+                setFiles(await getFiles(curDir, true));
             }
         }
     }
