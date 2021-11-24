@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import FileList from '@component/fileManagement/FileList';
+import FileList from '@component/fileManagement/FileListForStar';
 import FileMenu from '@component/fileManagement/FileMenuForStar';
 import Sidebar from '@component/layout/Sidebar';
 import Header from '@component/layout/Header';
@@ -12,7 +12,6 @@ import { getFiles, getAllStarFiles } from '@util';
 import { getCapacity } from 'api';
 
 import arrow from '@asset/image/icons/icon_left_arrow.svg';
-import { relative } from 'path';
 
 interface StarPageProps {
 	user: User;
@@ -37,7 +36,7 @@ const StarPage: React.FC<StarPageProps> = ({ user, setUser }) => {
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 
 	const onClickDirectory = async (relativePath: string) => {
-		if ((relativePath = '/')) {
+		if (relativePath === '/') {
 			const files = await getAllStarFiles(relativePath, isAscending);
 			setFiles(files);
 		} else {
