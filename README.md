@@ -49,7 +49,7 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 
 ## 📜 API 문서
 
-[PostMan Docs](https://documenter.getpostman.com/view/13315664/UVC6j6rk)
+[PostMan Docs](https://documenter.getpostman.com/view/13315664/UVJZnHu8)
 
 ## 💾 Deploy Process
 
