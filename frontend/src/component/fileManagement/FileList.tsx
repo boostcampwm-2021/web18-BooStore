@@ -69,7 +69,7 @@ const FileList: React.FC<Props> = ({
 	};
 
 	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
-	
+
 	return (
 		<Container className={className} ref={container}>
 			<FileHeader>
@@ -102,17 +102,18 @@ const FileList: React.FC<Props> = ({
 					scrollFrame={container.current ?? undefined}
 				>
 					{files.map((file, index) => {
-						console.log(file.isStar);
-						return <File
-							className="file"
-							key={index}
-							file={file}
-							setFiles={setFiles}
-							selectedFiles={selectedFiles}
-							setSelectedFiles={setSelectedFiles}
-							setCurrentDir={canDirectoryClick ? setCurrentDir : () => {}}
-							currentDirectory={currentDirectory}
-						/>
+						return (
+							<File
+								className="file"
+								key={index}
+								file={file}
+								setFiles={setFiles}
+								selectedFiles={selectedFiles}
+								setSelectedFiles={setSelectedFiles}
+								setCurrentDir={canDirectoryClick ? setCurrentDir : () => {}}
+								currentDirectory={currentDirectory}
+							/>
+						);
 					})}
 				</Selection>
 			</Files>

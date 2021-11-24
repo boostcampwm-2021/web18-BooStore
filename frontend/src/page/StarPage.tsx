@@ -1,5 +1,5 @@
-import React, { Key, useCallback, useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 import FileList from '@component/fileManagement/FileList';
 import FileMenu from '@component/fileManagement/FileMenuForStar';
@@ -8,7 +8,7 @@ import Header from '@component/layout/Header';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
-import { getFiles } from '@util';
+import { getFiles, getAllStarFiles } from '@util';
 import { getCapacity } from 'api';
 
 import arrow from '@asset/image/icons/icon_left_arrow.svg';
@@ -38,7 +38,7 @@ const StarPage: React.FC<StarPageProps> = ({ user, setUser }) => {
 
 	const onClickDirectory = async (relativePath: string) => {
 		if ((relativePath = '/')) {
-			const files = await getFiles(relativePath, isAscending, false, true);
+			const files = await getAllStarFiles(relativePath, isAscending);
 			setFiles(files);
 		} else {
 			const files = await getFiles(relativePath, isAscending, false, false);
@@ -68,7 +68,11 @@ const StarPage: React.FC<StarPageProps> = ({ user, setUser }) => {
 
 	const updateFiles = async () => {
 		setSelectedFiles(new Map());
-		setFiles(await getFiles(currentDir, isAscending, false, false));
+		if (currentDir === '/') {
+			setFiles(await getAllStarFiles(currentDir, isAscending));
+		} else {
+			setFiles(await getFiles(currentDir, isAscending, false));
+		}
 		setCapacity(await getCapacity());
 	};
 

@@ -56,6 +56,19 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 	return filteredFolders.concat(filteredFiles);
 };
 
+export const splitFolderAndFile = (target: ICloud[]) => {
+	const files = [];
+	const folders = [];
+	target.map((file) => {
+		if (file.contentType === 'folder') {
+			folders.push(file);
+		} else {
+			files.push(file);
+		}
+	});
+	return [...folders, ...files];
+};
+
 export const getDirectoryList = async (loginId: string) => {
 	const allFiles = await Cloud.find(
 		{

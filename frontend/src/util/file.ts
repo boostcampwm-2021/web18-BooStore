@@ -17,7 +17,19 @@ export const getFiles = (
 		})
 		.then((data) => {
 			const files: FileDTO[] = data;
-			console.log(files);
+			return files;
+		});
+};
+
+export const getAllStarFiles = (directory: string, isAscending: boolean) => {
+	return fetch(`/user/starfiles?path=${directory}&isAscending=${isAscending}`, {
+		credentials: 'include',
+	})
+		.then((res) => {
+			return res.json();
+		})
+		.then((data) => {
+			const files: FileDTO[] = data;
 			return files;
 		});
 };
