@@ -11,10 +11,11 @@ interface Props{
     isOpenMoveFile: boolean;
     setIsOpenMoveFile: React.Dispatch<React.SetStateAction<boolean>>;
     selectedFiles: Map<string, FileDTO>;
+    setIsUpdateComplete: React.Dispatch<React.SetStateAction<boolean>>
     curDir : string;
 }
 
-const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,setIsOpenMoveFile, selectedFiles, curDir })=>{
+const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,setIsOpenMoveFile, selectedFiles, curDir, setIsUpdateComplete })=>{
 
     const [directories, setDirectories] = useState<string[]>([]);
     const [newDirectory, setNewDirectory] = useState<string>('');
@@ -47,7 +48,10 @@ const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,s
     const moveFile = async()=>{
         setIsOpenMoveFile(false);
         if(newDirectory!=''){
-            await handleMoveFile(Array.from(selectedFiles.values()),newDirectory);
+            const status = await handleMoveFile(Array.from(selectedFiles.values()),newDirectory);
+            if(status){
+                setIsUpdateComplete(true);
+            }
         }
     }
 
