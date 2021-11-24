@@ -7,8 +7,6 @@ import Selection from './Selection';
 
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
-import HeaderContextMenu from '@component/HeaderContextMenu';
-import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
@@ -67,8 +65,6 @@ const FileList: React.FC<Props> = ({
 			return result;
 		});
 	};
-
-	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
 
 	return (
 		<Container className={className} ref={container}>

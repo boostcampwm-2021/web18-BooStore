@@ -3,21 +3,32 @@ import useContextMenu from '@component/hook/useContextMenu';
 import ContextDropdown from '@component/common/ContextDropdown';
 import { FileDTO, FileEditAction } from '@DTO';
 
+
 interface Props {
 	setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsOpenMoveFile: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedFiles: Map<string, FileDTO>;
 	setFiles?: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	show: boolean;
+    anchorPoint: {
+		x: number;
+		y: number;
+  }
 }
 const HeaderContextMenu: React.FC<Props> = ({
 	setIsOpenNewFolder,
 	selectedFiles,
 	setFiles = () => {},
+	setIsOpenMoveFile, show, anchorPoint
 }) => {
-	const { anchorPoint, show } = useContextMenu();
 
 	const addNewFolder = () => {
 		setIsOpenNewFolder(true);
 	};
+
+	const moveFile = ()=>{
+		setIsOpenMoveFile(true);
+	  }
 
 	const addStar = useCallback(() => {
 		const targetIds = [...selectedFiles.values()].map((file) => file._id);
@@ -51,6 +62,7 @@ const HeaderContextMenu: React.FC<Props> = ({
 		return (
 			<ContextDropdown top={anchorPoint.y} left={anchorPoint.x}>
 				<li onClick={addNewFolder}>새 폴더 만들기</li>
+				<li onClick={moveFile}>이동</li>
 				<li onClick={addStar}>중요 문서함에 추가</li>
 			</ContextDropdown>
 		);
