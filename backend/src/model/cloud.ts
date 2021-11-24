@@ -8,6 +8,7 @@ export interface ICloud {
 	ownerId: string;
 	contentType: string;
 	isDeleted: boolean;
+	isStar: boolean;
 	createdAt: string;
 	updatedAt: string;
 	deletedAt: Date;
@@ -46,6 +47,10 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 			type: Boolean,
 			default: false,
 		},
+		isStar: {
+			type: Boolean,
+			default: false,
+		},
 		deletedAt: {
 			type: Date,
 		},
@@ -55,5 +60,4 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 		timestamps: true,
 	}
 );
-
 export const Cloud = model<ICloudDoc>('Cloud', cloudSchema);

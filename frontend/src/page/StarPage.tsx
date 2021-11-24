@@ -1,20 +1,19 @@
-import React, { Key, useCallback, useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 
-import FileList from '@component/fileManagement/FileList';
-import FileMenu from '@component/fileManagement/FileMenuForMain';
+import FileList from '@component/fileManagement/FileListForStar';
+import FileMenu from '@component/fileManagement/FileMenuForStar';
 import Sidebar from '@component/layout/Sidebar';
 import Header from '@component/layout/Header';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
-import { getFiles } from '@util';
+import { getFiles, getAllStarFiles } from '@util';
 import { getCapacity } from 'api';
 
-import { ReactComponent as ArrowSvg } from '@asset/image/icons/icon_left_arrow.svg';
-import { useLocation } from 'react-router';
+import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
-interface MainPageProps {
+interface StarPageProps {
 	user: User;
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
@@ -26,47 +25,26 @@ interface DirectoryProps {
 	onClickDirectory: (relativePath: string) => Promise<void>;
 }
 
-const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDirectory }) => {
-	let relativePath: string = currentDir
-		.split('/')
-		.slice(0, idx + 1)
-		.join('/');
-	if (relativePath === '') {
-		relativePath = '/';
-	}
-
-	return (
-		<>
-			{idx != 0 && <ArrowSvg style={{ verticalAlign: 'middle' }} />}
-			<span onClick={() => onClickDirectory(relativePath)} style={{ cursor: 'pointer' }}>
-				{name}
-			</span>
-		</>
-	);
-};
-
-const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
+const StarPage: React.FC<StarPageProps> = ({ user, setUser }) => {
 	const [currentDir, setCurrentDir] = useState('/');
 	const [capacity, setCapacity] = useState<Capacity>({
 		currentCapacity: 0,
-		maxCapacity: 1024 * 1024 * 10,
+		maxCapacity: 1024 * 1024 * 1024,
 	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
 	const [selectedFiles, setSelectedFiles] = useState<Map<string, FileDTO>>(new Map());
 	const [isAscending, setIsAscending] = useState<boolean>(true);
-	const location = useLocation<{ currentDirectory: string | undefined }>();
 
 	const onClickDirectory = async (relativePath: string) => {
-		const files = await getFiles(relativePath, isAscending);
-		setFiles(files);
+		if (relativePath === '/') {
+			const files = await getAllStarFiles(relativePath, isAscending);
+			setFiles(files);
+		} else {
+			const files = await getFiles(relativePath, isAscending, false, false);
+			setFiles(files);
+		}
+		setSelectedFiles(new Map());
 		setCurrentDir(relativePath);
-		setSelectedFiles(new Map());
-	};
-
-	const updateFiles = async () => {
-		setSelectedFiles(new Map());
-		setFiles(await getFiles(currentDir, isAscending));
-		setCapacity(await getCapacity());
 	};
 
 	const getCurDirectoryComponent = useCallback(() => {
@@ -87,25 +65,30 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 			));
 	}, [currentDir]);
 
+	const updateFiles = async () => {
+		setSelectedFiles(new Map());
+		if (currentDir === '/') {
+			setFiles(await getAllStarFiles(currentDir, isAscending));
+		} else {
+			setFiles(await getFiles(currentDir, isAscending, false));
+		}
+		setCapacity(await getCapacity());
+	};
+
 	useEffect(() => {
 		updateFiles();
 	}, [currentDir, isAscending]);
-
-	useEffect(() => {
-		const currentDirectory = location.state?.currentDirectory;
-		setCurrentDir(currentDirectory ?? '/');
-	}, []);
 
 	return (
 		<>
 			<Header user={user} setUser={setUser} setCurrentDir={setCurrentDir} />
 			<Container>
-				<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir} />
+				<SidebarForTrash capacity={capacity} files={files} setCurrentDir={setCurrentDir} />
 				<InnerContainer>
 					<DirectorySection>
 						<Directory
 							idx={0}
-							name={'내 스토어'}
+							name={'중요 문서함'}
 							currentDir={currentDir}
 							onClickDirectory={onClickDirectory}
 							key={0}
@@ -113,15 +96,11 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						{getCurDirectoryComponent()}
 					</DirectorySection>
 					<FileMenu
-						showShareButton
-						capacity={capacity}
 						setCapacity={setCapacity}
 						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
-						currentDir={currentDir}
 						setFiles={setFiles}
 						files={files}
-						updateFiles={updateFiles}
 					/>
 					<StyledFileList
 						files={files}
@@ -132,10 +111,28 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						currentDirectory={currentDir}
 						isAscending={isAscending}
 						setIsAscending={setIsAscending}
-						updateFiles={updateFiles}
 					/>
 				</InnerContainer>
 			</Container>
+		</>
+	);
+};
+
+const Directory: React.FC<DirectoryProps> = ({ idx, name, currentDir, onClickDirectory }) => {
+	let relativePath: string = currentDir
+		.split('/')
+		.slice(0, idx + 1)
+		.join('/');
+	if (relativePath === '') {
+		relativePath = '/';
+	}
+
+	return (
+		<>
+			{idx != 0 && <img src={arrow} style={{ verticalAlign: 'middle' }}></img>}
+			<span onClick={() => onClickDirectory(relativePath)} style={{ cursor: 'pointer' }}>
+				{name}
+			</span>
 		</>
 	);
 };
@@ -146,7 +143,7 @@ const Container = styled.div`
 	overflow-y: hidden;
 `;
 
-const SidebarForMain = styled(Sidebar)`
+const SidebarForTrash = styled(Sidebar)`
 	flex: 1;
 `;
 
@@ -170,4 +167,4 @@ const StyledFileList = styled(FileList)`
 	flex: 1;
 `;
 
-export default MainPage;
+export default StarPage;

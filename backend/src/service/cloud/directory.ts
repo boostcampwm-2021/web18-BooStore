@@ -5,6 +5,7 @@ export interface FilesArg {
 	regex: string;
 	isAscending: boolean;
 	isDeleted: boolean;
+	isStar: boolean;
 }
 
 export interface FilteredFilesArg {
@@ -17,12 +18,13 @@ interface Directory {
 	name: string;
 }
 
-export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: FilesArg) => {
+export const getFiles = async ({ loginId, regex, isAscending, isDeleted, isStar }: FilesArg) => {
 	const files = await Cloud.find(
 		{
 			directory: { $regex: regex },
 			ownerId: loginId,
 			isDeleted,
+			isStar: { $in: isStar ? [true] : [true, false] },
 		},
 		{
 			directory: true,
@@ -32,6 +34,7 @@ export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: Files
 			updatedAt: true,
 			size: true,
 			ownerId: true,
+			isStar: true,
 		},
 		{ sort: { name: isAscending ? 'asc' : 'desc' } }
 	).exec();
@@ -51,6 +54,19 @@ export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
 		}
 	});
 	return filteredFolders.concat(filteredFiles);
+};
+
+export const splitFolderAndFile = (target: ICloud[]) => {
+	const files = [];
+	const folders = [];
+	target.map((file) => {
+		if (file.contentType === 'folder') {
+			folders.push(file);
+		} else {
+			files.push(file);
+		}
+	});
+	return [...folders, ...files];
 };
 
 export const getDirectoryList = async (loginId: string) => {

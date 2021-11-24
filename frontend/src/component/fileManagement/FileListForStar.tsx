@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-import File from './File';
+import File from './FileForStar';
 import { FileDTO } from '@DTO';
 import Selection from './Selection';
 

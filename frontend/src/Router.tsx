@@ -5,6 +5,7 @@ import Signup from './page/SignupPage';
 import Main from './page/MainPage';
 import { User } from './model';
 import TrashPage from '@page/TrashPage';
+import StarPage from '@page/StarPage';
 
 export type hasUserProps = {
 	user: User | null;
@@ -19,6 +20,9 @@ const Router: React.FC<hasUserProps> = ({ user, setUser }) => {
 				</Route>
 				<Route path="/trash" exact>
 					<TrashPage user={user} setUser={setUser} />
+				</Route>
+				<Route path="/star" exact>
+					<StarPage user={user} setUser={setUser} />
 				</Route>
 				<Redirect to="/" />
 			</Switch>
