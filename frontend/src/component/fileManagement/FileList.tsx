@@ -84,7 +84,8 @@ const FileList: React.FC<Props> = ({
 				<HeaderContextMenu
 					setIsOpenNewFolder={setIsOpenNewFolder}
 					selectedFiles={selectedFiles}
-					updateFiles={updateFiles}
+					setFiles={setFiles}
+					curDir={currentDirectory}
 				/>
 				<NewFolderModal
 					isOpenNewFolder={isOpenNewFolder}

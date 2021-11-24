@@ -22,7 +22,6 @@ import {
 	createAncestorsFolder,
 	getNewFolder,
 	getTrashFiles,
-	updateStarStatus,
 } from '../service/cloud';
 
 const router = express.Router();

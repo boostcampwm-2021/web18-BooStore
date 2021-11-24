@@ -156,7 +156,6 @@ const FileMenuForMain: React.FC<Props> = ({
 			file = trashFiles.find((file) => file.name === folderName);
 			if (file === undefined) {
 				return folderName;
-				
 			}
 		}
 

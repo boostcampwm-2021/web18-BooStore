@@ -5,7 +5,6 @@ import { FileDTO, FileEditAction } from '@DTO';
 import FileIcon from './FileIcon';
 import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
 import { useLocation } from 'react-router';
-import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
 
 interface Props {
 	file: FileDTO;

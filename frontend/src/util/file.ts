@@ -17,6 +17,7 @@ export const getFiles = (
 		})
 		.then((data) => {
 			const files: FileDTO[] = data;
+			console.log(files);
 			return files;
 		});
 };
