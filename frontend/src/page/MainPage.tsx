@@ -5,6 +5,8 @@ import FileList from '@component/fileManagement/FileList';
 import FileMenu from '@component/fileManagement/FileMenuForMain';
 import Sidebar from '@component/layout/Sidebar';
 import Header from '@component/layout/Header';
+import ContextMenu from '@component/common/ContextMenu';
+import NewFolderModal from '@component/fileManagement/NewFolderModal';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
@@ -96,12 +98,29 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 		setCurrentDir(currentDirectory ?? '/');
 	}, []);
 
+	const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+	const [show, setShow] = useState(false);
+
+	const handleContextMenu = useCallback(
+		(event) => {
+			event.preventDefault();
+			setAnchorPoint({ x: event.pageX, y: event.pageY });
+			setShow(true);
+		},
+		[setShow, setAnchorPoint]
+	);
+
+	const handleClick = useCallback(() => (show ? setShow(false) : null), [show]);
+
+	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
+	const [isOpenMoveFile, setIsOpenMoveFile] = useState(false);
+
 	return (
 		<>
 			<Header user={user} setUser={setUser} setCurrentDir={setCurrentDir} />
 			<Container>
 				<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir} />
-				<InnerContainer>
+				<InnerContainer onClick={handleClick} onContextMenu={handleContextMenu}>
 					<DirectorySection>
 						<Directory
 							idx={0}
@@ -132,6 +151,19 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						currentDirectory={currentDir}
 						isAscending={isAscending}
 						setIsAscending={setIsAscending}
+					/>
+					<ContextMenu 
+						setIsOpenNewFolder={setIsOpenNewFolder} 
+						setIsOpenMoveFile={setIsOpenMoveFile}
+						show={show}
+						anchorPoint={anchorPoint}
+					/>
+					<NewFolderModal
+						isOpenNewFolder={isOpenNewFolder}
+						setIsOpenNewFolder={setIsOpenNewFolder}
+						setFiles={setFiles}
+						files={files}
+						curDir={currentDir}
 					/>
 				</InnerContainer>
 			</Container>

@@ -7,8 +7,6 @@ import Selection from './Selection';
 
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
-import HeaderContextMenu from '@component/HeaderContextMenu';
-import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
@@ -67,8 +65,6 @@ const FileList: React.FC<Props> = ({
 		});
 	};
 
-	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
-
 	return (
 		<Container className={className} ref={container}>
 			<FileHeader>
@@ -80,14 +76,6 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
-				<HeaderContextMenu setIsOpenNewFolder={setIsOpenNewFolder} />
-				<NewFolderModal
-					isOpenNewFolder={isOpenNewFolder}
-					setIsOpenNewFolder={setIsOpenNewFolder}
-					setFiles={setFiles}
-					files={files}
-					curDir={currentDirectory}
-				/>
 			</FileHeader>
 			<Files>
 				<Selection

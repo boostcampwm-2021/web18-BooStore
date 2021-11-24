@@ -20,6 +20,7 @@ const ContextDropdown = styled.ul<Props>`
     transition: opacity 0.5s linear;
     top: ${(props) => props.top}px;
     left: ${(props) => props.left}px;
+    z-index: 3;
 `;
 
 export default ContextDropdown;
