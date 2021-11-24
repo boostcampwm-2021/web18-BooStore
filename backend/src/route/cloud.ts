@@ -73,7 +73,6 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 router.get('/download', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { current_dir, files, folders } = req.query;
-
 	if (current_dir === undefined || files === undefined || folders === undefined) {
 		return res.status(400).send();
 	}
@@ -85,8 +84,8 @@ router.get('/download', isAuthenticated, async (req, res) => {
 		directories: typeof folders === 'string' ? [folders] : (folders as Array<string>),
 	});
 	await downloadFiles({ downloadList: metadataList, currentDir: current_dir as string });
-	const targetFolderPath = path.join(path.resolve(), 'temp/', loginId);
-	const zipFolderPath = path.join(path.resolve(), 'temp/', `${loginId}.zip`);
+	const targetFolderPath = path.join(path.resolve(), 'temp', loginId);
+	const zipFolderPath = path.join(path.resolve(), 'temp', `${loginId}.zip`);
 
 	createZipFile({ targetFolderPath, zipFolderPath });
 	res.download(zipFolderPath, `${loginId}.zip`, (err) => {
