@@ -25,7 +25,6 @@ import {
 	updateDir,
 } from '../service/cloud';
 
-
 const router = express.Router();
 
 router.get('/validate', isAuthenticated, async (req, res) => {
