@@ -102,8 +102,8 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 						type="password"
 					/>
 				</InputContainer>
-				<Button onClick={onClickLogin}>login</Button>
-				<SignupButton onClick={onClickSignup}>Sign up</SignupButton>
+				<Button onClick={onClickLogin}> 로그인 </Button>
+				<SignupButton onClick={onClickSignup}> 회원가입 </SignupButton>
 				<FailureModal
 					isOpen={isOpenFailureModal}
 					setOpen={setOpenFailureModal}
@@ -118,7 +118,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 
 const LoginContainer = styled.div`
 	position: absolute;
-	top: 300px;
+	top: 22%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
