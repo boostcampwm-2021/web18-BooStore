@@ -22,7 +22,7 @@ interface UlProps{
 }
 
 
-const HeaderContextMenu: React.FC<Props> = ({
+const ContextMenu: React.FC<Props> = ({
 	setIsOpenNewFolder, setIsOpenMoveFile, show, anchorPoint, selectedFiles, setFiles=()=>{}
 }) => {
 
@@ -36,7 +36,6 @@ const HeaderContextMenu: React.FC<Props> = ({
       setIsOpenMoveFile(true);
     }
   }
-<<<<<<< HEAD
 
 	const addStar = useCallback(() => {
 		const targetIds = [...selectedFiles.values()].map((file) => file._id);
@@ -77,30 +76,6 @@ const HeaderContextMenu: React.FC<Props> = ({
 	return <></>;
 };
 
-const StyledLi = styled.li<UlProps>`
-	color: ${
-	(props)=>{
-		if(props.size==0){
-		return props.theme.color.Line;
-		}
-	}
-	}
-`;
-
-export default HeaderContextMenu;
-=======
-  
-    if (show) {
-      return (
-        <ContextDropdown top={anchorPoint.y} left={anchorPoint.x} >
-          <li onClick={addNewFolder}>새 폴더 만들기</li>
-          <StyledLi onClick={()=>moveFile(selectedFiles.size)} size={selectedFiles.size}>이동</StyledLi>
-        </ContextDropdown>
-      );
-    }
-    return <></>;
-  };
-
   const StyledLi = styled.li<UlProps>`
     color: ${
       (props)=>{
@@ -110,6 +85,5 @@ export default HeaderContextMenu;
       }
     }
   `;
-  
+
   export default ContextMenu;
->>>>>>> 328b3d93e79680beb94043408d5a85cea4dbc107
