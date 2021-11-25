@@ -20,23 +20,21 @@ interface UlProps {
 	size: number;
 }
 
-const HeaderContextMenu: React.FC<Props> = ({
-	setIsOpenNewFolder,
-	setIsOpenMoveFile,
-	show,
-	anchorPoint,
-	selectedFiles,
-	setFiles = () => {},
+
+
+const ContextMenu: React.FC<Props> = ({
+	setIsOpenNewFolder, setIsOpenMoveFile, show, anchorPoint, selectedFiles, setFiles=()=>{}
 }) => {
 	const addNewFolder = () => {
 		setIsOpenNewFolder(true);
 	};
 
-	const moveFile = (selectedFilesSize: number) => {
-		if (selectedFilesSize != 0) {
-			setIsOpenMoveFile(true);
-		}
-	};
+	const moveFile = (selectedFilesSize: number)=>
+  {
+    if(selectedFilesSize!=0){
+      setIsOpenMoveFile(true);
+    }
+  }
 
 	const addStar = useCallback(() => {
 		const targetIds = [...selectedFiles.values()].map((file) => file._id);
@@ -78,12 +76,15 @@ const HeaderContextMenu: React.FC<Props> = ({
 	return <></>;
 };
 
-const StyledLi = styled.li<UlProps>`
-	color: ${(props) => {
-		if (props.size == 0) {
-			return props.theme.color.Line;
-		}
-	}};
-`;
+  const StyledLi = styled.li<UlProps>`
+    color: ${
+      (props)=>{
+        if(props.size==0){
+          return props.theme.color.Line;
+        }
+      }
+    }
+  `;
 
-export default HeaderContextMenu;
+  export default ContextMenu;
+

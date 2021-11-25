@@ -35,19 +35,10 @@ const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,s
         setNewDirectory(directory);
     }
 
-    const editDir = (directory: string)=>{
-        if(directory==='/') return '내 스토어';
-        else{
-            return directory.split('/').slice(-1)[0];
-        }
-    }
-
     const moveFile = async()=>{
         setIsOpenMoveFile(false);
-        console.log("selectedDir:"+ newDirectory);
         if(newDirectory!=''){
             const status = await handleMoveFile(Array.from(selectedFiles.values()),newDirectory);
-            console.log('status: '+status);
             if(status){
                 setFiles(await getFiles(curDir, true));
             }
@@ -58,7 +49,7 @@ const MoveFileModal: React.FC<Props> = ({onCloseButton = true, isOpenMoveFile ,s
         return directories.map((directory:string) => {
             return (
                 <StyledDiv key={directory} onClick={()=>{chooseNewDir(directory);}} >
-                    { editDir(directory) }
+                    { directory==='/'? '/내 스토어': directory }
                 </StyledDiv>
             )
         })
