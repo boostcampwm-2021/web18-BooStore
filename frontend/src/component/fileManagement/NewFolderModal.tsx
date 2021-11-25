@@ -37,11 +37,11 @@ const NewFolderModal: React.FC<Props> = ({
 	}, [onCloseButton]);
 
 	const makeNewFolder = async () => {
+		onRequestClose();
 		const notOverlappedName = await getNotOverlappedName(curDir, newFolderName);
 		await handleNewFolder(notOverlappedName, curDir);
 		setFiles(await getFiles(curDir, true));
 		setNewFolderName('');
-		onRequestClose();
 	};
 
 	const onInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
