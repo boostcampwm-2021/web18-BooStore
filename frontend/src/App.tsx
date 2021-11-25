@@ -34,6 +34,10 @@ const App: React.FC = () => {
 				
 				console.error(err);
 			});
+
+			document.addEventListener('contextmenu',(e) => {
+				e.preventDefault();
+			})
 	}, []);
 
 	return (

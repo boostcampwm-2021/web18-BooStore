@@ -106,9 +106,9 @@ const Profile = styled(profile)`
 `;
 const ProfileModal = styled.div`
 	position: absolute;
-    top: 150%;
-    right: 0;
-	z-index: 2;
+    top: 120%;
+    right: 20px;
+	z-index: 6;
     
     border: 1px solid ${(props) => props.theme.color.Line};
     border-radius: 8px;

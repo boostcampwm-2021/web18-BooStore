@@ -11,6 +11,7 @@ const GlobalStyle = createGlobalStyle`
  
 	* {
 		box-sizing: border-box;
+	}
         
     a { text-decoration: none; }
     a:link { text-decoration: none; }
@@ -18,7 +19,9 @@ const GlobalStyle = createGlobalStyle`
     a:hover { text-decoration: none; }
     a:focus { text-decoration: none; }
 
-	}     
+	button {
+		cursor: pointer;
+	}
 `;
 
 export default GlobalStyle;

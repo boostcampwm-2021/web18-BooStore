@@ -5,6 +5,7 @@ export interface FilesArg {
 	regex: string;
 	isAscending: boolean;
 	isDeleted: boolean;
+	isStar: boolean;
 }
 
 export interface FilteredFilesArg {
@@ -14,14 +15,16 @@ export interface FilteredFilesArg {
 
 interface Directory {
 	directory: string;
+	name: string;
 }
 
-export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: FilesArg) => {
-	const files = Cloud.find(
+export const getFiles = async ({ loginId, regex, isAscending, isDeleted, isStar }: FilesArg) => {
+	const files = await Cloud.find(
 		{
 			directory: { $regex: regex },
 			ownerId: loginId,
 			isDeleted,
+			isStar: { $in: isStar ? [true] : [true, false] },
 		},
 		{
 			directory: true,
@@ -31,6 +34,7 @@ export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: Files
 			updatedAt: true,
 			size: true,
 			ownerId: true,
+			isStar: true,
 		},
 		{ sort: { name: isAscending ? 'asc' : 'desc' } }
 	).exec();
@@ -38,37 +42,44 @@ export const getFiles = async ({ loginId, regex, isAscending, isDeleted }: Files
 };
 
 export const getFilteredFiles = ({ path, originFiles }: FilteredFilesArg) => {
-	const directories = [];
-	const splittedPath = path === '/' ? [''] : (path as string).split('/');
 	const filteredFiles = [];
 	const filteredFolders = [];
 	originFiles.map((file) => {
 		if (file.directory === path) {
-			filteredFiles.push(file);
-		} else {
-			const splittedDirectory = file.directory.split('/');
-			if (directories.indexOf(splittedDirectory[splittedPath.length]) === -1) {
-				directories.push(splittedDirectory[splittedPath.length]);
-				file.contentType = 'folder';
-				file.size = 0;
-				file.name = splittedDirectory[splittedPath.length];
-				file.directory = path;
+			if (file.contentType === 'folder') {
 				filteredFolders.push(file);
+			} else {
+				filteredFiles.push(file);
 			}
 		}
 	});
 	return filteredFolders.concat(filteredFiles);
 };
 
+export const splitFolderAndFile = (target: ICloud[]) => {
+	const files = [];
+	const folders = [];
+	target.map((file) => {
+		if (file.contentType === 'folder') {
+			folders.push(file);
+		} else {
+			files.push(file);
+		}
+	});
+	return [...folders, ...files];
+};
+
 export const getDirectoryList = async (loginId: string) => {
 	const allFiles = await Cloud.find(
 		{
 			ownerId: loginId,
+			contentType: 'folder',
 			isDeleted: false,
 		},
 		{
 			_id: false,
 			directory: true,
+			name: true,
 		}
 	);
 
@@ -78,10 +89,12 @@ export const getDirectoryList = async (loginId: string) => {
 
 const makeDirectoryToArrFormat = (allFiles: Directory[]) => {
 	const directorySet = new Set();
-	allFiles
-		.filter((file) => file.directory.length > 1)
-		.forEach((file) => {
-			directorySet.add(file.directory);
-		});
+	allFiles.forEach((file) => {
+		if (file.directory == '/') {
+			directorySet.add(file.directory + file.name);
+		} else {
+			directorySet.add(file.directory + '/' + file.name);
+		}
+	});
 	return Array.from(directorySet);
 };

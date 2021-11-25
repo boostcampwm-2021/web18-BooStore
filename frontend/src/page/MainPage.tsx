@@ -5,6 +5,9 @@ import FileList from '@component/fileManagement/FileList';
 import FileMenu from '@component/fileManagement/FileMenuForMain';
 import Sidebar from '@component/layout/Sidebar';
 import Header from '@component/layout/Header';
+import ContextMenu from '@component/common/ContextMenu';
+import NewFolderModal from '@component/fileManagement/NewFolderModal';
+import MoveFileModal from '@component/fileManagement/MoveFileModal';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
@@ -52,19 +55,19 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 		maxCapacity: 1024 * 1024 * 10,
 	});
 	const [files, setFiles] = useState<FileDTO[]>([]);
-	const [selectedFiles, setSelectedFiles] = useState<FileDTO[]>([]);
+	const [selectedFiles, setSelectedFiles] = useState<Map<string, FileDTO>>(new Map());
 	const [isAscending, setIsAscending] = useState<boolean>(true);
-	const location = useLocation<{ currentDirectory: string|undefined}>();
-
+	const location = useLocation<{ currentDirectory: string | undefined }>();
+	
 	const onClickDirectory = async (relativePath: string) => {
 		const files = await getFiles(relativePath, isAscending);
 		setFiles(files);
 		setCurrentDir(relativePath);
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const updateFiles = async () => {
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 		setFiles(await getFiles(currentDir, isAscending));
 		setCapacity(await getCapacity());
 	};
@@ -90,18 +93,34 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	useEffect(() => {
 		updateFiles();
 	}, [currentDir, isAscending]);
-	
 	useEffect(() => {
 		const currentDirectory = location.state?.currentDirectory;
 		setCurrentDir(currentDirectory ?? '/');
 	}, []);
+
+	const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+	const [show, setShow] = useState(false);
+
+	const handleContextMenu = useCallback(
+		(event) => {
+			event.preventDefault();
+			setAnchorPoint({ x: event.pageX, y: event.pageY });
+			setShow(true);
+		},
+		[setShow, setAnchorPoint]
+	);
+
+	const handleClick = useCallback(() => (show ? setShow(false) : null), [show]);
+
+	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
+	const [isOpenMoveFile, setIsOpenMoveFile] = useState(false);
 
 	return (
 		<>
 			<Header user={user} setUser={setUser} setCurrentDir={setCurrentDir} />
 			<Container>
 				<SidebarForMain capacity={capacity} files={files} setCurrentDir={setCurrentDir} />
-				<InnerContainer>
+				<InnerContainer onClick={handleClick} onContextMenu={handleContextMenu}>
 					<DirectorySection>
 						<Directory
 							idx={0}
@@ -113,7 +132,6 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						{getCurDirectoryComponent()}
 					</DirectorySection>
 					<FileMenu
-						showShareButton
 						capacity={capacity}
 						setCapacity={setCapacity}
 						selectedFiles={selectedFiles}
@@ -125,6 +143,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 					/>
 					<StyledFileList
 						files={files}
+						setFiles={setFiles}
 						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
 						setCurrentDir={setCurrentDir}
@@ -132,6 +151,28 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						isAscending={isAscending}
 						setIsAscending={setIsAscending}
 					/>
+					<ContextMenu 
+						setIsOpenNewFolder={setIsOpenNewFolder} 
+						setIsOpenMoveFile={setIsOpenMoveFile}
+						show={show}
+						anchorPoint={anchorPoint}
+						selectedFiles={selectedFiles}
+						setFiles={setFiles}
+					/>
+					<NewFolderModal
+						isOpenNewFolder={isOpenNewFolder}
+						setIsOpenNewFolder={setIsOpenNewFolder}
+						setFiles={setFiles}
+						files={files}
+						curDir={currentDir}
+					/>
+					{isOpenMoveFile && <MoveFileModal 
+						selectedFiles={selectedFiles}
+						isOpenMoveFile={isOpenMoveFile} 
+						setIsOpenMoveFile={setIsOpenMoveFile}
+						curDir={currentDir}
+						setFiles={setFiles}
+					/>}
 				</InnerContainer>
 			</Container>
 		</>
@@ -153,6 +194,7 @@ const InnerContainer = styled.div`
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	height: 100%;
 	overflow-y: hidden;
+	min-width: 1000px;
 
 	display: flex;
 	flex-direction: column;

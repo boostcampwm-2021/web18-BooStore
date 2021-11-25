@@ -9,12 +9,12 @@ import Button from '@component/common/Button';
 
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
-import { getCapacity } from 'api';
+import { getCapacity, removeFile, restoreTrashFile } from 'api';
 
 interface Props {
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
-	selectedFiles: FileDTO[];
-	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	selectedFiles: Map<string, FileDTO>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	files: FileDTO[];
 }
@@ -29,33 +29,10 @@ const FileMenuForTrash: React.FC<Props> = ({
 	const [isOnSelectAll, setOnSelectAll] = useState(false);
 
 	const onClickDelete = () => {
-		const ids = selectedFiles.map((file) => file._id);
+		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = selectedFiles
-			.filter((file) => file.contentType !== 'folder')
-			.map((file) => file._id);
-		const directories = selectedFiles
-			.filter((file) => file.contentType === 'folder')
-			.map((file) => {
-				const { directory, name } = file;
-				if (directory.endsWith('/')) {
-					return directory + name;
-				}
-				return `${directory}/${name}`;
-			});
-		const body = {
-			targetIds: targetIds,
-			directorys: directories,
-		};
-		fetch('/cloud/files', {
-			method: 'DELETE',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		})
+		removeFile(selectedFiles)
 			.then(async () => {
 				setCapacity(await getCapacity());
 			})
@@ -63,62 +40,41 @@ const FileMenuForTrash: React.FC<Props> = ({
 				console.error(err);
 			});
 
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const onClickRestore = () => {
-		const ids = selectedFiles.map((file) => file._id);
+		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = selectedFiles
-			.filter((file) => file.contentType !== 'folder')
-			.map((file) => file._id);
-		const directories = selectedFiles
-			.filter((file) => file.contentType === 'folder')
-			.map((file) => {
-				const { directory, name } = file;
-				if (directory.endsWith('/')) {
-					return directory + name;
-				}
-				return `${directory}/${name}`;
-			});
-		const body = {
-			targetIds: targetIds,
-			directorys: directories,
-			action: FileEditAction.restore,
-		};
-		fetch('/cloud/files', {
-			method: 'PUT',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+		restoreTrashFile(selectedFiles);
 
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const onClickSelectAll = useCallback(() => {
 		if (isOnSelectAll) {
-			setSelectedFiles([]);
+			setSelectedFiles(new Map());
+		} else {
+			const newMap = files.reduce((prev, file) => {
+				prev.set(file._id, file);
+				return prev;
+			}, new Map<string, FileDTO>());
+			setSelectedFiles(newMap);
 		}
-		else {
-			setSelectedFiles([ ...files ]);
-		}
-		
-		setOnSelectAll(prev => !prev);
-	}, [ files, selectedFiles, isOnSelectAll ]);
+
+		setOnSelectAll((prev) => !prev);
+	}, [files, selectedFiles, isOnSelectAll]);
 
 	return (
 		<Container>
 			<SelectAllBtn onClick={onClickSelectAll}>
 				{isOnSelectAll ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			</SelectAllBtn>
-			<DownloadButton onClick={onClickRestore} disabled={selectedFiles.length === 0}>
+			<DownloadButton onClick={onClickRestore} disabled={selectedFiles.size === 0}>
 				복원하기
 			</DownloadButton>
-			<DeleteButton onClick={onClickDelete} disabled={selectedFiles.length === 0}>
+			<DeleteButton onClick={onClickDelete} disabled={selectedFiles.size === 0}>
 				삭제하기
 			</DeleteButton>
 		</Container>
@@ -134,7 +90,8 @@ const Container = styled.div`
 
 const SelectAllBtn = styled.button`
 	cursor: pointer;
-
+	border: 1px solid ${(props)=> props.theme.color.Line};
+	border-radius: 4px;
 	padding: 0;
 	margin-right: 20px;
 

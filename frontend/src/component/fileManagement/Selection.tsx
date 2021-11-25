@@ -1,9 +1,18 @@
+import { throttle } from '@util/throttle';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
+/*
+ * selector: 선택 대상의 query selector
+ * addSelected: 선택 대상이 포함되면 실행되는 함수
+ * removeSelect: 선택 대상이 포함되지않은 경우 실행되는 함수
+ * scrollFrame: 만약 스크롤이 적용된 경우, 스크롤이 실행되는 엘리먼트
+ */
 interface SelectionProps {
+	selector: string;
 	addSelcted: (id: string) => void;
-	removeSelect: (id: string) => void;
+	removeSelected: (id: string) => void;
+	scrollFrame?: HTMLElement;
 }
 interface OffsetPosition {
 	ltX: number;
@@ -12,7 +21,13 @@ interface OffsetPosition {
 	rbY: number;
 }
 
-const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelect }) => {
+const Selection: React.FC<SelectionProps> = ({
+	children,
+	selector,
+	addSelcted,
+	removeSelected,
+	scrollFrame,
+}) => {
 	const [point, setPoint] = useState({
 		startX: 0,
 		startY: 0,
@@ -22,20 +37,29 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 	const [isDraging, setDraging] = useState(false);
 	const container = useRef<HTMLDivElement>(null);
 
-	const getFileElements = () => container.current?.querySelectorAll('.file');
-	const getOffsetPosition = (target: HTMLDivElement, pageX: number, pageY: number) => {
+	const getElements = () => container.current?.querySelectorAll(selector);
+	const getOffsetPosition = (
+		offsetLeft: number,
+		offsetTop: number,
+		pageX: number,
+		pageY: number
+	) => {
 		return {
-			offsetX: pageX - target.offsetLeft,
-			offsetY: pageY - target.offsetTop,
+			offsetX: pageX - offsetLeft + (scrollFrame?.scrollLeft ?? 0),
+			offsetY: pageY - offsetTop + (scrollFrame?.scrollTop ?? 0),
 		};
 	};
 
 	const onStartDrag = (event: MouseEvent) => {
+		if (event.button !== 0) {
+			return;
+		}
 		if (!container.current || !container.current.contains(event.target as Element)) {
 			return;
 		}
 		const { pageX, pageY } = event;
-		const { offsetX, offsetY } = getOffsetPosition(container.current, pageX, pageY);
+		const { offsetLeft, offsetTop } = container.current;
+		let { offsetX, offsetY } = getOffsetPosition(offsetLeft, offsetTop, pageX, pageY);
 
 		setPoint({
 			startX: offsetX,
@@ -48,14 +72,17 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 	const onEndDrag = (event: MouseEvent) => {
 		setDraging(false);
 	};
-	const onChangeBox = useCallback(
-		(event: MouseEvent) => {
-			if (!container.current || !isDraging) {
-				return;
-			}
-			const { pageX, pageY } = event;
-			const { offsetWidth, offsetHeight } = container.current;
-			let { offsetX, offsetY } = getOffsetPosition(container.current, pageX, pageY);
+
+	const throttledChangeBox = throttle(
+		(
+			pageX: number,
+			pageY: number,
+			offsetLeft: number,
+			offsetTop: number,
+			offsetWidth: number,
+			offsetHeight: number
+		) => {
+			let { offsetX, offsetY } = getOffsetPosition(offsetLeft, offsetTop, pageX, pageY);
 			if (offsetX < 0) {
 				offsetX = 0;
 			} else if (offsetX > offsetWidth) {
@@ -70,33 +97,49 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 			setPoint((prev) => ({ ...prev, endX: offsetX, endY: offsetY }));
 
 			selectRange({
-				ltX: Math.min(point.startX, point.endX),
-				ltY: Math.min(point.startY, point.endY),
-				rbX: Math.max(point.startX, point.endX),
-				rbY: Math.max(point.startY, point.endY),
+				ltX: Math.min(point.startX, offsetX),
+				ltY: Math.min(point.startY, offsetY),
+				rbX: Math.max(point.startX, offsetX),
+				rbY: Math.max(point.startY, offsetY),
 			});
 		},
-		[isDraging, children, point]
+		5
 	);
-	const selectRange = ({ ltY, ltX, rbY, rbX }: OffsetPosition) => {
-		const fileElements = getFileElements();
 
-		fileElements?.forEach((tmp) => {
-			const ele = tmp as HTMLElement;
-
-			const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = ele;
-			if (
-				offsetTop > rbY ||
-				offsetTop + offsetHeight < ltY ||
-				offsetLeft > rbX ||
-				offsetLeft + offsetWidth < ltX
-			) {
-				return removeSelect(ele.dataset.id!);
+	const onChangeBox = useCallback(
+		(event: MouseEvent) => {
+			if (!container.current || !isDraging) {
+				return;
 			}
+			const { pageX, pageY } = event;
+			const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = container.current;
 
-			addSelcted(ele.dataset.id!);
-		});
-	};
+			throttledChangeBox(pageX, pageY, offsetLeft, offsetTop, offsetWidth, offsetHeight);
+		},
+		[isDraging, addSelcted, removeSelected]
+	);
+	const selectRange = useCallback(
+		({ ltY, ltX, rbY, rbX }: OffsetPosition) => {
+			const fileElements = getElements();
+
+			fileElements?.forEach((tmp) => {
+				const ele = tmp as HTMLElement;
+
+				const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = ele;
+				if (
+					offsetTop > rbY ||
+					offsetTop + offsetHeight < ltY ||
+					offsetLeft > rbX ||
+					offsetLeft + offsetWidth < ltX
+				) {
+					return removeSelected(ele.dataset.id!);
+				}
+
+				addSelcted(ele.dataset.id!);
+			});
+		},
+		[addSelcted, removeSelected]
+	);
 
 	useEffect(() => {
 		window.addEventListener('mousemove', onChangeBox);
@@ -104,7 +147,7 @@ const Selection: React.FC<SelectionProps> = ({ children, addSelcted, removeSelec
 		return () => {
 			window.removeEventListener('mousemove', onChangeBox);
 		};
-	}, [isDraging, children, point]);
+	}, [isDraging, addSelcted]);
 
 	useEffect(() => {
 		window.addEventListener('mousedown', onStartDrag);
@@ -140,7 +183,7 @@ const DragBox = styled.div.attrs<OffsetPosition>(({ ltY, ltX, rbY, rbX }) => ({
 		left: `${ltX}px`,
 		width: `${rbX - ltX}px`,
 		height: `${rbY - ltY}px`,
-		zIndex: 99,
+		zIndex: 2,
 	},
 }))<OffsetPosition>`
 	position: absolute;

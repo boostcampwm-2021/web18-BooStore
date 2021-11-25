@@ -9,16 +9,18 @@ import Button from '@component/common/Button';
 
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
+import { moveFileToTrash } from '@api';
+import { getFiles, getNotOverlappedName } from '@util';
 
 interface Props {
 	showShareButton?: boolean;
 	capacity: Capacity;
 	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
-	selectedFiles: FileDTO[];
-	setSelectedFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	selectedFiles: Map<string, FileDTO>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	currentDir: string;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
-	files: FileDTO[]
+	files: FileDTO[];
 	updateFiles?: Function;
 }
 
@@ -71,7 +73,7 @@ const FileMenuForMain: React.FC<Props> = ({
 	};
 
 	const onClickDownload = async () => {
-		const targetIds = selectedFiles
+		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)
 			.reduce((acc, cur) => {
@@ -79,7 +81,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			}, '');
 		const filesQuery = targetIds === '' ? 'files=&' : targetIds;
 
-		const directories = selectedFiles
+		const directories = [...selectedFiles.values()]
 			.filter((file) => file.contentType === 'folder')
 			.map((file) => {
 				return file.name;
@@ -125,37 +127,13 @@ const FileMenuForMain: React.FC<Props> = ({
 			});
 	};
 
-	const onClickDelete = () => {
-		const ids = selectedFiles.map((file) => file._id);
+	const onClickDelete = async () => {
+		const ids = [...selectedFiles.keys()];
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
-		const targetIds = selectedFiles
-			.filter((file) => file.contentType !== 'folder')
-			.map((file) => file._id);
-		const directorys = selectedFiles
-			.filter((file) => file.contentType === 'folder')
-			.map((file) => {
-				const { directory, name } = file;
-				if (directory.endsWith('/')) {
-					return directory + name;
-				}
-				return `${directory}/${name}`;
-			});
-		const body = {
-			targetIds: targetIds,
-			directorys: directorys,
-			action: FileEditAction.trash,
-		};
-		fetch('/cloud/files', {
-			method: 'PUT',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+		await moveFileToTrash(selectedFiles);
 
-		setSelectedFiles([]);
+		setSelectedFiles(new Map());
 	};
 
 	const validateSize = async (totalSize: number) => {
@@ -174,6 +152,36 @@ const FileMenuForMain: React.FC<Props> = ({
 	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
 		const formData = new FormData();
 
+		const relativePaths: Map<string, string> = new Map();
+		if (selectedUploadFiles[0].webkitRelativePath != '') {
+			const relativePath = selectedUploadFiles[0].webkitRelativePath;
+			const createdFolderName = relativePath.split('/')[0];
+			const notOverlappedName = await getNotOverlappedName(currentDir, createdFolderName);
+
+			if (createdFolderName === notOverlappedName) {
+				selectedUploadFiles.forEach((file) => {
+					const { webkitRelativePath: wRP, name } = file;
+
+					relativePaths.set(name, wRP);
+				});
+			} else {
+				selectedUploadFiles.forEach((file) => {
+					const { webkitRelativePath: wRP, name } = file;
+
+					relativePaths.set(
+						name,
+						`${notOverlappedName}/${wRP.split('/').slice(1).join('/')}`
+					);
+				});
+			}
+		} else {
+			selectedUploadFiles.forEach((file) => {
+				const { webkitRelativePath: wRP, name } = file;
+
+				relativePaths.set(name, wRP);
+			});
+		}
+
 		formData.append('rootDirectory', currentDir);
 		let metaData: any = {};
 		let sectionSize = 0;
@@ -186,7 +194,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			setProgressModalText(name);
 			setProcessedFileSize((prev) => prev + size);
 			formData.append('uploadFiles', file, name);
-			metaData[file.name] = file.webkitRelativePath;
+			metaData[name] = relativePaths.get(name);
 
 			// 1MB 단위로 보냄
 			if (sectionSize >= 1024 * 1024 || processedSize == totalSize) {
@@ -243,14 +251,17 @@ const FileMenuForMain: React.FC<Props> = ({
 
 	const onClickSelectAll = useCallback(() => {
 		if (isOnSelectAll) {
-			setSelectedFiles([]);
+			setSelectedFiles(new Map());
+		} else {
+			const newMap = files.reduce((prev, file) => {
+				prev.set(file._id, file);
+				return prev;
+			}, new Map<string, FileDTO>());
+			setSelectedFiles(newMap);
 		}
-		else {
-			setSelectedFiles([ ...files ]);
-		}
-		
-		setOnSelectAll(prev => !prev);
-	}, [ files, isOnSelectAll ]);
+
+		setOnSelectAll((prev) => !prev);
+	}, [files, isOnSelectAll]);
 
 	useEffect(() => {
 		if (selectedUploadFiles === null || selectedUploadFiles.length === 0) {
@@ -260,30 +271,28 @@ const FileMenuForMain: React.FC<Props> = ({
 		handleFileUpload();
 		setSelectedUploadFiles(null);
 	}, [selectedUploadFiles]);
-	
+
 	useEffect(() => {
 		if (files.length === 0) {
 			setOnSelectAll(false);
-		}
-		else if (selectedFiles.length === files.length) {
+		} else if (selectedFiles.size === files.length) {
 			setOnSelectAll(true);
-		}
-		else {
+		} else {
 			setOnSelectAll(false);
 		}
 	}, [selectedFiles, files]);
-	
+
 	return (
 		<Container>
 			<SelectAllBtn onClick={onClickSelectAll}>
 				{isOnSelectAll ? <ToggleOnSvg /> : <ToggleOffSvg />}
 			</SelectAllBtn>
-			{selectedFiles.length > 0 ? (
+			{selectedFiles.size > 0 ? (
 				<DownloadButton onClick={onClickDownload}> 다운로드 </DownloadButton>
 			) : (
 				<UploadButton nameOfToggleButton={'올리기'} items={uploadDropBoxItems} />
 			)}
-			{selectedFiles.length > 0 && (
+			{selectedFiles.size > 0 && (
 				<DeleteButton onClick={onClickDelete}> 삭제하기 </DeleteButton>
 			)}
 			{showShareButton && <ShareButton> 공유하기 </ShareButton>}
@@ -324,10 +333,11 @@ const Container = styled.div`
 
 const SelectAllBtn = styled.button`
 	cursor: pointer;
-
+	border: 1px solid ${(props)=> props.theme.color.Line};
+	border-radius: 4px;
 	padding: 0;
 	margin-right: 20px;
-
+	
 	display: flex;
 	justify-content: center;
 	align-items: center;

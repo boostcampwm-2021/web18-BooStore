@@ -7,4 +7,5 @@ export interface FileDTO {
 	updatedAt: string;
 	size: number;
 	ownerId: string;
+	isStar: boolean;
 }

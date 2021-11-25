@@ -49,7 +49,7 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 
 ## 📜 API 문서
 
-[PostMan Docs](https://documenter.getpostman.com/view/13315664/UVC6j6rk)
+[PostMan Docs](https://documenter.getpostman.com/view/13315664/UVJZnHu8)
 
 ## 💾 Deploy Process
 
@@ -77,3 +77,4 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 - [2주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/2%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
 - [3주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/3%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
 - [4주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/4%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
+- [5주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/5%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)

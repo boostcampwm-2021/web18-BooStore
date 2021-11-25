@@ -7,8 +7,10 @@ import {
 	FilesArg,
 	FilteredFilesArg,
 	getDirectoryList,
+	splitFolderAndFile,
 } from '../service/cloud';
 import { isAuthenticated } from '../middleware';
+import { applyEscapeString } from '../util';
 
 const router = express.Router();
 
@@ -28,7 +30,7 @@ router.get('/capacity', isAuthenticated, async (req, res) => {
 });
 
 router.get('/files', isAuthenticated, async (req, res) => {
-	const { path, isAscending, isDeleted } = req.query;
+	const { path, isAscending, isDeleted, isStar } = req.query;
 	const { loginId } = req.user;
 	if (path === undefined) {
 		return res.status(400).send();
@@ -39,9 +41,12 @@ router.get('/files', isAuthenticated, async (req, res) => {
 
 	const filesArg: FilesArg = {
 		loginId: loginId,
-		regex: `(^${path}$)|(^${path === '/' ? '' : path}/(.*)?$)`,
+		regex: `(^${applyEscapeString(path as string)}$)|(^${
+			path === '/' ? '' : applyEscapeString(path as string)
+		}/(.*)?$)`,
 		isAscending: isAscending === 'true',
 		isDeleted: isDeleted === 'true',
+		isStar: isStar === 'true',
 	};
 
 	const tempFiles = await getFiles(filesArg);
@@ -60,4 +65,29 @@ router.get('/directory', isAuthenticated, async (req, res) => {
 	const directoryList = await getDirectoryList(loginId);
 	return res.json(directoryList);
 });
+
+router.get('/starfiles', isAuthenticated, async (req, res) => {
+	const { path, isAscending } = req.query;
+	const { loginId } = req.user;
+	if (path === undefined) {
+		return res.status(400).send();
+	}
+	if (path === '') {
+		return res.status(400).send();
+	}
+
+	const filesArg: FilesArg = {
+		loginId: loginId,
+		regex: `.+`,
+		isAscending: isAscending === 'true',
+		isDeleted: false,
+		isStar: true,
+	};
+
+	const tempFiles = await getFiles(filesArg);
+	const data = splitFolderAndFile(tempFiles);
+
+	return res.status(200).json(data);
+});
+
 export default router;

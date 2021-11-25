@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-import File from './File';
+import File from './FileForStar';
 import { FileDTO } from '@DTO';
 import Selection from './Selection';
 
@@ -21,7 +21,7 @@ interface Props {
 	isAscending: boolean;
 	setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
 	className?: string;
-
+	updateFiles?: Function;
 }
 
 const FileList: React.FC<Props> = ({
@@ -35,7 +35,7 @@ const FileList: React.FC<Props> = ({
 	selectedFiles,
 	setIsAscending,
 	className,
-
+	updateFiles = () => {},
 }) => {
 	const container = useRef<HTMLDivElement>(null);
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -67,6 +67,8 @@ const FileList: React.FC<Props> = ({
 			return result;
 		});
 	};
+
+	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
 
 	return (
 		<Container className={className} ref={container}>

@@ -1,18 +1,19 @@
-import React, { Key, useCallback, useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 
-import FileList from '@component/fileManagement/FileList';
-import FileMenu from '@component/fileManagement/FileMenuForTrash';
+import FileList from '@component/fileManagement/FileListForStar';
+import FileMenu from '@component/fileManagement/FileMenuForStar';
 import Sidebar from '@component/layout/Sidebar';
 import Header from '@component/layout/Header';
 import { User } from '@model';
 import { Capacity } from '@model';
 import { FileDTO } from '@DTO';
-import { getCapacity, getTrashFiles } from 'api';
+import { getFiles, getAllStarFiles } from '@util';
+import { getCapacity } from 'api';
 
 import arrow from '@asset/image/icons/icon_left_arrow.svg';
 
-interface TrashPageProps {
+interface StarPageProps {
 	user: User;
 	setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
@@ -24,7 +25,7 @@ interface DirectoryProps {
 	onClickDirectory: (relativePath: string) => Promise<void>;
 }
 
-const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
+const StarPage: React.FC<StarPageProps> = ({ user, setUser }) => {
 	const [currentDir, setCurrentDir] = useState('/');
 	const [capacity, setCapacity] = useState<Capacity>({
 		currentCapacity: 0,
@@ -35,10 +36,14 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 
 	const onClickDirectory = async (relativePath: string) => {
+		if (relativePath === '/') {
+			const files = await getAllStarFiles(relativePath, isAscending);
+			setFiles(files);
+		} else {
+			const files = await getFiles(relativePath, isAscending, false, false);
+			setFiles(files);
+		}
 		setSelectedFiles(new Map());
-
-		const files = await getTrashFiles();
-		setFiles(files);
 		setCurrentDir(relativePath);
 	};
 
@@ -62,7 +67,11 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 
 	const updateFiles = async () => {
 		setSelectedFiles(new Map());
-		setFiles(await getTrashFiles());
+		if (currentDir === '/') {
+			setFiles(await getAllStarFiles(currentDir, isAscending));
+		} else {
+			setFiles(await getFiles(currentDir, isAscending, false));
+		}
 		setCapacity(await getCapacity());
 	};
 
@@ -79,7 +88,7 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 					<DirectorySection>
 						<Directory
 							idx={0}
-							name={'휴지통'}
+							name={'중요 문서함'}
 							currentDir={currentDir}
 							onClickDirectory={onClickDirectory}
 							key={0}
@@ -96,7 +105,6 @@ const TrashPage: React.FC<TrashPageProps> = ({ user, setUser }) => {
 					<StyledFileList
 						files={files}
 						setFiles={setFiles}
-						canDirectoryClick={false}
 						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
 						setCurrentDir={setCurrentDir}
@@ -160,4 +168,4 @@ const StyledFileList = styled(FileList)`
 	flex: 1;
 `;
 
-export default TrashPage;
+export default StarPage;
