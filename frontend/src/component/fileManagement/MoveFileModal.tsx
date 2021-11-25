@@ -12,6 +12,7 @@ interface Props {
 	isOpenMoveFile: boolean;
 	setIsOpenMoveFile: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedFiles: Map<string, FileDTO>;
+	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	curDir: string;
 }
@@ -21,6 +22,7 @@ const MoveFileModal: React.FC<Props> = ({
 	isOpenMoveFile,
 	setIsOpenMoveFile,
 	selectedFiles,
+	setSelectedFiles,
 	curDir,
 	setFiles,
 }) => {
@@ -71,6 +73,7 @@ const MoveFileModal: React.FC<Props> = ({
 			const status = await handleMoveFile(targetIds, newDirectory, curDir);
 			if (status) {
 				setFiles(await getFiles(curDir, true));
+				setSelectedFiles(new Map<string, FileDTO>());
 			}
 		}
 	};

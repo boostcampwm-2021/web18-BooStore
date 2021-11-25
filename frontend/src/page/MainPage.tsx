@@ -168,6 +168,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 					/>
 					{isOpenMoveFile && <MoveFileModal 
 						selectedFiles={selectedFiles}
+						setSelectedFiles={setSelectedFiles}
 						isOpenMoveFile={isOpenMoveFile} 
 						setIsOpenMoveFile={setIsOpenMoveFile}
 						curDir={currentDir}
