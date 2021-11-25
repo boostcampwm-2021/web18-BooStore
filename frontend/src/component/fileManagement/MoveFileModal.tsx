@@ -152,7 +152,7 @@ const DirectoryCompContainer = styled.li<{ selected: boolean }>`
 	padding: 10px 0px 10px 0px;
 	width: 100%;
 	&:hover {
-		background-color: ${(props) => props.theme.color.Line};
+		background-color: ${(props) => !props.selected && props.theme.color.SecondaryBG};
 	}
 	background-color: ${(props) => props.selected && props.theme.color.Line};
 `;
