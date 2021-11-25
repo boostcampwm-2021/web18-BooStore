@@ -194,6 +194,7 @@ const InnerContainer = styled.div`
 	background-color: ${(props) => props.theme.color.PrimaryBG};
 	height: 100%;
 	overflow-y: hidden;
+	min-width: 1000px;
 
 	display: flex;
 	flex-direction: column;
