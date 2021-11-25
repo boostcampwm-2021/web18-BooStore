@@ -37,19 +37,9 @@ const MoveFileModal: React.FC<Props> = ({
 		asyncFunc();
 	};
 
-	const moveFile = async () => {
-		setIsOpenMoveFile(false);
-		if (newDirectory != '') {
-			const status = await handleMoveFile(Array.from(selectedFiles.values()), newDirectory);
-			if (status) {
-				setFiles(await getFiles(curDir, true));
-			}
-		}
+	const chooseNewDir = (directory: string) => {
+		setNewDirectory(directory);
 	};
-
-    const chooseNewDir= (directory: string)=>{
-        setNewDirectory(directory);
-    }
 
 	const makeDirectoryList = useCallback(() => {
 		return directories.map((directory: string) => {
@@ -67,6 +57,16 @@ const MoveFileModal: React.FC<Props> = ({
 	useEffect(() => {
 		handleDirectoryList();
 	}, []);
+	const moveFile = async () => {
+		setIsOpenMoveFile(false);
+		if (newDirectory != '') {
+			const targetIds = [...selectedFiles.keys()];
+			const status = await handleMoveFile(targetIds, newDirectory, curDir);
+			if (status) {
+				setFiles(await getFiles(curDir, true));
+			}
+		}
+	};
 
 	const onRequestClose = useCallback(() => {
 		if (onCloseButton) {

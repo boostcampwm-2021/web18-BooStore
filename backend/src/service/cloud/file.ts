@@ -190,6 +190,8 @@ export const updateFile = async (
 	fileName: string,
 	newDir: string
 ) => {
+	const notOverlappedFilename = await getNotOverlappedName(newDir, fileName, loginId);
+
 	return await Cloud.updateOne(
 		{
 			ownerId: loginId,
@@ -198,6 +200,7 @@ export const updateFile = async (
 		},
 		{
 			directory: newDir,
+			name: notOverlappedFilename,
 		}
 	);
 };
@@ -211,18 +214,21 @@ const removeObjectStorageObjects = async (keys) => {
 	}).promise();
 };
 
-export const getFilesForUpdate = async(loginId: string, curDir: string) => {
-	const filesForUpdate = await Cloud.find({
-		ownerId: loginId,
-		directory: curDir,
-		isDeleted: false
-	},{
-		osLink:false,
-		idDeleted:false
-	});
+export const getFilesForUpdate = async (loginId: string, curDir: string) => {
+	const filesForUpdate = await Cloud.find(
+		{
+			ownerId: loginId,
+			directory: curDir,
+			isDeleted: false,
+		},
+		{
+			osLink: false,
+			idDeleted: false,
+		}
+	);
 
 	return filesForUpdate;
-}
+};
 
 export const getTrashFiles = async (userLoginId: string) => {
 	const docs = await Cloud.find({
