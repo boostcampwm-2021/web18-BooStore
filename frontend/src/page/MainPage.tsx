@@ -132,7 +132,6 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						{getCurDirectoryComponent()}
 					</DirectorySection>
 					<FileMenu
-						showShareButton
 						capacity={capacity}
 						setCapacity={setCapacity}
 						selectedFiles={selectedFiles}
