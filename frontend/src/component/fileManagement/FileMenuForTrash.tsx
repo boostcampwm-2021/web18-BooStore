@@ -90,7 +90,8 @@ const Container = styled.div`
 
 const SelectAllBtn = styled.button`
 	cursor: pointer;
-
+	border: 1px solid ${(props)=> props.theme.color.Line};
+	border-radius: 4px;
 	padding: 0;
 	margin-right: 20px;
 

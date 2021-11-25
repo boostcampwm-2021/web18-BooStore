@@ -22,7 +22,7 @@ import {
 	createAncestorsFolder,
 	getNewFolder,
 	getTrashFiles,
-	updateFile,
+	updateDir,
 } from '../service/cloud';
 
 const router = express.Router();
@@ -173,17 +173,9 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 
 router.post('/update', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
-	const { files, newdir } = req.body;
-	await Promise.all(
-		files.selectedFiles.map(async (file) => {
-			if (file.contentType === 'folder') {
-			} else {
-				await updateFile(loginId, file.directory, file.name, newdir.newDirectory);
-				return res.send();
-			}
-		})
-	);
-	return res.send(304);
+	const { files, newdir, curDirectory } = req.body;
+	await updateDir(loginId, files, newdir, curDirectory);
+	return res.send();
 });
 
 export default router;

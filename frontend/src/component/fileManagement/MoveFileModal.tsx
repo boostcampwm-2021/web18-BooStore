@@ -4,7 +4,7 @@ import ReactModal from 'react-modal';
 import { getDirectoryList } from 'api';
 import { handleMoveFile } from 'api';
 import { FileDTO } from '@DTO';
-import { getFiles } from '@util';
+import { applyEscapeString, getFiles } from '@util';
 import Button from '@component/common/Button';
 
 interface Props {
@@ -29,22 +29,26 @@ const MoveFileModal: React.FC<Props> = ({
 
 	const handleDirectoryList = () => {
 		const asyncFunc = async () => {
-			let tempDirectories = await getDirectoryList();
+			let tempDirectories: string[] = await getDirectoryList();
 			tempDirectories.unshift('/');
-			tempDirectories = tempDirectories.filter((dir: string) => dir != curDir);
+
+			tempDirectories = [...selectedFiles.values()].reduce((prev, file) => {
+				if (file.contentType !== 'folder') {
+					return prev;
+				}
+
+				const { directory, name } = file;
+				const targetDir = directory === '/' ? `/${name}` : `${directory}/${name}`;
+				const regex = new RegExp(`^${applyEscapeString(targetDir)}(\\/.*)?$`);
+				const result = prev.filter((ele) => !regex.test(ele));
+
+				return result;
+			}, tempDirectories);
+
+			tempDirectories = tempDirectories.filter((dir: string) => dir !== curDir);
 			setDirectories(tempDirectories);
 		};
 		asyncFunc();
-	};
-
-	const moveFile = async () => {
-		setIsOpenMoveFile(false);
-		if (newDirectory != '') {
-			const status = await handleMoveFile(Array.from(selectedFiles.values()), newDirectory);
-			if (status) {
-				setFiles(await getFiles(curDir, true));
-			}
-		}
 	};
 
 	const makeDirectoryList = useCallback(() => {
@@ -60,15 +64,24 @@ const MoveFileModal: React.FC<Props> = ({
 		});
 	}, [directories, newDirectory]);
 
-	useEffect(() => {
-		handleDirectoryList();
-	}, []);
+	const moveFile = async () => {
+		setIsOpenMoveFile(false);
+		if (newDirectory != '') {
+			const targetIds = [...selectedFiles.keys()];
+			const status = await handleMoveFile(targetIds, newDirectory, curDir);
+			if (status) {
+				setFiles(await getFiles(curDir, true));
+			}
+		}
+	};
 
 	const onRequestClose = useCallback(() => {
 		if (onCloseButton) {
 			setIsOpenMoveFile(false);
 		}
 	}, [onCloseButton]);
+
+	useEffect(handleDirectoryList, []);
 
 	return (
 		<ReactModal
