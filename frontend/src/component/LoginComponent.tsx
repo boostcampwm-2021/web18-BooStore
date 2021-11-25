@@ -77,6 +77,11 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 			pathname: '/signup',
 		});
 	};
+	const onPasswordKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			onClickLogin();
+		}
+	}
 
 	return (
 		<>
@@ -100,6 +105,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 						placeholder="비밀번호"
 						onChange={onChange}
 						type="password"
+						onKeyPress={onPasswordKeyPress}
 					/>
 				</InputContainer>
 				<Button onClick={onClickLogin}> 로그인 </Button>

@@ -86,6 +86,12 @@ const SignupComponent: React.FC<Props> = () => {
 			setOpenFailureModal(true);
 		}
 	};
+	
+	const onPasswordCheckKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			onClickSignup();
+		}
+	}
 
 	useEffect(() => {
 		if (isEqualPassword()) {
@@ -128,6 +134,7 @@ const SignupComponent: React.FC<Props> = () => {
 						placeholder="비밀번호 확인"
 						onChange={onChange}
 						type="password"
+						onKeyPress={onPasswordCheckKeyPress}
 					/>
 				</InputContainer>
 				<HintBox>

@@ -52,6 +52,12 @@ const NewFolderModal: React.FC<Props> = ({
 		onRequestClose();
 	};
 
+	const onInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			makeNewFolder();
+		}
+	}
+	
 	if (isOpenNewFolder) {
 		return (
 			<ReactModal
@@ -82,6 +88,8 @@ const NewFolderModal: React.FC<Props> = ({
 						value={newFolderName}
 						placeholder="제목 없는 폴더"
 						onChange={onChange}
+						onKeyPress={onInputKeyPress}
+						autoComplete="off"
 					/>
 					<ButtonContainer>
 						<MakeFolderButton onClick={makeNewFolder}>만들기</MakeFolderButton>
