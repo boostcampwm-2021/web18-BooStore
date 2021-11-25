@@ -47,6 +47,10 @@ const MoveFileModal: React.FC<Props> = ({
 		}
 	};
 
+    const chooseNewDir= (directory: string)=>{
+        setNewDirectory(directory);
+    }
+
 	const makeDirectoryList = useCallback(() => {
 		return directories.map((directory: string) => {
 			return (

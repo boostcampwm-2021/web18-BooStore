@@ -211,6 +211,19 @@ const removeObjectStorageObjects = async (keys) => {
 	}).promise();
 };
 
+export const getFilesForUpdate = async(loginId: string, curDir: string) => {
+	const filesForUpdate = await Cloud.find({
+		ownerId: loginId,
+		directory: curDir,
+		isDeleted: false
+	},{
+		osLink:false,
+		idDeleted:false
+	});
+
+	return filesForUpdate;
+}
+
 export const getTrashFiles = async (userLoginId: string) => {
 	const docs = await Cloud.find({
 		ownerId: userLoginId,
