@@ -22,7 +22,7 @@ import {
 	createAncestorsFolder,
 	getNewFolder,
 	getTrashFiles,
-	updateFile
+	updateFile,
 } from '../service/cloud';
 
 const router = express.Router();
@@ -170,34 +170,20 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 
 	return res.json(files);
 });
-router.post('/newfolder', isAuthenticated, async (req, res) => {
-	const { loginId } = req.user;
-	const { name, curdir } = req.body;
-	let newDir = curdir.curDir + name.newFolderName;
-	if (curdir.curDir != '/') {
-		newDir = curdir.curDir + '/' + name.newFolderName;
-	}
-	try {
-		await createAncestorsFolder(newDir, loginId);
-		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
-		return res.json(newFolder);
-	} catch (err) {
-		res.sendStatus(304);
-	}
-});
 
-router.post('/update',isAuthenticated, async(req,res)=>{
+router.post('/update', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
-	const { files, newdir} = req.body;
-	await Promise.all(files.selectedFiles.map(async(file) => {
-		if(file.contentType ==='folder'){
-		}
-		else{
-			await updateFile(loginId, file.directory, file.name, newdir.newDirectory);
-			return res.send();
-		}	
-	}))
+	const { files, newdir } = req.body;
+	await Promise.all(
+		files.selectedFiles.map(async (file) => {
+			if (file.contentType === 'folder') {
+			} else {
+				await updateFile(loginId, file.directory, file.name, newdir.newDirectory);
+				return res.send();
+			}
+		})
+	);
 	return res.send(304);
-})
+});
 
 export default router;

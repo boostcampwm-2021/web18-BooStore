@@ -10,7 +10,6 @@ const ContextDropdown = styled.ul<Props>`
     background-color: #fff;
     border-radius: 8px;
     padding: ${(props)=>props.theme.padding.Content};
-    width: 150px;
     height: auto;
     margin: 0;
     position: absolute;
@@ -20,7 +19,7 @@ const ContextDropdown = styled.ul<Props>`
     transition: opacity 0.5s linear;
     top: ${(props) => props.top}px;
     left: ${(props) => props.left}px;
-    z-index: 3;
+    z-index: 6;
 `;
 
 export default ContextDropdown;
