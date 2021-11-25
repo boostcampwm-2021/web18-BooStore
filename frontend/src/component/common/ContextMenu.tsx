@@ -1,23 +1,42 @@
 import React, { useCallback, useState } from 'react';
-import useContextMenu from '@component/hook/useContextMenu';
 import ContextDropdown from '@component/common/ContextDropdown';
+
+import styled from 'styled-components';
 import { FileDTO, FileEditAction } from '@DTO';
+
 
 interface Props {
 	setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsOpenMoveFile: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedFiles: Map<string, FileDTO>;
 	setFiles?: React.Dispatch<React.SetStateAction<FileDTO[]>>;
+	show: boolean;
+    anchorPoint: {
+		x: number;
+		y: number;
+  }
 }
+
+interface UlProps{
+	size: number;
+}
+
+
 const HeaderContextMenu: React.FC<Props> = ({
-	setIsOpenNewFolder,
-	selectedFiles,
-	setFiles = () => {},
+	setIsOpenNewFolder, setIsOpenMoveFile, show, anchorPoint, selectedFiles, setFiles=()=>{}
 }) => {
-	const { anchorPoint, show } = useContextMenu();
 
 	const addNewFolder = () => {
 		setIsOpenNewFolder(true);
 	};
+
+	const moveFile = (selectedFilesSize: number)=>
+  {
+    if(selectedFilesSize!=0){
+      setIsOpenMoveFile(true);
+    }
+  }
+<<<<<<< HEAD
 
 	const addStar = useCallback(() => {
 		const targetIds = [...selectedFiles.values()].map((file) => file._id);
@@ -47,10 +66,10 @@ const HeaderContextMenu: React.FC<Props> = ({
 	}, [setFiles, selectedFiles]);
 
 	if (show) {
-		// console.log("anchor.x: "+anchorPoint.x+" anchor.y: "+anchorPoint.y);
 		return (
 			<ContextDropdown top={anchorPoint.y} left={anchorPoint.x}>
 				<li onClick={addNewFolder}>새 폴더 만들기</li>
+				<StyledLi onClick={()=>moveFile(selectedFiles.size)} size={selectedFiles.size}>이동</StyledLi>
 				<li onClick={addStar}>중요 문서함에 추가</li>
 			</ContextDropdown>
 		);
@@ -58,4 +77,39 @@ const HeaderContextMenu: React.FC<Props> = ({
 	return <></>;
 };
 
+const StyledLi = styled.li<UlProps>`
+	color: ${
+	(props)=>{
+		if(props.size==0){
+		return props.theme.color.Line;
+		}
+	}
+	}
+`;
+
 export default HeaderContextMenu;
+=======
+  
+    if (show) {
+      return (
+        <ContextDropdown top={anchorPoint.y} left={anchorPoint.x} >
+          <li onClick={addNewFolder}>새 폴더 만들기</li>
+          <StyledLi onClick={()=>moveFile(selectedFiles.size)} size={selectedFiles.size}>이동</StyledLi>
+        </ContextDropdown>
+      );
+    }
+    return <></>;
+  };
+
+  const StyledLi = styled.li<UlProps>`
+    color: ${
+      (props)=>{
+        if(props.size==0){
+          return props.theme.color.Line;
+        }
+      }
+    }
+  `;
+  
+  export default ContextMenu;
+>>>>>>> 328b3d93e79680beb94043408d5a85cea4dbc107

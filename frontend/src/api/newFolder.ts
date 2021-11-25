@@ -1,4 +1,4 @@
-export const handleNewFolder = async (newFolderName: string ,curDir: string)=>{
+export const handleNewFolder = (newFolderName: string ,curDir: string)=>{
     return fetch(`/cloud/newfolder`,{
         method: 'POST',
         credentials: 'include',
