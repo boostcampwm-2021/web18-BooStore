@@ -86,6 +86,12 @@ const SignupComponent: React.FC<Props> = () => {
 			setOpenFailureModal(true);
 		}
 	};
+	
+	const onPasswordCheckKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			onClickSignup();
+		}
+	}
 
 	useEffect(() => {
 		if (isEqualPassword()) {
@@ -128,6 +134,7 @@ const SignupComponent: React.FC<Props> = () => {
 						placeholder="비밀번호 확인"
 						onChange={onChange}
 						type="password"
+						onKeyPress={onPasswordCheckKeyPress}
 					/>
 				</InputContainer>
 				<HintBox>
@@ -135,9 +142,9 @@ const SignupComponent: React.FC<Props> = () => {
 				</HintBox>
 				<WarningBox>{isWarning ? '비밀번호가 일치하지 않습니다.' : ''}</WarningBox>
 				<Button onClick={onClickSignup} style={{ float: 'right' }}>
-					Sign up
+					회원가입
 				</Button>
-				<LoginButton onClick={onClickBack}>login</LoginButton>
+				<LoginButton onClick={onClickBack}> 로그인 </LoginButton>
 				<FailureModal
 					isOpen={isOpenFailureModal}
 					setOpen={setOpenFailureModal}
@@ -152,7 +159,7 @@ const SignupComponent: React.FC<Props> = () => {
 
 const SignupContainer = styled.div`
 	position: absolute;
-	top: 300px;
+	top: 22%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

@@ -77,6 +77,11 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 			pathname: '/signup',
 		});
 	};
+	const onPasswordKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			onClickLogin();
+		}
+	}
 
 	return (
 		<>
@@ -100,10 +105,11 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 						placeholder="비밀번호"
 						onChange={onChange}
 						type="password"
+						onKeyPress={onPasswordKeyPress}
 					/>
 				</InputContainer>
-				<Button onClick={onClickLogin}>login</Button>
-				<SignupButton onClick={onClickSignup}>Sign up</SignupButton>
+				<Button onClick={onClickLogin}> 로그인 </Button>
+				<SignupButton onClick={onClickSignup}> 회원가입 </SignupButton>
 				<FailureModal
 					isOpen={isOpenFailureModal}
 					setOpen={setOpenFailureModal}
@@ -118,7 +124,7 @@ const LoginComponent: React.FC<Props> = ({ setUser }) => {
 
 const LoginContainer = styled.div`
 	position: absolute;
-	top: 300px;
+	top: 22%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

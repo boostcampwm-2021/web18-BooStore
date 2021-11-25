@@ -52,7 +52,7 @@ const Sidebar: React.FC<Props> = ({ capacity, className, files, setCurrentDir })
 };
 
 const Container = styled.div`
-	min-width: 250px;
+	min-width: 290px;
 	max-width: 350px;
 	overflow-x: hidden;
 	height: 100%;
