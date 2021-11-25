@@ -16,14 +16,13 @@ interface Props {
 	};
 }
 
-interface UlProps {
-	size: number;
-}
-
-
-
 const ContextMenu: React.FC<Props> = ({
-	setIsOpenNewFolder, setIsOpenMoveFile, show, anchorPoint, selectedFiles, setFiles=()=>{}
+	setIsOpenNewFolder,
+	setIsOpenMoveFile,
+	show,
+	anchorPoint,
+	selectedFiles,
+	setFiles = () => {},
 }) => {
 	const addNewFolder = () => {
 		setIsOpenNewFolder(true);
@@ -65,26 +64,33 @@ const ContextMenu: React.FC<Props> = ({
 	if (show) {
 		return (
 			<ContextDropdown top={anchorPoint.y} left={anchorPoint.x}>
-				<li onClick={addNewFolder}>새 폴더 만들기</li>
-				<StyledLi onClick={() => moveFile(selectedFiles.size)} size={selectedFiles.size}>
+				<StyledLi onClick={addNewFolder}>새 폴더 만들기</StyledLi>
+				<StyledLi onClick={() => moveFile(selectedFiles.size)} disabled={selectedFiles.size === 0}>
 					이동
 				</StyledLi>
-				<li onClick={addStar}>중요 문서함에 추가</li>
+				<StyledLi onClick={addStar}>중요 문서함에 추가</StyledLi>
 			</ContextDropdown>
 		);
 	}
 	return <></>;
 };
 
-  const StyledLi = styled.li<UlProps>`
-    color: ${
-      (props)=>{
-        if(props.size==0){
-          return props.theme.color.Line;
-        }
-      }
-    }
-  `;
+interface UlProps {
+	disabled?: boolean;
+}
+const StyledLi = styled.li<UlProps>`
+	cursor: pointer;
+	color: ${(props) => {
+		if (props.disabled) {
+			return props.theme.color.Line;
+		}
+	}};
+	
+	margin-bottom: 10px;
+	&:last-child {
+		margin-bottom: 0;
+	}
+`;
 
-  export default ContextMenu;
+export default ContextMenu;
 
