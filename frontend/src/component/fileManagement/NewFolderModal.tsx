@@ -82,7 +82,6 @@ const NewFolderModal: React.FC<Props> = ({
 						autoComplete="off"
 						onChange={onChange}
 						onKeyPress={onInputKeyPress}
-						autoComplete="off"
 					/>
 					<ButtonContainer>
 						<MakeFolderButton onClick={makeNewFolder}>만들기</MakeFolderButton>
