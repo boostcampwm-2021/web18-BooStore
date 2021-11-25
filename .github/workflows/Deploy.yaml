@@ -22,6 +22,8 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git pull origin main
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
             chmod +x ./script/*.sh
             ./script/build.sh
             ./script/deploy.sh 
