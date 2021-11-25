@@ -5,6 +5,7 @@ import ModalComponent, { ModalType } from '@component/common/ModalComponent';
 import Button from '@component/common/Button';
 import { FileDTO } from '@DTO';
 import { handleNewFolder } from 'api';
+import { getFiles, getNotOverlappedName } from '@util';
 
 interface Props {
 	onCloseButton?: boolean;
@@ -36,18 +37,9 @@ const NewFolderModal: React.FC<Props> = ({
 	}, [onCloseButton]);
 
 	const makeNewFolder = async () => {
-		let cnt = 0;
-		files.forEach((file) => {
-			let splitName = file.name.split(newFolderName);
-			if (splitName[0] === '' && splitName.length == 2) {
-				if (splitName[1] === '') {
-					cnt++;
-				}
-				//else if(splitName[1]===)
-			}
-		});
-		const addedFolder: FileDTO = await handleNewFolder(newFolderName, curDir);
-		setFiles((oldArr) => [...oldArr, addedFolder]);
+		const notOverlappedName = await getNotOverlappedName(curDir, newFolderName);
+		await handleNewFolder(notOverlappedName, curDir);
+		setFiles(await getFiles(curDir, true));
 		setNewFolderName('');
 		onRequestClose();
 	};
@@ -87,6 +79,7 @@ const NewFolderModal: React.FC<Props> = ({
 						name="newFolderName"
 						value={newFolderName}
 						placeholder="제목 없는 폴더"
+						autoComplete="off"
 						onChange={onChange}
 						onKeyPress={onInputKeyPress}
 						autoComplete="off"
