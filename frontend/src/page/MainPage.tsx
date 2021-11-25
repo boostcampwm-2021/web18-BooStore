@@ -151,7 +151,6 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						currentDirectory={currentDir}
 						isAscending={isAscending}
 						setIsAscending={setIsAscending}
-						updateFiles={updateFiles}
 					/>
 					<ContextMenu 
 						setIsOpenNewFolder={setIsOpenNewFolder} 
@@ -159,6 +158,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						show={show}
 						anchorPoint={anchorPoint}
 						selectedFiles={selectedFiles}
+						setFiles={setFiles}
 					/>
 					<NewFolderModal
 						isOpenNewFolder={isOpenNewFolder}

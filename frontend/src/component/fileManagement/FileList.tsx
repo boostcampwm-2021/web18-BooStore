@@ -7,6 +7,8 @@ import Selection from './Selection';
 
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
+import ContextMenu from '@component/common/ContextMenu';
+import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
@@ -19,7 +21,7 @@ interface Props {
 	isAscending: boolean;
 	setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
 	className?: string;
-	updateFiles?: Function;
+
 }
 
 const FileList: React.FC<Props> = ({
@@ -33,7 +35,7 @@ const FileList: React.FC<Props> = ({
 	selectedFiles,
 	setIsAscending,
 	className,
-	updateFiles = () => {},
+
 }) => {
 	const container = useRef<HTMLDivElement>(null);
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -77,18 +79,6 @@ const FileList: React.FC<Props> = ({
 				<FileHeaderElement> 올린 날짜 </FileHeaderElement>
 				<FileHeaderElement> 수정한 날짜 </FileHeaderElement>
 				<FileHeaderElement> 파일 크기 </FileHeaderElement>
-				<HeaderContextMenu
-					setIsOpenNewFolder={setIsOpenNewFolder}
-					selectedFiles={selectedFiles}
-					setFiles={setFiles}
-				/>
-				<NewFolderModal
-					isOpenNewFolder={isOpenNewFolder}
-					setIsOpenNewFolder={setIsOpenNewFolder}
-					setFiles={setFiles}
-					files={files}
-					curDir={currentDirectory}
-				/>
 			</FileHeader>
 			<Files>
 				<Selection
