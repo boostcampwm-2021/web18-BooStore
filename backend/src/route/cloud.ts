@@ -46,6 +46,11 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 	const relativePaths = JSON.parse(relativePath);
 
 	try {
+		const totalSzie = files.reduce((prev, file) => prev + file.size, 0);
+		if (!(await canIncreaseCurrentCapacity({ loginId: loginId, value: totalSzie }))) {
+			return res.status(403).send();
+		}
+
 		await Promise.all(
 			files.map(async (file) => {
 				const { path, size, originalname, mimetype, filename, destination } = file;
