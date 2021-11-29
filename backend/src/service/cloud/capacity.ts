@@ -23,7 +23,7 @@ interface CCFunctionParameter {
 export const canIncreaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
 	if (!user) {
-		return false;
+		throw new Error('Not Found User');
 	}
 
 	const { maxCapacity, currentCapacity } = user;
@@ -33,7 +33,7 @@ export const canIncreaseCurrentCapacity = async ({ loginId, value }: CCFunctionP
 export const canDecreaseCurrentCapacity = async ({ loginId, value }: CCFunctionParameter) => {
 	const user = await User.findOne({ loginId }).exec();
 	if (!user) {
-		return false;
+		throw new Error('Not Found User');
 	}
 
 	const { currentCapacity } = user;
