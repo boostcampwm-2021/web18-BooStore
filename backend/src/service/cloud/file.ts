@@ -63,7 +63,7 @@ export const uploadFile = async ({
 			Body: fs.createReadStream(diskFilePath),
 		}).promise();
 
-		const cafPromise = createAncestorsFolder(cloudDirectory, userLoginId);
+		const cafPromise = createAncestorsFolderDocs(cloudDirectory, userLoginId);
 
 		const notOverlappedName = await getNotOverlappedName(
 			cloudDirectory,
@@ -133,8 +133,7 @@ export const getNotOverlappedName = async (
 	return await getNotOverlappedName(directory, newFilename, ownerId);
 };
 
-// /test2/폴더어/폴더어2/test.txt -> /test2/폴더어/폴더어2
-export const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
+export const createAncestorsFolderDocs = async (curDirectory: string, userLoginId: string) => {
 	if (curDirectory === '/') {
 		return;
 	}
@@ -293,7 +292,7 @@ export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctio
 	}, new Set<string>());
 
 	const createDirPromise = Promise.all(
-		[...directories].map((directory) => createAncestorsFolder(directory, userLoginId))
+		[...directories].map((directory) => createAncestorsFolderDocs(directory, userLoginId))
 	);
 
 	const resultPromise = Cloud.updateMany(
@@ -391,7 +390,7 @@ export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersF
 			}, new Set<string>());
 
 			const createDirPromise = Promise.all(
-				[...directories].map((directory) => createAncestorsFolder(directory, userLoginId))
+				[...directories].map((directory) => createAncestorsFolderDocs(directory, userLoginId))
 			);
 
 			const moveFolderPromise = Cloud.updateOne(

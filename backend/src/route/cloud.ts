@@ -19,7 +19,7 @@ import {
 	createZipFile,
 	deleteZipFile,
 	updateStarStatus,
-	createAncestorsFolder,
+	createAncestorsFolderDocs,
 	getNewFolder,
 	getTrashFiles,
 	updateDir,
@@ -120,7 +120,7 @@ router.get('/download', isAuthenticated, async (req, res) => {
 });
 
 router.patch('/files', isAuthenticated, async (req, res) => {
-	const { targetIds = [], directories = [], action, newdir = "", curdir = "" } = req.body;
+	const { targetIds = [], directories = [], action, newdir = '', curdir = '' } = req.body;
 	const { loginId } = req.user;
 	const { targetIds = [], directories = [], action } = req.body;
 	if (loginId === undefined) {
@@ -185,9 +185,9 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 		newDir = curDir + '/' + folderName;
 	}
 	try {
-		await createAncestorsFolder(newDir, loginId);
+		await createAncestorsFolderDocs(newDir, loginId);
 		const newFolder = await getNewFolder(loginId, curDir, folderName);
-		if(newFolder===null){
+		if (newFolder === null) {
 			return res.status(503).send();
 		}
 		return res.json(newFolder);
