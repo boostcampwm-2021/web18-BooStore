@@ -7,7 +7,7 @@ export const getFiles = (
 	isStar: boolean = false
 ) => {
 	return fetch(
-		`/user/files?path=${directory}&isAscending=${isAscending}&isDeleted=${isDeleted}&isStar=${isStar}`,
+		`/cloud/files?path=${directory}&isAscending=${isAscending}&isDeleted=${isDeleted}&isStar=${isStar}`,
 		{
 			credentials: 'include',
 		}
@@ -22,7 +22,7 @@ export const getFiles = (
 };
 
 export const getAllStarFiles = (directory: string, isAscending: boolean) => {
-	return fetch(`/user/starfiles?path=${directory}&isAscending=${isAscending}`, {
+	return fetch(`/cloud/starfiles?path=${directory}&isAscending=${isAscending}`, {
 		credentials: 'include',
 	})
 		.then((res) => {

@@ -19,35 +19,46 @@ import {
 	createZipFile,
 	deleteZipFile,
 	updateStarStatus,
-	createAncestorsFolder,
+	createAncestorsFolderDocs,
 	getNewFolder,
 	getTrashFiles,
 	updateDir,
+	splitFolderAndFile,
+	FilteredFilesArg,
+	FilesArg,
+	getFilteredFiles,
+	getFiles,
 } from '../service/cloud';
-
+import { applyEscapeString } from '../util';
 const router = express.Router();
 
 router.get('/validate', isAuthenticated, async (req, res) => {
 	const { size } = req.query;
+	const { loginId } = req.user;
 	const value = Number(size);
-	if (isNaN(value)) {
+	if (isNaN(value) || size.length === 0) {
 		return res.status(400).send();
 	}
 
-	!(await canIncreaseCurrentCapacity({ loginId: req.user.loginId, value }))
-		? res.status(409).send()
-		: res.status(200).send();
+	if (await canIncreaseCurrentCapacity({ loginId, value })) {
+		return res.status(200).send();
+	} else {
+		return res.status(409).send();
+	}
 });
 
 router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req, res) => {
 	const files = req.files as Express.Multer.File[];
 	const { loginId } = req.user;
 	const { relativePath, rootDirectory } = req.body;
-	const relativePaths = JSON.parse(relativePath);
+	if (loginId === undefined || relativePath === undefined || rootDirectory === undefined) {
+		return res.status(400).send();
+	}
 
+	const relativePaths = JSON.parse(relativePath);
 	try {
-		const totalSzie = files.reduce((prev, file) => prev + file.size, 0);
-		if (!(await canIncreaseCurrentCapacity({ loginId: loginId, value: totalSzie }))) {
+		const totalSize = files.reduce((prev, file) => prev + file.size, 0);
+		if (!(await canIncreaseCurrentCapacity({ loginId: loginId, value: totalSize }))) {
 			return res.status(403).send();
 		}
 
@@ -71,15 +82,16 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 			})
 		);
 
-		res.status(200).send();
+		return res.status(200).send();
 	} catch (err) {
-		res.status(500).send();
+		return res.status(500).send();
 	}
 });
 
 router.get('/download', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { current_dir, files, folders } = req.query;
+
 	if (current_dir === undefined || files === undefined || folders === undefined) {
 		return res.status(400).send();
 	}
@@ -96,7 +108,9 @@ router.get('/download', isAuthenticated, async (req, res) => {
 
 	createZipFile({ targetFolderPath, zipFolderPath });
 	res.download(zipFolderPath, `${loginId}.zip`, (err) => {
-		if (!err) {
+		if (err) {
+			res.status(500).send();
+		} else {
 			res.send();
 		}
 	});
@@ -105,9 +119,15 @@ router.get('/download', isAuthenticated, async (req, res) => {
 	return;
 });
 
-router.put('/files', isAuthenticated, async (req, res) => {
-	const { targetIds = [], directories = [], action } = req.body;
+router.patch('/files', isAuthenticated, async (req, res) => {
+	const { targetIds = [], directories = [], action, newdir = '', curdir = '' } = req.body;
 	const { loginId } = req.user;
+	if (loginId === undefined) {
+		return res.status(400).send();
+	}
+	if (targetIds === undefined || directories === undefined || action === undefined) {
+		return res.status(400).send();
+	}
 	try {
 		switch (action) {
 			case FileEditAction.trash:
@@ -119,6 +139,7 @@ router.put('/files', isAuthenticated, async (req, res) => {
 				await restoreTrashFolders({ directories, userLoginId: loginId });
 				break;
 			case FileEditAction.move:
+				await updateDir(loginId, targetIds, newdir, curdir);
 				break;
 			case FileEditAction.addStar:
 				await updateStarStatus({ userLoginId: loginId, targetIds: targetIds, state: true });
@@ -130,11 +151,12 @@ router.put('/files', isAuthenticated, async (req, res) => {
 					state: false,
 				});
 				break;
+			default:
+				return res.status(400).send('invalid action');
 		}
-
-		res.send();
+		return res.status(200).send();
 	} catch (err) {
-		res.status(500).send();
+		return res.status(500).send();
 	}
 });
 
@@ -155,25 +177,34 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 router.post('/newfolder', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { name, curdir } = req.body;
-	let newDir = curdir.curDir + name.newFolderName;
-	if (curdir.curDir != '/') {
-		newDir = curdir.curDir + '/' + name.newFolderName;
+	const folderName = name.newFolderName;
+	const curDir = curdir.curDir;
+	let newDir = curDir + folderName;
+	if (curDir != '/') {
+		newDir = curDir + '/' + folderName;
 	}
 	try {
-		await createAncestorsFolder(newDir, loginId);
-		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
+		await createAncestorsFolderDocs(newDir, loginId);
+		const newFolder = await getNewFolder(loginId, curDir, folderName);
+		if (newFolder === null) {
+			return res.status(503).send();
+		}
 		return res.json(newFolder);
 	} catch (err) {
-		res.sendStatus(304);
+		return res.sendStatus(503);
 	}
 });
 
 router.get('/trash', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 
-	const files = await getTrashFiles(loginId);
+	try {
+		const files = await getTrashFiles(loginId);
 
-	return res.json(files);
+		return res.json(files);
+	} catch (err) {
+		return res.status(500).send();
+	}
 });
 
 router.post('/update', isAuthenticated, async (req, res) => {
@@ -181,6 +212,67 @@ router.post('/update', isAuthenticated, async (req, res) => {
 	const { files, newdir, curDirectory } = req.body;
 	await updateDir(loginId, files, newdir, curDirectory);
 	return res.send();
+});
+
+router.get('/files', isAuthenticated, async (req, res) => {
+	const { path, isAscending, isDeleted, isStar } = req.query;
+	const { loginId } = req.user;
+	if (path === undefined || isAscending === undefined || isDeleted === undefined) {
+		return res.status(400).send();
+	}
+	if (path === '') {
+		return res.status(400).send();
+	}
+
+	try {
+		const filesArg: FilesArg = {
+			loginId: loginId,
+			regex: `(^${applyEscapeString(path as string)}$)|(^${
+				path === '/' ? '' : applyEscapeString(path as string)
+			}/(.*)?$)`,
+			isAscending: isAscending === 'true',
+			isDeleted: isDeleted === 'true',
+			isStar: isStar === 'true',
+		};
+
+		const tempFiles = await getFiles(filesArg);
+
+		const filteredFilesArg: FilteredFilesArg = {
+			path: path as string,
+			originFiles: tempFiles,
+		};
+
+		const files = getFilteredFiles(filteredFilesArg);
+		return res.status(200).json(files);
+	} catch (err) {
+		return res.status(500).send();
+	}
+});
+
+router.get('/starfiles', isAuthenticated, async (req, res) => {
+	const { path, isAscending } = req.query;
+	const { loginId } = req.user;
+	if (path === undefined || isAscending === undefined) {
+		return res.status(400).send();
+	}
+	if (path === '') {
+		return res.status(400).send();
+	}
+
+	const filesArg: FilesArg = {
+		loginId: loginId,
+		regex: `.+`,
+		isAscending: isAscending === 'true',
+		isDeleted: false,
+		isStar: true,
+	};
+	try {
+		const tempFiles = await getFiles(filesArg);
+		const data = splitFolderAndFile(tempFiles);
+		return res.status(200).json(data);
+	} catch (err) {
+		return res.status(500).send();
+	}
 });
 
 export default router;

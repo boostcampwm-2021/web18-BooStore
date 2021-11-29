@@ -61,7 +61,7 @@ const File: React.FC<Props> = ({
 			action: FileEditAction.removeStar,
 		};
 		fetch('/cloud/files', {
-			method: 'PUT',
+			method: 'PATCH',
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
