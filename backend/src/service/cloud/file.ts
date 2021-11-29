@@ -339,9 +339,7 @@ export const moveFoldersToTrash = async ({ directories, userLoginId }: FoldersFu
 	return Promise.all(
 		directories.flatMap((ele) => {
 			const { directory, name } = ele;
-			const path = applyEscapeString(
-				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
-			);
+			const path = applyEscapeString(`${directory}/${name}`.replace(/\/\/|\//g, '\\/'));
 
 			const moveFolderPromise = Cloud.updateOne(
 				{
