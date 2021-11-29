@@ -243,7 +243,7 @@ export const getTrashFiles = async (userLoginId: string) => {
 	const files = docs.filter((doc) => doc.contentType !== 'folder');
 
 	const directories = folders.map((folder) =>
-		`${folder.directory}/${folder.name}`.replace(/\/\//g, '/').replace(/\//g, '\\/')
+		`${folder.directory}/${folder.name}`.replace(/\/\/|\//g, '\\/')
 	);
 
 	const foldersOutsideFolder = directories.reduce(
@@ -390,7 +390,9 @@ export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersF
 			}, new Set<string>());
 
 			const createDirPromise = Promise.all(
-				[...directories].map((directory) => createAncestorsFolderDocs(directory, userLoginId))
+				[...directories].map((directory) =>
+					createAncestorsFolderDocs(directory, userLoginId)
+				)
 			);
 
 			const moveFolderPromise = Cloud.updateOne(
