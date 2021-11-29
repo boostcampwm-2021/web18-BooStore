@@ -96,6 +96,7 @@ const StyledLi = styled.li<UlProps>`
 		padding-top: 0;
 	}
 
+	margin-bottom: 10px;
 	&:last-child {
 		padding-bottom: 0;
 		border-bottom: none;
