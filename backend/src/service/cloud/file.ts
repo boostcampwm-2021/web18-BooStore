@@ -49,39 +49,43 @@ export const uploadFile = async ({
 	size,
 	userLoginId,
 }: UploadArg) => {
-	const objectStorageKey = path
-		.join(userLoginId, fileName)
-		.split(/\\\\|\\/)
-		.join('/');
+	const objectStorageKey = path.join(userLoginId, fileName).replace(/\\\\|\\/g, '/');
 	const diskFilePath = path.join(destination, fileName);
 	const cloudDirectory = path
 		.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'))
-		.split(/\\\\|\\/)
-		.join('/');
+		.replace(/\\\\|\\/g, '/');
 
-	const s3Promise = S3.upload({
-		Bucket: bucketName,
-		Key: objectStorageKey,
-		ACL: 'public-read',
-		Body: fs.createReadStream(diskFilePath),
-	}).promise();
+	try {
+		const s3Promise = S3.upload({
+			Bucket: bucketName,
+			Key: objectStorageKey,
+			ACL: 'public-read',
+			Body: fs.createReadStream(diskFilePath),
+		}).promise();
 
-	const cafPromise = createAncestorsFolder(cloudDirectory, userLoginId);
+		const cafPromise = createAncestorsFolder(cloudDirectory, userLoginId);
 
-	const notOverlappedName = await getNotOverlappedName(cloudDirectory, originalName, userLoginId);
+		const notOverlappedName = await getNotOverlappedName(
+			cloudDirectory,
+			originalName,
+			userLoginId
+		);
 
-	const cloudPromise = Cloud.create({
-		name: notOverlappedName,
-		size: size,
-		ownerId: userLoginId,
-		directory: cloudDirectory,
-		contentType: mimetype,
-		osLink: `${OBJECT_STORAGE_BASE}/${bucketName}/${objectStorageKey}`,
-	});
+		const cloudPromise = Cloud.create({
+			name: notOverlappedName,
+			size: size,
+			ownerId: userLoginId,
+			directory: cloudDirectory,
+			contentType: mimetype,
+			osLink: `${OBJECT_STORAGE_BASE}/${bucketName}/${objectStorageKey}`,
+		});
 
-	await Promise.all([cafPromise, s3Promise, cloudPromise]);
+		await Promise.all([cafPromise, s3Promise, cloudPromise]);
 
-	await increaseCurrentCapacity({ loginId: userLoginId, value: size });
+		await increaseCurrentCapacity({ loginId: userLoginId, value: size });
+	} catch (err) {
+		throw new Error(err);
+	}
 };
 
 // 중복된 경우, 파일명 뒷부분에 중복 번호를 붙여준다.
