@@ -88,6 +88,35 @@ export const uploadFile = async ({
 	}
 };
 
+const parseFilename = (filename: string) => {
+	let realName = '',
+		name = filename,
+		numbering = 0,
+		ext = '';
+	const regex1 = /^(?<name>.*)(?<ext>\..*)$/;
+	const match1 = filename.match(regex1);
+	if (match1) {
+		ext = match1.groups.ext;
+		name = match1.groups.name;
+		realName = name;
+	}
+
+	const regex2 = /^(?<realName>.+)\((?<numbering>\d+)\)$/;
+	const match2 = name.match(regex2);
+	if (match2) {
+		realName = match2.groups.realName;
+		numbering = Number(match2.groups.numbering);
+	}
+
+	return {
+		realName,
+		name,
+		numbering,
+		ext,
+		filename,
+	};
+};
+
 // 중복된 경우, 파일명 뒷부분에 중복 번호를 붙여준다.
 // 형식은  파일명(숫자).확장자  형태이다.
 // ex) filename.txt,  filename(1).txt,  filename(2).txt
@@ -96,41 +125,38 @@ export const getNotOverlappedName = async (
 	filename: string,
 	ownerId: string
 ) => {
-	const fileDoc = await Cloud.findOne({
-		name: filename,
+	const { realName, ext } = parseFilename(filename);
+	let regexStr = `^${applyEscapeString(realName)}`;
+	regexStr += `(\\(\\d+\\)|)`;
+	regexStr += ext;
+	regexStr += `$`;
+
+	const fileDocs = await Cloud.find({
 		directory: directory,
 		ownerId: ownerId,
+		name: {
+			$regex: regexStr,
+		},
 	}).exec();
-	if (!fileDoc) {
+	if (fileDocs.length === 0) {
 		return filename;
 	}
 
-	let extIndex = filename.lastIndexOf('.');
-	if (extIndex === -1) {
-		extIndex = filename.length;
-	}
-	const name = filename.slice(0, extIndex);
-	const ext = filename.slice(extIndex);
-	const leftBracketIndex = name.lastIndexOf('(');
-	const rightBracketIndex = name.lastIndexOf(')');
+	const numbers = fileDocs
+		.map((file) => {
+			const parsedFilename = parseFilename(file.name);
+			return parsedFilename.numbering;
+		})
+		.sort((a, b) => a - b);
+	const leastNumber = numbers.findIndex((ele, index) => ele !== index);
 
-	if (
-		leftBracketIndex === -1 ||
-		rightBracketIndex === -1 ||
-		rightBracketIndex !== name.length - 1 ||
-		leftBracketIndex + 1 >= rightBracketIndex
-	) {
-		return await getNotOverlappedName(directory, `${name}(1)${ext}`, ownerId);
+	if (leastNumber === 0) {
+		return filename;
+	} else if (leastNumber === -1) {
+		return `${realName}(${numbers.length})${ext}`;
+	} else {
+		return `${realName}(${leastNumber})${ext}`;
 	}
-
-	const strInsideBracket = name.slice(leftBracketIndex + 1, rightBracketIndex);
-	const overlapNumber = Number(strInsideBracket);
-	if (isNaN(overlapNumber)) {
-		return await getNotOverlappedName(directory, `${name}(1)${ext}`, ownerId);
-	}
-
-	const newFilename = `${name.slice(0, leftBracketIndex)}(${overlapNumber + 1})${ext}`;
-	return await getNotOverlappedName(directory, newFilename, ownerId);
 };
 
 export const createAncestorsFolderDocs = async (curDirectory: string, userLoginId: string) => {
