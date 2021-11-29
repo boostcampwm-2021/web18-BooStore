@@ -122,7 +122,6 @@ router.get('/download', isAuthenticated, async (req, res) => {
 router.patch('/files', isAuthenticated, async (req, res) => {
 	const { targetIds = [], directories = [], action, newdir = '', curdir = '' } = req.body;
 	const { loginId } = req.user;
-	const { targetIds = [], directories = [], action } = req.body;
 	if (loginId === undefined) {
 		return res.status(400).send();
 	}
