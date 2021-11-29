@@ -42,7 +42,7 @@ const ContextMenu: React.FC<Props> = ({
 			action: FileEditAction.addStar,
 		};
 		fetch('/cloud/files', {
-			method: 'PUT',
+			method: 'PATCH',
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
@@ -85,10 +85,15 @@ const StyledLi = styled.li<UlProps>`
 			return props.theme.color.Line;
 		}
 	}};
-	
-	margin-bottom: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid ${(props) => props.theme.color.Line};
+	&:first-child {
+		padding-top: 0;
+	}
 	&:last-child {
-		margin-bottom: 0;
+		padding-bottom: 0;
+		border-bottom: none;
 	}
 `;
 

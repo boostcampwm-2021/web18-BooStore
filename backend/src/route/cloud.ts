@@ -116,7 +116,8 @@ router.get('/download', isAuthenticated, async (req, res) => {
 	return;
 });
 
-router.put('/files', isAuthenticated, async (req, res) => {
+router.patch('/files', isAuthenticated, async (req, res) => {
+	const { targetIds = [], directories = [], action, newdir = "", curdir = "" } = req.body;
 	const { loginId } = req.user;
 	const { targetIds = [], directories = [], action } = req.body;
 	if (loginId === undefined) {
@@ -136,6 +137,7 @@ router.put('/files', isAuthenticated, async (req, res) => {
 				await restoreTrashFolders({ directories, userLoginId: loginId });
 				break;
 			case FileEditAction.move:
+				await updateDir(loginId, targetIds, newdir, curdir);
 				break;
 			case FileEditAction.addStar:
 				await updateStarStatus({ userLoginId: loginId, targetIds: targetIds, state: true });
@@ -171,16 +173,21 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 router.post('/newfolder', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { name, curdir } = req.body;
-	let newDir = curdir.curDir + name.newFolderName;
-	if (curdir.curDir != '/') {
-		newDir = curdir.curDir + '/' + name.newFolderName;
+	const folderName = name.newFolderName;
+	const curDir = curdir.curDir;
+	let newDir = curDir + folderName;
+	if (curDir != '/') {
+		newDir = curDir + '/' + folderName;
 	}
 	try {
 		await createAncestorsFolder(newDir, loginId);
-		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
+		const newFolder = await getNewFolder(loginId, curDir, folderName);
+		if(newFolder===null){
+			return res.status(503).send();
+		}
 		return res.json(newFolder);
 	} catch (err) {
-		res.sendStatus(304);
+		return res.sendStatus(503);
 	}
 });
 
@@ -259,4 +266,5 @@ router.get('/starfiles', isAuthenticated, async (req, res) => {
 		return res.status(500).send();
 	}
 });
+
 export default router;
