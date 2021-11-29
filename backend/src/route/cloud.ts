@@ -34,14 +34,17 @@ const router = express.Router();
 
 router.get('/validate', isAuthenticated, async (req, res) => {
 	const { size } = req.query;
+	const { loginId } = req.user;
 	const value = Number(size);
-	if (isNaN(value)) {
+	if (isNaN(value) || size.length === 0) {
 		return res.status(400).send();
 	}
 
-	!(await canIncreaseCurrentCapacity({ loginId: req.user.loginId, value }))
-		? res.status(409).send()
-		: res.status(200).send();
+	if (await canIncreaseCurrentCapacity({ loginId, value })) {
+		return res.status(200).send();
+	} else {
+		return res.status(409).send();
+	}
 });
 
 router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req, res) => {
