@@ -28,12 +28,11 @@ const ContextMenu: React.FC<Props> = ({
 		setIsOpenNewFolder(true);
 	};
 
-	const moveFile = (selectedFilesSize: number)=>
-  {
-    if(selectedFilesSize!=0){
-      setIsOpenMoveFile(true);
-    }
-  }
+	const moveFile = (selectedFilesSize: number) => {
+		if (selectedFilesSize != 0) {
+			setIsOpenMoveFile(true);
+		}
+	};
 
 	const addStar = useCallback(() => {
 		const targetIds = [...selectedFiles.values()].map((file) => file._id);
@@ -65,10 +64,15 @@ const ContextMenu: React.FC<Props> = ({
 		return (
 			<ContextDropdown top={anchorPoint.y} left={anchorPoint.x}>
 				<StyledLi onClick={addNewFolder}>새 폴더 만들기</StyledLi>
-				<StyledLi onClick={() => moveFile(selectedFiles.size)} disabled={selectedFiles.size === 0}>
+				<StyledLi
+					onClick={() => moveFile(selectedFiles.size)}
+					disabled={selectedFiles.size === 0}
+				>
 					이동
 				</StyledLi>
-				<StyledLi onClick={addStar}>중요 문서함에 추가</StyledLi>
+				<StyledLi onClick={() => addStar} disabled={selectedFiles.size === 0}>
+					중요 문서함에 추가
+				</StyledLi>
 			</ContextDropdown>
 		);
 	}
@@ -91,6 +95,7 @@ const StyledLi = styled.li<UlProps>`
 	&:first-child {
 		padding-top: 0;
 	}
+
 	&:last-child {
 		padding-bottom: 0;
 		border-bottom: none;
@@ -98,4 +103,3 @@ const StyledLi = styled.li<UlProps>`
 `;
 
 export default ContextMenu;
-
