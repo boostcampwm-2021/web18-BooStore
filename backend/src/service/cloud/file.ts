@@ -291,11 +291,11 @@ export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctio
 		return result;
 	}, new Set<string>());
 
-	const createDirPromise = Promise.all(
+	const createAncFolderPromise = Promise.all(
 		[...directories].map((directory) => createAncestorsFolderDocs(directory, userLoginId))
 	);
 
-	const resultPromise = Cloud.updateMany(
+	const updateDocsPromise = Cloud.updateMany(
 		{
 			ownerId: userLoginId,
 			_id: { $in: targetIds },
@@ -305,7 +305,7 @@ export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctio
 		}
 	).exec();
 
-	await Promise.all([createDirPromise, resultPromise]);
+	await Promise.all([createAncFolderPromise, updateDocsPromise]);
 };
 
 export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
