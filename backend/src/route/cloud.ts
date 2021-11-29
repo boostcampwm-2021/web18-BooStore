@@ -105,8 +105,8 @@ router.get('/download', isAuthenticated, async (req, res) => {
 	return;
 });
 
-router.put('/files', isAuthenticated, async (req, res) => {
-	const { targetIds = [], directories = [], action } = req.body;
+router.patch('/files', isAuthenticated, async (req, res) => {
+	const { targetIds = [], directories = [], action, newdir = "", curdir = "" } = req.body;
 	const { loginId } = req.user;
 	try {
 		switch (action) {
@@ -119,6 +119,7 @@ router.put('/files', isAuthenticated, async (req, res) => {
 				await restoreTrashFolders({ directories, userLoginId: loginId });
 				break;
 			case FileEditAction.move:
+				await updateDir(loginId, targetIds, newdir, curdir);
 				break;
 			case FileEditAction.addStar:
 				await updateStarStatus({ userLoginId: loginId, targetIds: targetIds, state: true });
@@ -177,13 +178,6 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 	const files = await getTrashFiles(loginId);
 
 	return res.json(files);
-});
-
-router.patch('/update', isAuthenticated, async (req, res) => {
-	const { loginId } = req.user;
-	const { files, newdir, curDirectory } = req.body;
-	await updateDir(loginId, files, newdir, curDirectory);
-	return res.send();
 });
 
 export default router;

@@ -17,7 +17,7 @@ export const moveFileToTrash = async (selectedFiles: Map<string, FileDTO>) => {
 		action: FileEditAction.trash,
 	};
 	await fetch('/cloud/files', {
-		method: 'PUT',
+		method: 'PATCH',
 		credentials: 'include',
 		headers: {
 			'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export const restoreTrashFile = async (selectedFiles: Map<string, FileDTO>) => {
 		action: FileEditAction.restore,
 	};
 	await fetch('/cloud/files', {
-		method: 'PUT',
+		method: 'PATCH',
 		credentials: 'include',
 		headers: {
 			'Content-Type': 'application/json',

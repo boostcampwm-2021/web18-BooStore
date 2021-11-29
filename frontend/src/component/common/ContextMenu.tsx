@@ -42,7 +42,7 @@ const ContextMenu: React.FC<Props> = ({
 			action: FileEditAction.addStar,
 		};
 		fetch('/cloud/files', {
-			method: 'PUT',
+			method: 'PATCH',
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',

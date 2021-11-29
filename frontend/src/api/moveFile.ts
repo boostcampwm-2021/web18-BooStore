@@ -1,18 +1,19 @@
-import { FileDTO } from "@DTO"
+import { FileDTO, FileEditAction } from "@DTO"
 
 
 export const handleMoveFile= (targetIds: string[], newDirectory: string, curDirectory: string)=>{
-    return fetch('/cloud/update',{
-        method: 'POST',
+    const body = {
+        targetIds: targetIds,
+        newdir: newDirectory,
+        curdir: curDirectory,
+        action: FileEditAction.move,
+    }
+
+    return fetch('/cloud/files',{
+        method: 'PATCH',
         credentials: 'include',
         headers : {"Content-Type" : "application/json"},
-        body: JSON.stringify(
-            {
-                files: targetIds,
-                newdir: newDirectory,
-                curDirectory: curDirectory
-            }
-        )
+        body: JSON.stringify(body)
     })
         .then((res) => {
             return res.ok;
