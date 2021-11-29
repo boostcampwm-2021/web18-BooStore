@@ -6,7 +6,7 @@ import { decreaseCurrentCapacity, increaseCurrentCapacity } from '.';
 import { applyEscapeString } from '../../util';
 
 const bucketName = process.env.S3_BUCKET_NAME;
-const OBJECT_STORAGE_BASE = 'https://kr.object.ncloudstorage.com';
+const OBJECT_STORAGE_BASE = process.env.S3_BASE_PATH;
 
 export interface UploadArg {
 	originalName: string;
