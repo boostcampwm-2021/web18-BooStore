@@ -1,4 +1,5 @@
 import { FileDTO,  FileEditAction } from '../DTO';
+import { handleFiles } from 'api';
 
 
 export const getTrashFiles = () => {
@@ -35,14 +36,8 @@ export const moveFileToTrash = async (selectedFiles: Map<string, FileDTO>) => {
 		directories: directories,
 		action: FileEditAction.trash,
 	};
-	await fetch('/cloud/files', {
-		method: 'PATCH',
-		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(body),
-	});
+
+	handleFiles('PATCH',body);
 };
 
 export const restoreTrashFile = async (selectedFiles: Map<string, FileDTO>) => {
@@ -61,14 +56,8 @@ export const restoreTrashFile = async (selectedFiles: Map<string, FileDTO>) => {
 		directories: directories,
 		action: FileEditAction.restore,
 	};
-	await fetch('/cloud/files', {
-		method: 'PATCH',
-		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(body),
-	});
+
+	handleFiles('PATCH',body);
 };
 
 export const removeFile = async (selectedFiles: Map<string, FileDTO>) => {
@@ -86,6 +75,7 @@ export const removeFile = async (selectedFiles: Map<string, FileDTO>) => {
 		targetIds: targetIds,
 		directories: directories,
 	};
+	//handleFiles('DELETE',body)
 	await fetch('/cloud/files', {
 		method: 'DELETE',
 		credentials: 'include',

@@ -161,6 +161,7 @@ router.patch('/files', isAuthenticated, async (req, res) => {
 });
 
 router.delete('/files', isAuthenticated, async (req, res) => {
+	console.log(req.body);
 	const { targetIds = [], directories = [] } = req.body;
 	const { loginId } = req.user;
 
