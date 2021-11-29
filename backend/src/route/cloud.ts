@@ -199,9 +199,13 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 router.get('/trash', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 
-	const files = await getTrashFiles(loginId);
+	try {
+		const files = await getTrashFiles(loginId);
 
-	return res.json(files);
+		return res.json(files);
+	} catch (err) {
+		return res.status(500).send();
+	}
 });
 
 router.post('/update', isAuthenticated, async (req, res) => {
