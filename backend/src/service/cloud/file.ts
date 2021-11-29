@@ -374,9 +374,7 @@ export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersF
 	return Promise.all(
 		directories.map(async (ele) => {
 			const { directory, name } = ele;
-			const path = applyEscapeString(
-				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
-			);
+			const path = applyEscapeString(`${directory}/${name}`.replace(/\/\/|\//g, '\\/'));
 
 			const files = await Cloud.find({
 				ownerId: userLoginId,
