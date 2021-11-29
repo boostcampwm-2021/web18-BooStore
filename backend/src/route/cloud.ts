@@ -156,13 +156,15 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 router.post('/newfolder', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { name, curdir } = req.body;
-	let newDir = curdir.curDir + name.newFolderName;
-	if (curdir.curDir != '/') {
-		newDir = curdir.curDir + '/' + name.newFolderName;
+	const folderName = name.newFolderName;
+	const curDir = curdir.curDir;
+	let newDir = curDir + folderName;
+	if (curDir != '/') {
+		newDir = curDir + '/' + folderName;
 	}
 	try {
 		await createAncestorsFolder(newDir, loginId);
-		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
+		const newFolder = await getNewFolder(loginId, curDir, folderName);
 		if(newFolder===null){
 			return res.status(204).send();
 		}
