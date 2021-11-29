@@ -40,7 +40,7 @@ const FileMenuForStar: React.FC<Props> = ({
 		setOnSelectAll((prev) => !prev);
 	}, [files, selectedFiles, isOnSelectAll]);
 
-	const onClickDownload = async () => {
+	const onClickDownload = () => {
 		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)

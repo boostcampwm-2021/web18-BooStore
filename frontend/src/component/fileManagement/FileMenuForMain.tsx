@@ -72,7 +72,7 @@ const FileMenuForMain: React.FC<Props> = ({
 		setSelectedUploadFiles(event.target.files);
 	};
 
-	const onClickDownload = async () => {
+	const onClickDownload = () => {
 		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)
