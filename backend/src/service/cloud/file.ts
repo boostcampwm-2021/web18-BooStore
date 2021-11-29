@@ -423,9 +423,7 @@ export const removeFolders = async ({ directories, userLoginId }: FoldersFunctio
 	return Promise.all(
 		directories.map(async (ele) => {
 			const { directory, name } = ele;
-			const path = applyEscapeString(
-				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
-			);
+			const path = applyEscapeString(`${directory}/${name}`.replace(/\/\/|\//g, '\\/'));
 
 			const files = await Cloud.find(
 				{
@@ -435,23 +433,32 @@ export const removeFolders = async ({ directories, userLoginId }: FoldersFunctio
 				{ osLink: true, size: true, ownerId: true }
 			).exec();
 
+			const totalSize = files.reduce((prev, { size }) => prev + size, 0);
 			const keys = files.map(({ osLink }) => {
 				return { Key: osLink.replace(`${OBJECT_STORAGE_BASE}/${bucketName}/`, '') };
 			});
-			removeObjectStorageObjects(keys);
 
-			const totalSize = files.reduce((prev, { size }) => prev + size, 0);
-			await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
-
-			Cloud.deleteOne({
+			const removeOSObjectPromise = removeObjectStorageObjects(keys);
+			const decreaseCCPromise = decreaseCurrentCapacity({
+				loginId: userLoginId,
+				value: totalSize,
+			});
+			const deleteFolderDocs = Cloud.deleteOne({
 				ownerId: userLoginId,
 				directory: directory,
 				name: name,
-			}).exec();
-			await Cloud.deleteMany({
+			});
+			const deleteFileDocs = Cloud.deleteMany({
 				ownerId: userLoginId,
 				directory: { $regex: `^${path}(\\/.*)?$` },
 			});
+
+			await Promise.all([
+				removeOSObjectPromise,
+				decreaseCCPromise,
+				deleteFolderDocs,
+				deleteFileDocs,
+			]);
 		})
 	);
 };
