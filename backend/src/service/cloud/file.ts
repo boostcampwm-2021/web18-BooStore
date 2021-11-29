@@ -6,7 +6,7 @@ import { decreaseCurrentCapacity, increaseCurrentCapacity } from '.';
 import { applyEscapeString } from '../../util';
 
 const bucketName = process.env.S3_BUCKET_NAME;
-const OBJECT_STORAGE_BASE = 'https://kr.object.ncloudstorage.com';
+const OBJECT_STORAGE_BASE = process.env.S3_BASE_PATH;
 
 export interface UploadArg {
 	originalName: string;
@@ -49,39 +49,72 @@ export const uploadFile = async ({
 	size,
 	userLoginId,
 }: UploadArg) => {
-	const objectStorageKey = path
-		.join(userLoginId, fileName)
-		.split(/\\\\|\\/)
-		.join('/');
+	const objectStorageKey = path.join(userLoginId, fileName).replace(/\\\\|\\/g, '/');
 	const diskFilePath = path.join(destination, fileName);
 	const cloudDirectory = path
 		.join(rootDirectory, relativePath.split('/').slice(0, -1).join('/'))
-		.split(/\\\\|\\/)
-		.join('/');
+		.replace(/\\\\|\\/g, '/');
 
-	const s3Promise = S3.upload({
-		Bucket: bucketName,
-		Key: objectStorageKey,
-		ACL: 'public-read',
-		Body: fs.createReadStream(diskFilePath),
-	}).promise();
+	try {
+		const s3Promise = S3.upload({
+			Bucket: bucketName,
+			Key: objectStorageKey,
+			ACL: 'public-read',
+			Body: fs.createReadStream(diskFilePath),
+		}).promise();
 
-	const cafPromise = createAncestorsFolder(cloudDirectory, userLoginId);
+		const cafPromise = createAncestorsFolderDocs(cloudDirectory, userLoginId);
 
-	const notOverlappedName = await getNotOverlappedName(cloudDirectory, originalName, userLoginId);
+		const notOverlappedName = await getNotOverlappedName(
+			cloudDirectory,
+			originalName,
+			userLoginId
+		);
 
-	const cloudPromise = Cloud.create({
-		name: notOverlappedName,
-		size: size,
-		ownerId: userLoginId,
-		directory: cloudDirectory,
-		contentType: mimetype,
-		osLink: `${OBJECT_STORAGE_BASE}/${bucketName}/${objectStorageKey}`,
-	});
+		const cloudPromise = Cloud.create({
+			name: notOverlappedName,
+			size: size,
+			ownerId: userLoginId,
+			directory: cloudDirectory,
+			contentType: mimetype,
+			osLink: `${OBJECT_STORAGE_BASE}/${bucketName}/${objectStorageKey}`,
+		});
 
-	await Promise.all([cafPromise, s3Promise, cloudPromise]);
+		await Promise.all([cafPromise, s3Promise, cloudPromise]);
 
-	await increaseCurrentCapacity({ loginId: userLoginId, value: size });
+		await increaseCurrentCapacity({ loginId: userLoginId, value: size });
+	} catch (err) {
+		throw new Error(err);
+	}
+};
+
+const parseFilename = (filename: string) => {
+	let realName = '',
+		name = filename,
+		numbering = 0,
+		ext = '';
+	const regex1 = /^(?<name>.*)(?<ext>\..*)$/;
+	const match1 = filename.match(regex1);
+	if (match1) {
+		ext = match1.groups.ext;
+		name = match1.groups.name;
+		realName = name;
+	}
+
+	const regex2 = /^(?<realName>.+)\((?<numbering>\d+)\)$/;
+	const match2 = name.match(regex2);
+	if (match2) {
+		realName = match2.groups.realName;
+		numbering = Number(match2.groups.numbering);
+	}
+
+	return {
+		realName,
+		name,
+		numbering,
+		ext,
+		filename,
+	};
 };
 
 // 중복된 경우, 파일명 뒷부분에 중복 번호를 붙여준다.
@@ -92,45 +125,41 @@ export const getNotOverlappedName = async (
 	filename: string,
 	ownerId: string
 ) => {
-	const fileDoc = await Cloud.findOne({
-		name: filename,
+	const { realName, ext } = parseFilename(filename);
+	let regexStr = `^${applyEscapeString(realName)}`;
+	regexStr += `(\\(\\d+\\)|)`;
+	regexStr += ext;
+	regexStr += `$`;
+
+	const fileDocs = await Cloud.find({
 		directory: directory,
 		ownerId: ownerId,
+		name: {
+			$regex: regexStr,
+		},
 	}).exec();
-	if (!fileDoc) {
+	if (fileDocs.length === 0) {
 		return filename;
 	}
 
-	let extIndex = filename.lastIndexOf('.');
-	if (extIndex === -1) {
-		extIndex = filename.length;
-	}
-	const name = filename.slice(0, extIndex);
-	const ext = filename.slice(extIndex);
-	const leftBracketIndex = name.lastIndexOf('(');
-	const rightBracketIndex = name.lastIndexOf(')');
+	const numbers = fileDocs
+		.map((file) => {
+			const parsedFilename = parseFilename(file.name);
+			return parsedFilename.numbering;
+		})
+		.sort((a, b) => a - b);
+	const leastNumber = numbers.findIndex((ele, index) => ele !== index);
 
-	if (
-		leftBracketIndex === -1 ||
-		rightBracketIndex === -1 ||
-		rightBracketIndex !== name.length - 1 ||
-		leftBracketIndex + 1 >= rightBracketIndex
-	) {
-		return await getNotOverlappedName(directory, `${name}(1)${ext}`, ownerId);
+	if (leastNumber === 0) {
+		return filename;
+	} else if (leastNumber === -1) {
+		return `${realName}(${numbers.length})${ext}`;
+	} else {
+		return `${realName}(${leastNumber})${ext}`;
 	}
-
-	const strInsideBracket = name.slice(leftBracketIndex + 1, rightBracketIndex);
-	const overlapNumber = Number(strInsideBracket);
-	if (isNaN(overlapNumber)) {
-		return await getNotOverlappedName(directory, `${name}(1)${ext}`, ownerId);
-	}
-
-	const newFilename = `${name.slice(0, leftBracketIndex)}(${overlapNumber + 1})${ext}`;
-	return await getNotOverlappedName(directory, newFilename, ownerId);
 };
 
-// /test2/폴더어/폴더어2/test.txt -> /test2/폴더어/폴더어2
-export const createAncestorsFolder = async (curDirectory: string, userLoginId: string) => {
+export const createAncestorsFolderDocs = async (curDirectory: string, userLoginId: string) => {
 	if (curDirectory === '/') {
 		return;
 	}
@@ -240,7 +269,7 @@ export const getTrashFiles = async (userLoginId: string) => {
 	const files = docs.filter((doc) => doc.contentType !== 'folder');
 
 	const directories = folders.map((folder) =>
-		`${folder.directory}/${folder.name}`.replace(/\/\//g, '/').replace(/\//g, '\\/')
+		`${folder.directory}/${folder.name}`.replace(/\/\/|\//g, '\\/')
 	);
 
 	const foldersOutsideFolder = directories.reduce(
@@ -288,11 +317,11 @@ export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctio
 		return result;
 	}, new Set<string>());
 
-	const createDirPromise = Promise.all(
-		[...directories].map((directory) => createAncestorsFolder(directory, userLoginId))
+	const createAncFolderPromise = Promise.all(
+		[...directories].map((directory) => createAncestorsFolderDocs(directory, userLoginId))
 	);
 
-	const resultPromise = Cloud.updateMany(
+	const updateDocsPromise = Cloud.updateMany(
 		{
 			ownerId: userLoginId,
 			_id: { $in: targetIds },
@@ -302,7 +331,7 @@ export const restoreTrashFiles = async ({ targetIds, userLoginId }: FilesFunctio
 		}
 	).exec();
 
-	await Promise.all([createDirPromise, resultPromise]);
+	await Promise.all([createAncFolderPromise, updateDocsPromise]);
 };
 
 export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs) => {
@@ -317,27 +346,26 @@ export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs)
 		return;
 	}
 
+	const totalSize = files.reduce((prev, { size }) => prev + size, 0);
 	const keys = files.map(({ osLink }) => {
 		return { Key: osLink.replace(`${OBJECT_STORAGE_BASE}/${bucketName}/`, '') };
 	});
-	removeObjectStorageObjects(keys);
 
-	const totalSize = files.reduce((prev, { size }) => prev + size, 0);
-	await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
-
-	await Cloud.deleteMany({
+	const removeOSObjectPromise = removeObjectStorageObjects(keys);
+	const decreaseCCPromise = decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
+	const deleteDocs = Cloud.deleteMany({
 		ownerId: userLoginId,
 		_id: { $in: targetIds },
 	});
+
+	await Promise.all([removeOSObjectPromise, decreaseCCPromise, deleteDocs]);
 };
 
 export const moveFoldersToTrash = async ({ directories, userLoginId }: FoldersFunctionArgs) => {
 	return Promise.all(
 		directories.flatMap((ele) => {
 			const { directory, name } = ele;
-			const path = applyEscapeString(
-				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
-			);
+			const path = applyEscapeString(`${directory}/${name}`.replace(/\/\/|\//g, '\\/'));
 
 			const moveFolderPromise = Cloud.updateOne(
 				{
@@ -372,9 +400,7 @@ export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersF
 	return Promise.all(
 		directories.map(async (ele) => {
 			const { directory, name } = ele;
-			const path = applyEscapeString(
-				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
-			);
+			const path = applyEscapeString(`${directory}/${name}`.replace(/\/\/|\//g, '\\/'));
 
 			const files = await Cloud.find({
 				ownerId: userLoginId,
@@ -387,7 +413,9 @@ export const restoreTrashFolders = async ({ directories, userLoginId }: FoldersF
 			}, new Set<string>());
 
 			const createDirPromise = Promise.all(
-				[...directories].map((directory) => createAncestorsFolder(directory, userLoginId))
+				[...directories].map((directory) =>
+					createAncestorsFolderDocs(directory, userLoginId)
+				)
 			);
 
 			const moveFolderPromise = Cloud.updateOne(
@@ -421,9 +449,7 @@ export const removeFolders = async ({ directories, userLoginId }: FoldersFunctio
 	return Promise.all(
 		directories.map(async (ele) => {
 			const { directory, name } = ele;
-			const path = applyEscapeString(
-				`${directory}/${name}`.replace('//', '/').replace(/\//g, '\\/')
-			);
+			const path = applyEscapeString(`${directory}/${name}`.replace(/\/\/|\//g, '\\/'));
 
 			const files = await Cloud.find(
 				{
@@ -433,23 +459,32 @@ export const removeFolders = async ({ directories, userLoginId }: FoldersFunctio
 				{ osLink: true, size: true, ownerId: true }
 			).exec();
 
+			const totalSize = files.reduce((prev, { size }) => prev + size, 0);
 			const keys = files.map(({ osLink }) => {
 				return { Key: osLink.replace(`${OBJECT_STORAGE_BASE}/${bucketName}/`, '') };
 			});
-			removeObjectStorageObjects(keys);
 
-			const totalSize = files.reduce((prev, { size }) => prev + size, 0);
-			await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
-
-			Cloud.deleteOne({
+			const removeOSObjectPromise = removeObjectStorageObjects(keys);
+			const decreaseCCPromise = decreaseCurrentCapacity({
+				loginId: userLoginId,
+				value: totalSize,
+			});
+			const deleteFolderDocs = Cloud.deleteOne({
 				ownerId: userLoginId,
 				directory: directory,
 				name: name,
-			}).exec();
-			await Cloud.deleteMany({
+			});
+			const deleteFileDocs = Cloud.deleteMany({
 				ownerId: userLoginId,
 				directory: { $regex: `^${path}(\\/.*)?$` },
 			});
+
+			await Promise.all([
+				removeOSObjectPromise,
+				decreaseCCPromise,
+				deleteFolderDocs,
+				deleteFileDocs,
+			]);
 		})
 	);
 };

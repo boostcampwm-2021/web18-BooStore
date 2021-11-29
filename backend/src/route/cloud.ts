@@ -19,7 +19,7 @@ import {
 	createZipFile,
 	deleteZipFile,
 	updateStarStatus,
-	createAncestorsFolder,
+	createAncestorsFolderDocs,
 	getNewFolder,
 	getTrashFiles,
 	updateDir,
@@ -34,14 +34,17 @@ const router = express.Router();
 
 router.get('/validate', isAuthenticated, async (req, res) => {
 	const { size } = req.query;
+	const { loginId } = req.user;
 	const value = Number(size);
-	if (isNaN(value)) {
+	if (isNaN(value) || size.length === 0) {
 		return res.status(400).send();
 	}
 
-	!(await canIncreaseCurrentCapacity({ loginId: req.user.loginId, value }))
-		? res.status(409).send()
-		: res.status(200).send();
+	if (await canIncreaseCurrentCapacity({ loginId, value })) {
+		return res.status(200).send();
+	} else {
+		return res.status(409).send();
+	}
 });
 
 router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req, res) => {
@@ -117,7 +120,7 @@ router.get('/download', isAuthenticated, async (req, res) => {
 });
 
 router.patch('/files', isAuthenticated, async (req, res) => {
-	const { targetIds = [], directories = [], action, newdir = "", curdir = "" } = req.body;
+	const { targetIds = [], directories = [], action, newdir = '', curdir = '' } = req.body;
 	const { loginId } = req.user;
 	const { targetIds = [], directories = [], action } = req.body;
 	if (loginId === undefined) {
@@ -149,6 +152,8 @@ router.patch('/files', isAuthenticated, async (req, res) => {
 					state: false,
 				});
 				break;
+			default:
+				return res.status(400).send('invalid action');
 		}
 		return res.status(200).send();
 	} catch (err) {
@@ -180,9 +185,9 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 		newDir = curDir + '/' + folderName;
 	}
 	try {
-		await createAncestorsFolder(newDir, loginId);
+		await createAncestorsFolderDocs(newDir, loginId);
 		const newFolder = await getNewFolder(loginId, curDir, folderName);
-		if(newFolder===null){
+		if (newFolder === null) {
 			return res.status(503).send();
 		}
 		return res.json(newFolder);
@@ -194,9 +199,13 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 router.get('/trash', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 
-	const files = await getTrashFiles(loginId);
+	try {
+		const files = await getTrashFiles(loginId);
 
-	return res.json(files);
+		return res.json(files);
+	} catch (err) {
+		return res.status(500).send();
+	}
 });
 
 router.post('/update', isAuthenticated, async (req, res) => {
