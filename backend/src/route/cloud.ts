@@ -132,8 +132,7 @@ router.patch('/files', isAuthenticated, async (req, res) => {
 				});
 				break;
 		}
-
-		res.send();
+		return res.send();
 	} catch (err) {
 		res.status(500).send();
 	}
@@ -166,11 +165,11 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 		await createAncestorsFolder(newDir, loginId);
 		const newFolder = await getNewFolder(loginId, curDir, folderName);
 		if(newFolder===null){
-			return res.status(204).send();
+			return res.status(503).send();
 		}
 		return res.json(newFolder);
 	} catch (err) {
-		res.sendStatus(503);
+		return res.sendStatus(503);
 	}
 });
 

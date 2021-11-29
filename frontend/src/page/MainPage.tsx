@@ -1,5 +1,5 @@
-import React, { Key, useCallback, useEffect, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useCallback, useEffect, useState } from 'react';
+import styled from 'styled-components';
 
 import FileList from '@component/fileManagement/FileList';
 import FileMenu from '@component/fileManagement/FileMenuForMain';
