@@ -152,6 +152,8 @@ router.patch('/files', isAuthenticated, async (req, res) => {
 					state: false,
 				});
 				break;
+			default:
+				return res.status(400).send('invalid action');
 		}
 		return res.status(200).send();
 	} catch (err) {
