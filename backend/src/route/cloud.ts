@@ -162,9 +162,12 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 	try {
 		await createAncestorsFolder(newDir, loginId);
 		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
+		if(newFolder===null){
+			return res.status(204).send();
+		}
 		return res.json(newFolder);
 	} catch (err) {
-		res.sendStatus(304);
+		res.sendStatus(503);
 	}
 });
 
@@ -176,7 +179,7 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 	return res.json(files);
 });
 
-router.post('/update', isAuthenticated, async (req, res) => {
+router.patch('/update', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { files, newdir, curDirectory } = req.body;
 	await updateDir(loginId, files, newdir, curDirectory);
