@@ -185,6 +185,7 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 		newDir = curDir + '/' + folderName;
 	}
 	try {
+<<<<<<< HEAD
 		await createAncestorsFolderDocs(newDir, loginId);
 		const newFolder = await getNewFolder(loginId, curDir, folderName);
 		if (newFolder === null) {
@@ -193,6 +194,16 @@ router.post('/newfolder', isAuthenticated, async (req, res) => {
 		return res.json(newFolder);
 	} catch (err) {
 		return res.sendStatus(503);
+=======
+		await createAncestorsFolder(newDir, loginId);
+		const newFolder = await getNewFolder(loginId, curdir.curDir, name.newFolderName);
+		if(newFolder===null){
+			return res.status(204).send();
+		}
+		return res.json(newFolder);
+	} catch (err) {
+		res.sendStatus(503);
+>>>>>>> 228c4a4 ([Feat])
 	}
 });
 
@@ -208,7 +219,16 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 	}
 });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8c68e9c ([Feat])
 router.post('/update', isAuthenticated, async (req, res) => {
+=======
+router.patch('/update', isAuthenticated, async (req, res) => {
+>>>>>>> 228c4a4 ([Feat])
 	const { loginId } = req.user;
 	const { files, newdir, curDirectory } = req.body;
 	await updateDir(loginId, files, newdir, curDirectory);
