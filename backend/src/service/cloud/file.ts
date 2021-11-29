@@ -320,18 +320,19 @@ export const removeFiles = async ({ targetIds, userLoginId }: FilesFunctionArgs)
 		return;
 	}
 
+	const totalSize = files.reduce((prev, { size }) => prev + size, 0);
 	const keys = files.map(({ osLink }) => {
 		return { Key: osLink.replace(`${OBJECT_STORAGE_BASE}/${bucketName}/`, '') };
 	});
-	removeObjectStorageObjects(keys);
 
-	const totalSize = files.reduce((prev, { size }) => prev + size, 0);
-	await decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
-
-	await Cloud.deleteMany({
+	const removeOSObjectPromise = removeObjectStorageObjects(keys);
+	const decreaseCCPromise = decreaseCurrentCapacity({ loginId: userLoginId, value: totalSize });
+	const deleteDocs = Cloud.deleteMany({
 		ownerId: userLoginId,
 		_id: { $in: targetIds },
 	});
+
+	await Promise.all([removeOSObjectPromise, decreaseCCPromise, deleteDocs]);
 };
 
 export const moveFoldersToTrash = async ({ directories, userLoginId }: FoldersFunctionArgs) => {
