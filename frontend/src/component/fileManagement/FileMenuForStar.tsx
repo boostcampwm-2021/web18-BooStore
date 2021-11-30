@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { FileDTO } from '@DTO';
 import { Capacity } from '@model';
@@ -10,18 +10,14 @@ import { downloadFiles } from '@api';
 import path from 'path';
 
 interface Props {
-	setCapacity: React.Dispatch<React.SetStateAction<Capacity>>;
 	selectedFiles: Map<string, FileDTO>;
 	setSelectedFiles: React.Dispatch<React.SetStateAction<Map<string, FileDTO>>>;
-	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
 	files: FileDTO[];
 }
 
 const FileMenuForStar: React.FC<Props> = ({
-	setCapacity,
 	selectedFiles,
 	setSelectedFiles,
-	setFiles,
 	files,
 }) => {
 	const [isOnSelectAll, setOnSelectAll] = useState(false);

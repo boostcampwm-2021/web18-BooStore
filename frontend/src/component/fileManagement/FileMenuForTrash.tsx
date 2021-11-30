@@ -1,10 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { FileDTO, FileEditAction } from '@DTO';
+import { FileDTO } from '@DTO';
 import { Capacity } from '@model';
-import DropBox, { DropBoxItem } from '@component/common/DropBox';
-import ModalComponent, { ModalType } from '@component/common/modalComponent';
-import ProgressBar from '@component/common/ProgressBar';
 import Button from '@component/common/Button';
 
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';

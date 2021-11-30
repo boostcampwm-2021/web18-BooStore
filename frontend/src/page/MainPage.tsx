@@ -58,7 +58,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 	const [selectedFiles, setSelectedFiles] = useState<Map<string, FileDTO>>(new Map());
 	const [isAscending, setIsAscending] = useState<boolean>(true);
 	const location = useLocation<{ currentDirectory: string | undefined }>();
-	
+
 	const onClickDirectory = async (relativePath: string) => {
 		const files = await getFiles(relativePath, isAscending);
 		setFiles(files);
@@ -110,7 +110,7 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 		[setShow, setAnchorPoint]
 	);
 
-	const handleClick = useCallback(() => (show ? setShow(false) : null), [show]);
+	const handleClick = useCallback(() => show && setShow(false), [show]);
 
 	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
 	const [isOpenMoveFile, setIsOpenMoveFile] = useState(false);
@@ -151,8 +151,8 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						isAscending={isAscending}
 						setIsAscending={setIsAscending}
 					/>
-					<ContextMenu 
-						setIsOpenNewFolder={setIsOpenNewFolder} 
+					<ContextMenu
+						setIsOpenNewFolder={setIsOpenNewFolder}
 						setIsOpenMoveFile={setIsOpenMoveFile}
 						show={show}
 						anchorPoint={anchorPoint}
@@ -163,17 +163,18 @@ const MainPage: React.FC<MainPageProps> = ({ user, setUser }) => {
 						isOpenNewFolder={isOpenNewFolder}
 						setIsOpenNewFolder={setIsOpenNewFolder}
 						setFiles={setFiles}
-						files={files}
 						curDir={currentDir}
 					/>
-					{isOpenMoveFile && <MoveFileModal 
-						selectedFiles={selectedFiles}
-						setSelectedFiles={setSelectedFiles}
-						isOpenMoveFile={isOpenMoveFile} 
-						setIsOpenMoveFile={setIsOpenMoveFile}
-						curDir={currentDir}
-						setFiles={setFiles}
-					/>}
+					{isOpenMoveFile && (
+						<MoveFileModal
+							selectedFiles={selectedFiles}
+							setSelectedFiles={setSelectedFiles}
+							isOpenMoveFile={isOpenMoveFile}
+							setIsOpenMoveFile={setIsOpenMoveFile}
+							curDir={currentDir}
+							setFiles={setFiles}
+						/>
+					)}
 				</InnerContainer>
 			</Container>
 		</>

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import ContextDropdown from '@component/common/ContextDropdown';
 
 import styled from 'styled-components';

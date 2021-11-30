@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from 'react';
-import styled from 'styled-components';
+import React from 'react';
 import { ModalType } from './type';
 
 import { ReactComponent as ProgressIcon } from '@asset/image/icons/icon_progress.svg';

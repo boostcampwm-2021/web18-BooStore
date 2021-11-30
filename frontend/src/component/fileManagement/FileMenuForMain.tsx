@@ -10,7 +10,7 @@ import Button from '@component/common/Button';
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
 import { moveFileToTrash, downloadFiles } from '@api';
-import { getFiles, getNotOverlappedName, getNotOverlappedRelativePaths } from '@util';
+import { getNotOverlappedRelativePaths } from '@util';
 
 interface Props {
 	showShareButton?: boolean;
