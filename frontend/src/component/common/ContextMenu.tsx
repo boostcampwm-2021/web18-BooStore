@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import ContextDropdown from '@component/common/ContextDropdown';
 
 import styled from 'styled-components';
 import { FileDTO, FileEditAction } from '@DTO';
+import { handleFiles } from 'api';
 
 interface Props {
 	setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,12 +29,11 @@ const ContextMenu: React.FC<Props> = ({
 		setIsOpenNewFolder(true);
 	};
 
-	const moveFile = (selectedFilesSize: number)=>
-  {
-    if(selectedFilesSize!=0){
-      setIsOpenMoveFile(true);
-    }
-  }
+	const moveFile = (selectedFilesSize: number) => {
+		if (selectedFilesSize != 0) {
+			setIsOpenMoveFile(true);
+		}
+	};
 
 	const addStar = useCallback(() => {
 		const targetIds = [...selectedFiles.values()].map((file) => file._id);
@@ -41,14 +41,7 @@ const ContextMenu: React.FC<Props> = ({
 			targetIds: targetIds,
 			action: FileEditAction.addStar,
 		};
-		fetch('/cloud/files', {
-			method: 'PATCH',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+		handleFiles('PATCH', body);
 
 		setFiles((files) =>
 			files.map((file) => {
@@ -65,10 +58,15 @@ const ContextMenu: React.FC<Props> = ({
 		return (
 			<ContextDropdown top={anchorPoint.y} left={anchorPoint.x}>
 				<StyledLi onClick={addNewFolder}>새 폴더 만들기</StyledLi>
-				<StyledLi onClick={() => moveFile(selectedFiles.size)} disabled={selectedFiles.size === 0}>
+				<StyledLi
+					onClick={() => moveFile(selectedFiles.size)}
+					disabled={selectedFiles.size === 0}
+				>
 					이동
 				</StyledLi>
-				<StyledLi onClick={addStar}>중요 문서함에 추가</StyledLi>
+				<StyledLi onClick={addStar} disabled={selectedFiles.size === 0}>
+					중요 문서함에 추가
+				</StyledLi>
 			</ContextDropdown>
 		);
 	}
@@ -98,4 +96,3 @@ const StyledLi = styled.li<UlProps>`
 `;
 
 export default ContextMenu;
-

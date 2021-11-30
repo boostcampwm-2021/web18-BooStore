@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import styled, { ThemeConsumer } from 'styled-components';
-import { convertByteToUnitString, getDate, getFiles } from '@util';
+import styled from 'styled-components';
+import { convertByteToUnitString, getDate } from '@util';
 import { FileDTO, FileEditAction } from '@DTO';
 import FileIcon from './FileIcon';
 import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
@@ -36,7 +36,7 @@ const File: React.FC<Props> = ({
 		if (event.button !== 0) {
 			return;
 		}
-		
+
 		setSelectedFiles((selectedFiles) => {
 			const result = new Map(selectedFiles);
 			if (result.has(_id)) {
@@ -74,7 +74,7 @@ const File: React.FC<Props> = ({
 		});
 	};
 
-	const changeCurrentDirectory = async () => {
+	const changeCurrentDirectory = () => {
 		if (isFolder) {
 			const childDir =
 				currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;

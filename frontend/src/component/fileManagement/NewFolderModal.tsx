@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import ReactModal from 'react-modal';
-import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+import ModalComponent, { ModalType } from '@component/common/modalComponent';
 import Button from '@component/common/Button';
 import { FileDTO } from '@DTO';
 import { handleNewFolder } from 'api';
@@ -12,7 +12,6 @@ interface Props {
 	isOpenNewFolder: boolean;
 	setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
 	setFiles: React.Dispatch<React.SetStateAction<FileDTO[]>>;
-	files: FileDTO[];
 	curDir: string;
 }
 
@@ -21,7 +20,6 @@ const NewFolderModal: React.FC<Props> = ({
 	isOpenNewFolder,
 	setIsOpenNewFolder,
 	setFiles,
-	files,
 	curDir,
 }) => {
 	const [newFolderName, setNewFolderName] = useState('');
@@ -50,47 +48,44 @@ const NewFolderModal: React.FC<Props> = ({
 		}
 	}
 	
-	if (isOpenNewFolder) {
-		return (
-			<ReactModal
-				isOpen={isOpenNewFolder}
-				onRequestClose={onRequestClose}
-				ariaHideApp={false}
-				style={{
-					content: {
-						width: '400px',
-						minHeight: '180px',
-						border: '1px solid #ccc',
-						background: '#fff',
-						overflow: 'auto',
-						WebkitOverflowScrolling: 'touch',
-						borderRadius: '4px',
-						outline: 'none',
-						padding: '20px',
-						display: 'flex',
-						flexDirection: 'column',
-						justifyContent: 'space-between',
-					},
-				}}
-			>
-				<InputContainer>
-					<p>새 폴더</p>
-					<Input
-						name="newFolderName"
-						value={newFolderName}
-						placeholder="제목 없는 폴더"
-						autoComplete="off"
-						onChange={onChange}
-						onKeyPress={onInputKeyPress}
-					/>
-					<ButtonContainer>
-						<MakeFolderButton onClick={makeNewFolder}>만들기</MakeFolderButton>
-					</ButtonContainer>
-				</InputContainer>
-			</ReactModal>
-		);
-	}
-	return <></>;
+	return (
+		<ReactModal
+			isOpen={isOpenNewFolder}
+			onRequestClose={onRequestClose}
+			ariaHideApp={false}
+			style={{
+				content: {
+					width: '400px',
+					minHeight: '180px',
+					border: '1px solid #ccc',
+					background: '#fff',
+					overflow: 'auto',
+					WebkitOverflowScrolling: 'touch',
+					borderRadius: '4px',
+					outline: 'none',
+					padding: '20px',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'space-between',
+				},
+			}}
+		>
+			<InputContainer>
+				<p>새 폴더</p>
+				<Input
+					name="newFolderName"
+					value={newFolderName}
+					placeholder="제목 없는 폴더"
+					autoComplete="off"
+					onChange={onChange}
+					onKeyPress={onInputKeyPress}
+				/>
+				<ButtonContainer>
+					<MakeFolderButton onClick={makeNewFolder}>만들기</MakeFolderButton>
+				</ButtonContainer>
+			</InputContainer>
+		</ReactModal>
+	);
 };
 
 const Input = styled.input`

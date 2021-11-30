@@ -1,4 +1,5 @@
-import { FileDTO, FileEditAction } from "@DTO"
+import { FileEditAction } from "@DTO";
+import { handleFiles } from 'api';
 
 
 export const handleMoveFile= (targetIds: string[], newDirectory: string, curDirectory: string)=>{
@@ -9,13 +10,5 @@ export const handleMoveFile= (targetIds: string[], newDirectory: string, curDire
         action: FileEditAction.move,
     }
 
-    return fetch('/cloud/files',{
-        method: 'PATCH',
-        credentials: 'include',
-        headers : {"Content-Type" : "application/json"},
-        body: JSON.stringify(body)
-    })
-        .then((res) => {
-            return res.ok;
-        });
+    return handleFiles('PATCH',body);
 }

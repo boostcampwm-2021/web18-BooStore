@@ -26,7 +26,7 @@ export const clearTrashFileScheduler = (cron: string, durationDay = 7) => {
 				ownerId: true,
 			}
 		).exec();
-		const filesSeperatedUser = files.reduce((prev, file) => {
+		const filesSeparatedUser = files.reduce((prev, file) => {
 			const { ownerId, _id } = file;
 			if (prev.hasOwnProperty(ownerId)) {
 				return prev[ownerId].push(_id);
@@ -35,9 +35,9 @@ export const clearTrashFileScheduler = (cron: string, durationDay = 7) => {
 			return prev;
 		}, {});
 
-		Object.keys(filesSeperatedUser).forEach((ownerId) => {
+		Object.keys(filesSeparatedUser).forEach((ownerId) => {
 			removeFiles({
-				targetIds: filesSeperatedUser[ownerId],
+				targetIds: filesSeparatedUser[ownerId],
 				userLoginId: ownerId,
 			});
 		});
