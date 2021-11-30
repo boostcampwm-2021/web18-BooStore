@@ -123,8 +123,16 @@ const FileMenuForMain: React.FC<Props> = ({
 		const res = await fetch(`/cloud/validate?size=${totalSize}`, {
 			credentials: 'include',
 		});
-
-		return res.ok;
+		
+		if (res.ok) {
+			return true;
+		}
+		else if (res.status === 403) {
+			return false;
+		}
+		else {
+			throw new Error(res.status.toString());
+		}
 	};
 
 	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
@@ -191,7 +199,24 @@ const FileMenuForMain: React.FC<Props> = ({
 			setProgressModalText('Complete!');
 			setIsCompleteSend(true);
 		} catch (err) {
-			setFailureModalText((err as Error).message);
+			const message = (err as Error).message;
+			const status = Number(message);
+			if (isNaN(status)) {
+				setFailureModalText(message);
+			}
+			else if (status === 400) {
+				setFailureModalText('잘못된 요청입니다. 다시 시도해주세요.');
+			}
+			else if (status === 401) {
+				setFailureModalText('로그인이 되어있지 않습니다.');
+			} 
+			else if (status === 403) {
+				setFailureModalText('허용된 용량을 초과했습니다.');
+			}
+			else {
+				setFailureModalText('서버에 장애가 발생하였습니다.');
+			}
+			
 			setOpenFailureModal(true);
 		}
 
