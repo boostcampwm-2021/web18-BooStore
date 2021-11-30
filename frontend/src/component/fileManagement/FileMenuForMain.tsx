@@ -10,7 +10,7 @@ import Button from '@component/common/Button';
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
 import { moveFileToTrash, downloadFiles } from '@api';
-import { getFiles, getNotOverlappedName } from '@util';
+import { getFiles, getNotOverlappedName, getNotOverlappedRelativePaths } from '@util';
 
 interface Props {
 	showShareButton?: boolean;
@@ -129,41 +129,13 @@ const FileMenuForMain: React.FC<Props> = ({
 
 	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
 		const formData = new FormData();
-
-		const relativePaths: Map<string, string> = new Map();
-		if (selectedUploadFiles[0].webkitRelativePath != '') {
-			const relativePath = selectedUploadFiles[0].webkitRelativePath;
-			const createdFolderName = relativePath.split('/')[0];
-			const notOverlappedName = await getNotOverlappedName(currentDir, createdFolderName);
-
-			if (createdFolderName === notOverlappedName) {
-				selectedUploadFiles.forEach((file) => {
-					const { webkitRelativePath: wRP, name } = file;
-
-					relativePaths.set(name, wRP);
-				});
-			} else {
-				selectedUploadFiles.forEach((file) => {
-					const { webkitRelativePath: wRP, name } = file;
-
-					relativePaths.set(
-						name,
-						`${notOverlappedName}/${wRP.split('/').slice(1).join('/')}`
-					);
-				});
-			}
-		} else {
-			selectedUploadFiles.forEach((file) => {
-				const { webkitRelativePath: wRP, name } = file;
-
-				relativePaths.set(name, wRP);
-			});
-		}
-
 		formData.append('rootDirectory', currentDir);
+		
+		const relativePaths = await getNotOverlappedRelativePaths(selectedUploadFiles, currentDir);
 		let metaData: any = {};
 		let sectionSize = 0;
 		let processedSize = 0;
+		const seperateCap = 1024 * 1024; // 1MB 단위
 		for await (const file of selectedUploadFiles) {
 			const { size, name } = file;
 			processedSize += size;
@@ -174,8 +146,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			formData.append('uploadFiles', file, name);
 			metaData[name] = relativePaths.get(name);
 
-			// 1MB 단위로 보냄
-			if (sectionSize >= 1024 * 1024 || processedSize == totalSize) {
+			if (sectionSize >= seperateCap || processedSize == totalSize) {
 				formData.append('relativePath', JSON.stringify(metaData));
 
 				const res = await fetch(`/cloud/upload`, {
