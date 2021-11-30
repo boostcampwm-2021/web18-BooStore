@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import ReactModal from 'react-modal';
-import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+import ModalComponent, { ModalType } from '@component/common/modalComponent';
 import Button from '@component/common/Button';
 import { FileDTO } from '@DTO';
 import { handleNewFolder } from 'api';
