@@ -235,6 +235,9 @@ export const updateFile = async (
 };
 
 const removeObjectStorageObjects = async (keys) => {
+	if (keys.length === 0) {
+		return;
+	}
 	return await S3.deleteObjects({
 		Bucket: bucketName,
 		Delete: {
@@ -451,14 +454,15 @@ export const removeFolders = async ({ directories, userLoginId }: FoldersFunctio
 			const { directory, name } = ele;
 			const path = applyEscapeString(`${directory}/${name}`.replace(/\/\/|\//g, '\\/'));
 
-			const files = await Cloud.find(
+			const docs = await Cloud.find(
 				{
 					ownerId: userLoginId,
 					directory: { $regex: `^${path}(\\/.*)?$` },
 				},
-				{ osLink: true, size: true, ownerId: true }
+				{ osLink: true, size: true, ownerId: true, contentType: true }
 			).exec();
 
+			const files = docs.filter((ele) => ele.contentType !== 'folder');
 			const totalSize = files.reduce((prev, { size }) => prev + size, 0);
 			const keys = files.map(({ osLink }) => {
 				return { Key: osLink.replace(`${OBJECT_STORAGE_BASE}/${bucketName}/`, '') };
