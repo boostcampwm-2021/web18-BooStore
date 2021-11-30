@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Capacity, User } from '@model';
+import { Capacity } from '@model';
 import { convertByteToUnitString } from '@util';
 import ProgressBar from '@component/common/ProgressBar';
 import DirectoryList from '@component/directoryList';

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import ContextDropdown from '@component/common/ContextDropdown';
 
 import styled from 'styled-components';
@@ -41,8 +41,7 @@ const ContextMenu: React.FC<Props> = ({
 			targetIds: targetIds,
 			action: FileEditAction.addStar,
 		};
-
-		handleFiles('PATCH',body);
+		handleFiles('PATCH', body);
 
 		setFiles((files) =>
 			files.map((file) => {
@@ -65,7 +64,7 @@ const ContextMenu: React.FC<Props> = ({
 				>
 					이동
 				</StyledLi>
-				<StyledLi onClick={() => addStar} disabled={selectedFiles.size === 0}>
+				<StyledLi onClick={addStar} disabled={selectedFiles.size === 0}>
 					중요 문서함에 추가
 				</StyledLi>
 			</ContextDropdown>

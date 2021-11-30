@@ -1,4 +1,4 @@
-import { FileDTO, FileEditAction } from "@DTO";
+import { FileEditAction } from "@DTO";
 import { handleFiles } from 'api';
 
 

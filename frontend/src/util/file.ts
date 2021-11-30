@@ -74,3 +74,40 @@ export const getNotOverlappedName = async (
 	const newFilename = `${folderName.slice(0, leftBracketIndex)}(${overlapNumber + 1})`;
 	return getNotOverlappedName(currentDirectory, newFilename, files, trashFiles);
 };
+
+export const getNotOverlappedRelativePaths = async (
+	selectedUploadFiles: File[],
+	currentDir: string
+) => {
+	const relativePaths: Map<string, string> = new Map();
+	if (selectedUploadFiles[0].webkitRelativePath != '') {
+		const relativePath = selectedUploadFiles[0].webkitRelativePath;
+		const createdFolderName = relativePath.split('/')[0];
+		const notOverlappedName = await getNotOverlappedName(currentDir, createdFolderName);
+
+		if (createdFolderName === notOverlappedName) {
+			selectedUploadFiles.forEach((file) => {
+				const { webkitRelativePath: wRP, name } = file;
+
+				relativePaths.set(name, wRP);
+			});
+		} else {
+			selectedUploadFiles.forEach((file) => {
+				const { webkitRelativePath: wRP, name } = file;
+
+				relativePaths.set(
+					name,
+					`${notOverlappedName}/${wRP.split('/').slice(1).join('/')}`
+				);
+			});
+		}
+	} else {
+		selectedUploadFiles.forEach((file) => {
+			const { webkitRelativePath: wRP, name } = file;
+
+			relativePaths.set(name, wRP);
+		});
+	}
+
+	return relativePaths;
+};
