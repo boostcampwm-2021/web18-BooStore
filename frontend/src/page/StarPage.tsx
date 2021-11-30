@@ -96,10 +96,8 @@ const StarPage: React.FC<StarPageProps> = ({ user, setUser }) => {
 						{getCurDirectoryComponent()}
 					</DirectorySection>
 					<FileMenu
-						setCapacity={setCapacity}
 						selectedFiles={selectedFiles}
 						setSelectedFiles={setSelectedFiles}
-						setFiles={setFiles}
 						files={files}
 					/>
 					<StyledFileList

@@ -43,7 +43,7 @@ router.get('/validate', isAuthenticated, async (req, res) => {
 	if (await canIncreaseCurrentCapacity({ loginId, value })) {
 		return res.status(200).send();
 	} else {
-		return res.status(409).send();
+		return res.status(403).send();
 	}
 });
 
@@ -51,7 +51,7 @@ router.post('/upload', isAuthenticated, upload.array('uploadFiles'), async (req,
 	const files = req.files as Express.Multer.File[];
 	const { loginId } = req.user;
 	const { relativePath, rootDirectory } = req.body;
-	if (loginId === undefined || relativePath === undefined || rootDirectory === undefined) {
+	if (relativePath === undefined || rootDirectory === undefined) {
 		return res.status(400).send();
 	}
 

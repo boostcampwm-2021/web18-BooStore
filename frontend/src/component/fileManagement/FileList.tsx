@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import styled from 'styled-components';
 
 import File from './File';
@@ -7,8 +7,6 @@ import Selection from './Selection';
 
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
-import ContextMenu from '@component/common/ContextMenu';
-import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];

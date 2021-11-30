@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import File from './FileForStar';
@@ -7,8 +7,6 @@ import Selection from './Selection';
 
 import { ReactComponent as AscIcon } from '@asset/image/icons/icon_sort_asc.svg';
 import { ReactComponent as DescIcon } from '@asset/image/icons/icon_sort_desc.svg';
-import ContextMenu from '@component/common/ContextMenu';
-import NewFolderModal from '@component/fileManagement/NewFolderModal';
 
 interface Props {
 	files: FileDTO[];
@@ -21,7 +19,6 @@ interface Props {
 	isAscending: boolean;
 	setIsAscending: React.Dispatch<React.SetStateAction<boolean>>;
 	className?: string;
-	updateFiles?: Function;
 }
 
 const FileList: React.FC<Props> = ({
@@ -35,7 +32,6 @@ const FileList: React.FC<Props> = ({
 	selectedFiles,
 	setIsAscending,
 	className,
-	updateFiles = () => {},
 }) => {
 	const container = useRef<HTMLDivElement>(null);
 	const onClickIsAscending = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -67,8 +63,6 @@ const FileList: React.FC<Props> = ({
 			return result;
 		});
 	};
-
-	const [isOpenNewFolder, setIsOpenNewFolder] = useState(false);
 
 	return (
 		<Container className={className} ref={container}>

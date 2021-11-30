@@ -10,7 +10,7 @@ import Button from '@component/common/Button';
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
 import { moveFileToTrash, downloadFiles } from '@api';
-import { getFiles, getNotOverlappedName } from '@util';
+import { getNotOverlappedRelativePaths } from '@util';
 
 interface Props {
 	showShareButton?: boolean;
@@ -123,47 +123,27 @@ const FileMenuForMain: React.FC<Props> = ({
 		const res = await fetch(`/cloud/validate?size=${totalSize}`, {
 			credentials: 'include',
 		});
-
-		return res.ok;
+		
+		if (res.ok) {
+			return true;
+		}
+		else if (res.status === 403) {
+			return false;
+		}
+		else {
+			throw new Error(res.status.toString());
+		}
 	};
 
 	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
 		const formData = new FormData();
-
-		const relativePaths: Map<string, string> = new Map();
-		if (selectedUploadFiles[0].webkitRelativePath != '') {
-			const relativePath = selectedUploadFiles[0].webkitRelativePath;
-			const createdFolderName = relativePath.split('/')[0];
-			const notOverlappedName = await getNotOverlappedName(currentDir, createdFolderName);
-
-			if (createdFolderName === notOverlappedName) {
-				selectedUploadFiles.forEach((file) => {
-					const { webkitRelativePath: wRP, name } = file;
-
-					relativePaths.set(name, wRP);
-				});
-			} else {
-				selectedUploadFiles.forEach((file) => {
-					const { webkitRelativePath: wRP, name } = file;
-
-					relativePaths.set(
-						name,
-						`${notOverlappedName}/${wRP.split('/').slice(1).join('/')}`
-					);
-				});
-			}
-		} else {
-			selectedUploadFiles.forEach((file) => {
-				const { webkitRelativePath: wRP, name } = file;
-
-				relativePaths.set(name, wRP);
-			});
-		}
-
 		formData.append('rootDirectory', currentDir);
+		
+		const relativePaths = await getNotOverlappedRelativePaths(selectedUploadFiles, currentDir);
 		let metaData: any = {};
 		let sectionSize = 0;
 		let processedSize = 0;
+		const seperateCap = 1024 * 1024; // 1MB 단위
 		for await (const file of selectedUploadFiles) {
 			const { size, name } = file;
 			processedSize += size;
@@ -174,8 +154,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			formData.append('uploadFiles', file, name);
 			metaData[name] = relativePaths.get(name);
 
-			// 1MB 단위로 보냄
-			if (sectionSize >= 1024 * 1024 || processedSize == totalSize) {
+			if (sectionSize >= seperateCap || processedSize == totalSize) {
 				formData.append('relativePath', JSON.stringify(metaData));
 
 				const res = await fetch(`/cloud/upload`, {
@@ -220,7 +199,24 @@ const FileMenuForMain: React.FC<Props> = ({
 			setProgressModalText('Complete!');
 			setIsCompleteSend(true);
 		} catch (err) {
-			setFailureModalText((err as Error).message);
+			const message = (err as Error).message;
+			const status = Number(message);
+			if (isNaN(status)) {
+				setFailureModalText(message);
+			}
+			else if (status === 400) {
+				setFailureModalText('잘못된 요청입니다. 다시 시도해주세요.');
+			}
+			else if (status === 401) {
+				setFailureModalText('로그인이 되어있지 않습니다.');
+			} 
+			else if (status === 403) {
+				setFailureModalText('허용된 용량을 초과했습니다.');
+			}
+			else {
+				setFailureModalText('서버에 장애가 발생하였습니다.');
+			}
+			
 			setOpenFailureModal(true);
 		}
 
