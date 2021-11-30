@@ -4,4 +4,5 @@ export * from './handleTrashFiles';
 export * from './cloud';
 export * from './newFolder';
 export * from './moveFile';
-export * from './handleTrashFiles'
+export * from './handleTrashFiles';
+export * from './download';

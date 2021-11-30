@@ -6,6 +6,7 @@ import Button from '@component/common/Button';
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
 import ModalComponent, { ModalType } from '@component/common/modalComponent';
+import { downloadFiles } from '@api';
 import path from 'path';
 
 interface Props {
@@ -39,8 +40,7 @@ const FileMenuForStar: React.FC<Props> = ({
 
 		setOnSelectAll((prev) => !prev);
 	}, [files, selectedFiles, isOnSelectAll]);
-
-	const onClickDownload = () => {
+	const createDownloadQuery = (selectedFiles: Map<string, FileDTO>) => {
 		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)
@@ -61,38 +61,17 @@ const FileMenuForStar: React.FC<Props> = ({
 			directories === '' ? 'folders=' : directories.substr(0, directories.length - 1);
 
 		const queryString = `current_dir=/&${filesQuery}${directoriesQuery}`;
-		fetch(`/cloud/download?${queryString}`, {
-			credentials: 'include',
-		})
-			.then((res) => {
-				if (res.ok) {
-					return res;
-				} else if (res.status === 401) {
-					throw new Error('올바른 사용자가 아닙니다. 로그인 후 사용해주십시오.');
-				} else {
-					throw new Error('올바른 요청이 아닙니다.');
-				}
-			})
-			.then(async (res) => {
-				const fileName = /attachment; filename="(?<fileName>[^"]+)"/.exec(
-					res.headers.get('Content-Disposition') as string
-				)?.groups?.fileName;
-				const blob = await res.blob();
-				return { fileName: fileName, blob: blob };
-			})
-			.then(({ fileName, blob }) => {
-				const url = window.URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = fileName as string;
-				document.body.appendChild(a);
-				a.click();
-				a.remove();
-			})
-			.catch((err) => {
-				setFailureModalText((err as Error).message);
-				setOpenFailureModal(true);
-			});
+		return queryString;
+	};
+
+	const onClickDownload = () => {
+		const queryString = createDownloadQuery(selectedFiles);
+		try {
+			downloadFiles(queryString);
+		} catch (err) {
+			setFailureModalText((err as Error).message);
+			setOpenFailureModal(true);
+		}
 	};
 
 	return (
@@ -121,7 +100,7 @@ const Container = styled.div`
 
 const SelectAllBtn = styled.button`
 	cursor: pointer;
-	border: 1px solid ${(props)=> props.theme.color.Line};
+	border: 1px solid ${(props) => props.theme.color.Line};
 	border-radius: 4px;
 	padding: 0;
 	margin-right: 20px;
