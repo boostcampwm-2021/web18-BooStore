@@ -13,19 +13,30 @@ import { ReactComponent as ZipFile } from '@asset/image/icons/icon_zip.svg';
 interface Props {
 	type: string;
 }
-const TypeIcon: React.FC<Props> = ({ type }) => {
-	return (
-		<IconDiv>
-			{type.includes('folder') && <Folder />}
-			{type.includes('text') && <TextFile />}
-			{type.includes('image') && <ImageFile />}
-			{type.includes('video') && <VideoFile />}
-			{type.includes('audio') && <AudioFile />}
-			{type.includes('zip') && <ZipFile />}
-			{type.includes('pdf') && <DocsFile />}
-			{type.includes('officedocument') && <DocsFile />}
-		</IconDiv>
-	);
+const FileIcon: React.FC<Props> = ({ type }) => {
+	const getIcon = () => {
+		if (type.includes('folder')) {
+			return <Folder />;
+		} else if (type.includes('text')) {
+			return <TextFile />;
+		} else if (type.includes('image')) {
+			return <ImageFile />;
+		} else if (type.includes('video')) {
+			return <VideoFile />;
+		} else if (type.includes('audio')) {
+			return <AudioFile />;
+		} else if (type.includes('zip')) {
+			return <ZipFile />;
+		} else if (type.includes('pdf')) {
+			return <DocsFile />;
+		} else if (type.includes('officedocument')) {
+			return <DocsFile />;
+		} else {
+			return <DefaultFile />;
+		}
+	};
+
+	return <IconDiv>{getIcon()}</IconDiv>;
 };
 
 const IconDiv = styled.div`
@@ -36,4 +47,4 @@ const IconDiv = styled.div`
 	align-items: center;
 `;
 
-export default TypeIcon;
+export default FileIcon;
