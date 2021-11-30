@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FileDTO, FileEditAction } from '@DTO';
 import { Capacity } from '@model';
 import DropBox, { DropBoxItem } from '@component/common/DropBox';
-import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+import ModalComponent, { ModalType } from '@component/common/modalComponent';
 import ProgressBar from '@component/common/ProgressBar';
 import Button from '@component/common/Button';
 
@@ -33,9 +33,8 @@ const FileMenuForTrash: React.FC<Props> = ({
 		setFiles((files) => files.filter((file) => !ids.includes(file._id)));
 
 		removeFile(selectedFiles)
-			.then(async () => {
-				setCapacity(await getCapacity());
-			})
+			.then(() => getCapacity())
+			.then((capacity) => setCapacity(capacity))
 			.catch((err) => {
 				console.error(err);
 			});
@@ -90,7 +89,7 @@ const Container = styled.div`
 
 const SelectAllBtn = styled.button`
 	cursor: pointer;
-	border: 1px solid ${(props)=> props.theme.color.Line};
+	border: 1px solid ${(props) => props.theme.color.Line};
 	border-radius: 4px;
 	padding: 0;
 	margin-right: 20px;

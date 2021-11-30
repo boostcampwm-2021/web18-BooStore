@@ -5,7 +5,7 @@ import { Capacity } from '@model';
 import Button from '@component/common/Button';
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
-import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+import ModalComponent, { ModalType } from '@component/common/modalComponent';
 import path from 'path';
 
 interface Props {
@@ -40,7 +40,7 @@ const FileMenuForStar: React.FC<Props> = ({
 		setOnSelectAll((prev) => !prev);
 	}, [files, selectedFiles, isOnSelectAll]);
 
-	const onClickDownload = async () => {
+	const onClickDownload = () => {
 		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { User } from '../model';
-import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+import ModalComponent, { ModalType } from '@component/common/modalComponent';
 import { ReactComponent as Account } from '@asset/image/icons/icon_login_user.svg';
 import { ReactComponent as Password } from '@asset/image/icons/icon_login_password.svg';
 import { ReactComponent as Logo } from '@asset/image/icons/logo_big.svg';

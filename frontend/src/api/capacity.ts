@@ -1,4 +1,3 @@
-
 export const getCapacity = () => {
 	return fetch('/user/capacity', {
 		credentials: 'include',

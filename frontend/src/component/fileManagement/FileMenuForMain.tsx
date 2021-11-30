@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FileDTO, FileEditAction } from '@DTO';
 import { Capacity } from '@model';
 import DropBox, { DropBoxItem } from '@component/common/DropBox';
-import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+import ModalComponent, { ModalType } from '@component/common/modalComponent';
 import ProgressBar from '@component/common/ProgressBar';
 import Button from '@component/common/Button';
 
@@ -72,7 +72,7 @@ const FileMenuForMain: React.FC<Props> = ({
 		setSelectedUploadFiles(event.target.files);
 	};
 
-	const onClickDownload = async () => {
+	const onClickDownload = () => {
 		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)
