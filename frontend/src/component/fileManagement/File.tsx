@@ -76,9 +76,7 @@ const File: React.FC<Props> = ({
 
 	const changeCurrentDirectory = () => {
 		if (isFolder) {
-			const childDir =
-				currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
-			setCurrentDir(childDir);
+			setCurrentDir(path);
 		}
 	};
 
