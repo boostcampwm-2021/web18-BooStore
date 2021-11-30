@@ -36,7 +36,7 @@ const File: React.FC<Props> = ({
 		if (event.button !== 0) {
 			return;
 		}
-		
+
 		setSelectedFiles((selectedFiles) => {
 			const result = new Map(selectedFiles);
 			if (result.has(_id)) {
@@ -74,7 +74,7 @@ const File: React.FC<Props> = ({
 		});
 	};
 
-	const changeCurrentDirectory = async () => {
+	const changeCurrentDirectory = () => {
 		if (isFolder) {
 			const childDir =
 				currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
