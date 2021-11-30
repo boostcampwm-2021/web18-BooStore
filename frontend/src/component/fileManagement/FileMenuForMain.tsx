@@ -39,7 +39,7 @@ const FileMenuForMain: React.FC<Props> = ({
 	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
 	const [isOpenFailureModal, setOpenFailureModal] = useState(false);
 	const [isCompleteSend, setIsCompleteSend] = useState(true);
-	const [isOpenProgreeModal, setOpenProgreeModal] = useState(false);
+	const [isOpenProgressModal, setOpenProgressModal] = useState(false);
 	const [processedFileSize, setProcessedFileSize] = useState(0);
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
@@ -123,14 +123,12 @@ const FileMenuForMain: React.FC<Props> = ({
 		const res = await fetch(`/cloud/validate?size=${totalSize}`, {
 			credentials: 'include',
 		});
-		
+
 		if (res.ok) {
 			return true;
-		}
-		else if (res.status === 403) {
+		} else if (res.status === 403) {
 			return false;
-		}
-		else {
+		} else {
 			throw new Error(res.status.toString());
 		}
 	};
@@ -138,12 +136,12 @@ const FileMenuForMain: React.FC<Props> = ({
 	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
 		const formData = new FormData();
 		formData.append('rootDirectory', currentDir);
-		
+
 		const relativePaths = await getNotOverlappedRelativePaths(selectedUploadFiles, currentDir);
 		let metaData: any = {};
 		let sectionSize = 0;
 		let processedSize = 0;
-		const seperateCap = 1024 * 1024; // 1MB 단위
+		const separateCap = 1024 * 1024; // 1MB 단위
 		for await (const file of selectedUploadFiles) {
 			const { size, name } = file;
 			processedSize += size;
@@ -154,7 +152,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			formData.append('uploadFiles', file, name);
 			metaData[name] = relativePaths.get(name);
 
-			if (sectionSize >= seperateCap || processedSize == totalSize) {
+			if (sectionSize >= separateCap || processedSize == totalSize) {
 				formData.append('relativePath', JSON.stringify(metaData));
 
 				const res = await fetch(`/cloud/upload`, {
@@ -191,7 +189,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			setProcessedFileSize(0);
 			setProgressModalText('Loading...');
 			setIsCompleteSend(false);
-			setOpenProgreeModal(true);
+			setOpenProgressModal(true);
 
 			await sendFiles(uploadFiles, totalSize);
 			updateFiles();
@@ -203,20 +201,16 @@ const FileMenuForMain: React.FC<Props> = ({
 			const status = Number(message);
 			if (isNaN(status)) {
 				setFailureModalText(message);
-			}
-			else if (status === 400) {
+			} else if (status === 400) {
 				setFailureModalText('잘못된 요청입니다. 다시 시도해주세요.');
-			}
-			else if (status === 401) {
+			} else if (status === 401) {
 				setFailureModalText('로그인이 되어있지 않습니다.');
-			} 
-			else if (status === 403) {
+			} else if (status === 403) {
 				setFailureModalText('허용된 용량을 초과했습니다.');
-			}
-			else {
+			} else {
 				setFailureModalText('서버에 장애가 발생하였습니다.');
 			}
-			
+
 			setOpenFailureModal(true);
 		}
 
@@ -286,9 +280,9 @@ const FileMenuForMain: React.FC<Props> = ({
 				<p>{failureModalText}</p>
 			</FailureModal>
 			<ProgressModal
-				isOpen={isOpenProgreeModal}
+				isOpen={isOpenProgressModal}
 				onCloseButton={isCompleteSend}
-				setOpen={setOpenProgreeModal}
+				setOpen={setOpenProgressModal}
 				modalType={ModalType.Upload}
 			>
 				<span> {progressModalText} </span>
