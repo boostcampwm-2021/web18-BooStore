@@ -207,13 +207,6 @@ router.get('/trash', isAuthenticated, async (req, res) => {
 	}
 });
 
-router.post('/update', isAuthenticated, async (req, res) => {
-	const { loginId } = req.user;
-	const { files, newdir, curDirectory } = req.body;
-	await updateDir(loginId, files, newdir, curDirectory);
-	return res.send();
-});
-
 router.get('/files', isAuthenticated, async (req, res) => {
 	const { path, isAscending, isDeleted, isStar } = req.query;
 	const { loginId } = req.user;

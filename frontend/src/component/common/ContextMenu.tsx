@@ -3,6 +3,7 @@ import ContextDropdown from '@component/common/ContextDropdown';
 
 import styled from 'styled-components';
 import { FileDTO, FileEditAction } from '@DTO';
+import { handleFiles } from 'api';
 
 interface Props {
 	setIsOpenNewFolder: React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,14 +41,8 @@ const ContextMenu: React.FC<Props> = ({
 			targetIds: targetIds,
 			action: FileEditAction.addStar,
 		};
-		fetch('/cloud/files', {
-			method: 'PATCH',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+
+		handleFiles('PATCH',body);
 
 		setFiles((files) =>
 			files.map((file) => {
