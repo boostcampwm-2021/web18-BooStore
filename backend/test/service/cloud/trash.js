@@ -173,4 +173,87 @@ describe('service/cloud/trash.ts', function () {
 			assert.equal(updatedFile.isDeleted, expected);
 		});
 	});
+	describe('moveFoldersToTrash', function () {
+		beforeEach('make documents', initCloudDocs);
+		afterEach('delete documents', async () => {
+			await Cloud.deleteMany({});
+		});
+
+		it('폴더를 쓰레기통으로 이동', async () => {
+			// given
+			await Cloud.updateOne(
+				{ directory: '/folder1', name: 'file1.txt' },
+				{ isDeleted: false }
+			);
+			const folder = await Cloud.findOneAndUpdate(
+				{
+					directory: '/',
+					name: 'folder1',
+				},
+				{
+					isDeleted: false,
+				},
+				{
+					new: true,
+				}
+			);
+			const input = {
+				userLoginId: loginId,
+				directories: [
+					{
+						directory: folder.directory,
+						name: folder.name,
+					},
+				],
+			};
+			const expected = true;
+
+			// when
+			await moveFoldersToTrash(input);
+			const updatedFile = await Cloud.findOne({
+				directory: '/folder1',
+				name: 'file1.txt',
+			});
+			const updatedFolder = await Cloud.findById(folder._id);
+
+			// then
+			assert.equal(updatedFile.isDeleted, expected);
+			assert.equal(updatedFolder.isDeleted, expected);
+		});
+	});
+	describe('restoreTrashFolders', function () {
+		beforeEach('make documents', initCloudDocs);
+		afterEach('delete documents', async () => {
+			await Cloud.deleteMany({});
+		});
+
+		it('폴더를 쓰레기통으로 이동', async () => {
+			// given
+			const input = {
+				userLoginId: loginId,
+				directories: [
+					{
+						directory: '/',
+						name: 'folder1',
+					},
+				],
+			};
+			const expected = false;
+
+			// when
+			await restoreTrashFolders(input);
+			const updatedFile = await Cloud.findOne({
+				directory: '/folder1',
+				name: 'file1.txt',
+			});
+			const updatedFolder = await Cloud.findOne({
+				directory: '/',
+				name: 'folder1',
+			});
+
+			// then
+			assert.equal(updatedFile.isDeleted, expected);
+			assert.equal(updatedFolder.isDeleted, expected);
+		});
+	});
 });
