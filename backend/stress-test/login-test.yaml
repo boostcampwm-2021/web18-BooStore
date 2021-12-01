@@ -1,7 +1,7 @@
 config:
-    target: 'http://49.50.165.179:'
+    target: 'http://49.50.165.179'
     phases:
-        - duration: 10
+        - duration: 2
           arrivalRate: 1
           name: Warm up
 scenarios:

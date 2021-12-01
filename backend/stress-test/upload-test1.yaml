@@ -1,16 +1,36 @@
 config:
-    target: 'http://49.50.165.179:'
+    target: 'http://49.50.165.179'
     phases:
-        - duration: 100
-          arrivalRate: 1
-          name: Warm up
+        - duration: 1
+          arrivalRate: 30
+
+    payload:
+        path: 'users.csv'
+        fields:
+            - 'id'
+            - 'password'
+        order: sequence
+    processor: './checkCookie.js'
 scenarios:
-    - name: '로그인'
+    - name: '1000명의 사용자가 동시에 400KB 파일을 업로드한다.'
       flow:
           - post:
                 url: '/login'
                 headers:
                     Content-Type: 'application/json'
                 json:
-                    id: 'test1234'
-                    password: 'test1234'
+                    id: '{{ id }}'
+                    password: '{{ password }}'
+                afterResponse: 'checkCookie'
+          - get:
+                url: '/user/files'
+                qs:
+                    path: '/'
+                    isAscending: 'true'
+                    isStar: 'false'
+                afterResponse: 'printResult'
+
+    # - post:
+    #     url: '/cloud/upload'
+    #     headers:
+    #         Content-Type: 'multipart/form-data; boundary=<calculated when request is sent>'
