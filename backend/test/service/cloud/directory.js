@@ -10,7 +10,7 @@ describe('service/cloud/directory.ts', function () {
 
 	before('connect', function (done) {
 		mongoose.connect(
-			'mongodb://localhost:27017/BooStore',
+			process.env.TEST_MONGO_URI,
 			{
 				useNewUrlParser: true,
 				useUnifiedTopology: true,

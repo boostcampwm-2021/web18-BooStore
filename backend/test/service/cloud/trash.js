@@ -45,7 +45,7 @@ const initCloudDocs = async () => {
 describe('service/cloud/trash.ts', function () {
 	before('connect', function (done) {
 		mongoose.connect(
-			'mongodb://localhost:27017/BooStore',
+			process.env.TEST_MONGO_URI,
 			{
 				useNewUrlParser: true,
 				useUnifiedTopology: true,
