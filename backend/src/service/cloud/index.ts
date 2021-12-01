@@ -3,3 +3,4 @@ export * from './file';
 export * from './directory';
 export * from './download';
 export * from './update';
+export * from './trash';
