@@ -33,7 +33,7 @@ const cloudSchema: Schema<ICloudDoc> = new Schema(
 		},
 		size: {
 			type: Number,
-			require: true,
+			default: 0,
 		},
 		ownerId: {
 			type: String,
