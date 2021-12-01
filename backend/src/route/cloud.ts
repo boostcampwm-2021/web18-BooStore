@@ -24,8 +24,8 @@ import {
 	getTrashFiles,
 	updateDir,
 	splitFolderAndFile,
-	FilteredFilesArg,
-	FilesArg,
+	GetFilteredFilesArg,
+	GetFilesArg,
 	getFilteredFiles,
 	getFiles,
 } from '../service/cloud';
@@ -218,7 +218,7 @@ router.get('/files', isAuthenticated, async (req, res) => {
 	}
 
 	try {
-		const filesArg: FilesArg = {
+		const filesArg: GetFilesArg = {
 			loginId: loginId,
 			regex: `(^${applyEscapeString(path as string)}$)|(^${
 				path === '/' ? '' : applyEscapeString(path as string)
@@ -230,7 +230,7 @@ router.get('/files', isAuthenticated, async (req, res) => {
 
 		const tempFiles = await getFiles(filesArg);
 
-		const filteredFilesArg: FilteredFilesArg = {
+		const filteredFilesArg: GetFilteredFilesArg = {
 			path: path as string,
 			originFiles: tempFiles,
 		};
@@ -252,7 +252,7 @@ router.get('/starfiles', isAuthenticated, async (req, res) => {
 		return res.status(400).send();
 	}
 
-	const filesArg: FilesArg = {
+	const filesArg: GetFilesArg = {
 		loginId: loginId,
 		regex: `.+`,
 		isAscending: isAscending === 'true',

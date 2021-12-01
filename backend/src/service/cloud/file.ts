@@ -1,7 +1,7 @@
 import S3 from '../../model/object-storage';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Cloud } from '../../model';
+import { Cloud, ICloud } from '../../model';
 import { decreaseCurrentCapacity, increaseCurrentCapacity } from '.';
 import { applyEscapeString } from '../../util';
 
@@ -37,6 +37,19 @@ interface updateStarStateArg {
 	userLoginId: string;
 	targetIds: string;
 	state: boolean;
+}
+
+export interface GetFilesArg {
+	loginId: string;
+	regex: string;
+	isAscending: boolean;
+	isDeleted: boolean;
+	isStar: boolean;
+}
+
+export interface GetFilteredFilesArg {
+	path: string;
+	originFiles: ICloud[];
 }
 
 export const uploadFile = async ({
@@ -504,4 +517,55 @@ export const updateStarStatus = async ({ userLoginId, targetIds, state }: update
 		}
 	);
 	return result.matchedCount;
+};
+
+export const getFiles = async ({ loginId, regex, isAscending, isDeleted, isStar }: GetFilesArg) => {
+	const files = await Cloud.find(
+		{
+			directory: { $regex: regex },
+			ownerId: loginId,
+			isDeleted,
+			isStar: { $in: isStar ? [true] : [true, false] },
+		},
+		{
+			directory: true,
+			name: true,
+			contentType: true,
+			createdAt: true,
+			updatedAt: true,
+			size: true,
+			ownerId: true,
+			isStar: true,
+		},
+		{ sort: { name: isAscending ? 'asc' : 'desc' } }
+	).exec();
+	return files;
+};
+
+export const getFilteredFiles = ({ path, originFiles }: GetFilteredFilesArg) => {
+	const filteredFiles = [];
+	const filteredFolders = [];
+	originFiles.map((file) => {
+		if (file.directory === path) {
+			if (file.contentType === 'folder') {
+				filteredFolders.push(file);
+			} else {
+				filteredFiles.push(file);
+			}
+		}
+	});
+	return filteredFolders.concat(filteredFiles);
+};
+
+export const splitFolderAndFile = (target: ICloud[]) => {
+	const files = [];
+	const folders = [];
+	target.map((file) => {
+		if (file.contentType === 'folder') {
+			folders.push(file);
+		} else {
+			files.push(file);
+		}
+	});
+	return [...folders, ...files];
 };
