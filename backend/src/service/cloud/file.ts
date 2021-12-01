@@ -88,7 +88,7 @@ export const uploadFile = async ({
 };
 
 const parseFilename = (filename: string) => {
-	let realName = '',
+	let realName = filename,
 		name = filename,
 		numbering = 0,
 		ext = '';
