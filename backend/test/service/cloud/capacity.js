@@ -159,4 +159,86 @@ describe('capacity.ts', function () {
 			assert.equal(result, expected);
 		});
 	});
+	describe('increaseCurrentCapacity', function () {
+		beforeEach('reset User Capacity', async () => {
+			await User.updateOne(
+				{
+					loginId,
+				},
+				{
+					currentCapacity: 0,
+					maxCapacity: 1000,
+				}
+			);
+		});
+
+		it('User Document의 currentCapacity의 값이 value만큼 증가됨', async () => {
+			// given
+			const input = { loginId, value: 50 };
+			const expected = 50;
+
+			// when
+			await increaseCurrentCapacity(input);
+			const user = await User.findOne({ loginId }).exec();
+			const result = user.currentCapacity;
+
+			// then
+			assert.equal(result, expected);
+		});
+		it('currentCapacity의 값을 증가시키지 못하는 경우 에러발생', async () => {
+			// given
+			const input = { loginId, value: 10000 };
+			const expected = `Can't increase CurrentCapacity`;
+
+			try {
+				// when
+				await increaseCurrentCapacity(input);
+				assert.fail();
+			} catch (err) {
+				// then
+				assert.equal(err.message, expected);
+			}
+		});
+	});
+	describe('decreaseCurrentCapacity', function () {
+		beforeEach('reset User Capacity', async () => {
+			await User.updateOne(
+				{
+					loginId,
+				},
+				{
+					currentCapacity: 100,
+					maxCapacity: 1000,
+				}
+			);
+		});
+
+		it('User Document의 currentCapacity의 값이 value만큼 감소됨', async () => {
+			// given
+			const input = { loginId, value: 50 };
+			const expected = 50;
+
+			// when
+			await decreaseCurrentCapacity(input);
+			const user = await User.findOne({ loginId }).exec();
+			const result = user.currentCapacity;
+
+			// then
+			assert.equal(result, expected);
+		});
+		it('currentCapacity의 값을 감소시키지 못하는 경우 에러발생', async () => {
+			// given
+			const input = { loginId, value: 10000 };
+			const expected = `Can't decrease CurrentCapacity`;
+
+			try {
+				// when
+				await decreaseCurrentCapacity(input);
+				assert.fail();
+			} catch (err) {
+				// then
+				assert.equal(err.message, expected);
+			}
+		});
+	});
 });
