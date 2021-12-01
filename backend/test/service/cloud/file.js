@@ -120,4 +120,27 @@ describe('service/cloud/file.ts', function () {
 		});
 	});
 
+	describe('createAncestorsFolderDocs', function () {
+		beforeEach('make documents', initCloudDocs);
+		afterEach('delete documents', async () => {
+			await Cloud.deleteMany({});
+		});
+
+		it('curDirectory의 조상폴더 Document가 없다면 만들어준다.', async () => {
+			// given
+			const input = ['/nope1/nope2', loginId];
+			const expectedLength = 2;
+			const expectedFind = true;
+
+			// when
+			const result = await createAncestorsFolderDocs(...input);
+			const nope1 = await Cloud.findOne({ directory: '/', name: 'nope1' });
+			const nope2 = await Cloud.findOne({ directory: '/nope1', name: 'nope2' });
+
+			// then
+			assert.equal(result.length, expectedLength);
+			assert.equal(!!nope1, expectedFind);
+			assert.equal(!!nope2, expectedFind);
+		});
+	});
 });
