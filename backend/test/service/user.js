@@ -38,4 +38,46 @@ describe('user.ts', function () {
 		});
 	});
 
+	describe('isExistsUser', function () {
+		const loginId = 'testCodeUser@';
+		const password = 'q@!D$DG!ASD';
+
+		before(`loginId가 "${loginId}"인 Docs 제작`, async () => {
+			User.deleteMany({});
+			await createUser({
+				loginId: loginId,
+				password: password,
+			});
+		});
+
+		after(`loginId가 "${loginId}"인 Docs 삭제`, async () => {
+			await User.deleteOne({
+				loginId: loginId,
+			});
+		});
+
+		it(`input: { loginId: "존재하는 Docs의 loginId" }, output: true`, async () => {
+			// given
+			const input = loginId;
+			const expected = true;
+
+			// when
+			const result = await isExistsUser({ loginId: input });
+
+			// then
+			assert.equal(result, expected);
+		});
+
+		it(`input: { loginId: "존재하지 않는 임의의 loginId" }, output: true`, async () => {
+			// given
+			const input = 'nope';
+			const expected = false;
+
+			// when
+			const result = await isExistsUser({ loginId: input });
+
+			// then
+			assert.equal(result, expected);
+		});
+	});
 });
