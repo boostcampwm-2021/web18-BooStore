@@ -12,7 +12,7 @@ const {
 const { createUser } = require('../../../src/service');
 const { User } = require('../../../src/model');
 
-describe('capacity.ts', function () {
+describe('service/cloud/capacity.ts', function () {
 	const loginId = 'testCodeUser@';
 	
 	before('connect', function (done) {

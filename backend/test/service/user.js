@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const { createUser, isExistsUser } = require('../../src/service');
 const { User } = require('../../src/model');
 
-describe('user.ts', function () {
+describe('service/user.ts', function () {
 	before('connect', function (done) {
 		mongoose.connect(
 			'mongodb://localhost:27017/BooStore',
