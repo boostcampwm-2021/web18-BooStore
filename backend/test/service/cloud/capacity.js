@@ -63,4 +63,100 @@ describe('capacity.ts', function () {
 			assert.deepEqual(result, expected);
 		});
 	});
+	describe('canIncreaseCurrentCapacity', function () {
+		beforeEach('reset User Capacity', async () => {
+			await User.updateOne(
+				{
+					loginId,
+				},
+				{
+					currentCapacity: 0,
+					maxCapacity: 1000,
+				}
+			);
+		});
+
+		it('Document의 현재 용량 + value가 최대 용량보다 작으면 true', async () => {
+			// given
+			const input = { loginId, value: 100 };
+			const expected = true;
+
+			// when
+			const result = await canIncreaseCurrentCapacity(input);
+
+			// then
+			assert.equal(result, expected);
+		});
+		it('Document의 현재 용량 + value가 최대 용량과 같으면 true', async () => {
+			// given
+			const input = { loginId, value: 1000 };
+			const expected = true;
+
+			// when
+			const result = await canIncreaseCurrentCapacity(input);
+
+			// then
+			assert.equal(result, expected);
+		});
+
+		it('Document의 현재 용량 + value가 최대 용량보다 크면 false', async () => {
+			// given
+			const input = { loginId, value: 10000 };
+			const expected = false;
+
+			// when
+			const result = await canIncreaseCurrentCapacity(input);
+
+			// then
+			assert.equal(result, expected);
+		});
+	});
+	describe('canDecreaseCurrentCapacity', function () {
+		beforeEach('reset User Capacity', async () => {
+			await User.updateOne(
+				{
+					loginId,
+				},
+				{
+					currentCapacity: 100,
+					maxCapacity: 1000,
+				}
+			);
+		});
+
+		it('Document의 현재 용량 - value가 0보다 크면 true', async () => {
+			// given
+			const input = { loginId, value: 50 };
+			const expected = true;
+
+			// when
+			const result = await canDecreaseCurrentCapacity(input);
+
+			// then
+			assert.equal(result, expected);
+		});
+		it('Document의 현재 용량 - value가 0이면 true', async () => {
+			// given
+			const input = { loginId, value: 100 };
+			const expected = true;
+
+			// when
+			const result = await canDecreaseCurrentCapacity(input);
+
+			// then
+			assert.equal(result, expected);
+		});
+
+		it('Document의 현재 용량 - value가 0보다 작으면 false', async () => {
+			// given
+			const input = { loginId, value: 10000 };
+			const expected = false;
+
+			// when
+			const result = await canDecreaseCurrentCapacity(input);
+
+			// then
+			assert.equal(result, expected);
+		});
+	});
 });
