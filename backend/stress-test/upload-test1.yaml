@@ -1,0 +1,16 @@
+config:
+    target: 'http://49.50.165.179:'
+    phases:
+        - duration: 100
+          arrivalRate: 1
+          name: Warm up
+scenarios:
+    - name: '로그인'
+      flow:
+          - post:
+                url: '/login'
+                headers:
+                    Content-Type: 'application/json'
+                json:
+                    id: 'test1234'
+                    password: 'test1234'
