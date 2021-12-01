@@ -241,4 +241,45 @@ describe('capacity.ts', function () {
 			}
 		});
 	});
+	describe('updateMaxCapacity', function () {
+		beforeEach('reset User Capacity', async () => {
+			await User.updateOne(
+				{
+					loginId,
+				},
+				{
+					currentCapacity: 0,
+					maxCapacity: 1000,
+				}
+			);
+		});
+
+		it('User Document의 maxCapacity 값이 value로 설정됨', async () => {
+			// given
+			const input = { loginId, maxCapacity: 50 };
+			const expected = 50;
+
+			// when
+			await updateMaxCapacity(input);
+			const user = await User.findOne({ loginId }).exec();
+			const result = user.maxCapacity;
+
+			// then
+			assert.equal(result, expected);
+		});
+		it('value가 0 미만인 경우 에러발생', async () => {
+			// given
+			const input = { loginId, maxCapacity: -10 };
+			const expected = `maxCapacity must be positive`;
+
+			try {
+				// when
+				await updateMaxCapacity(input);
+				assert.fail();
+			} catch (err) {
+				// then
+				assert.equal(err.message, expected);
+			}
+		});
+	});
 });
