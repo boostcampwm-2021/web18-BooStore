@@ -212,27 +212,6 @@ export const getNewFolder = async (loginId: string, parentDir: string, curDir: s
 	return newFolder;
 };
 
-export const updateFile = async (
-	loginId: string,
-	curDir: string,
-	fileName: string,
-	newDir: string
-) => {
-	const notOverlappedFilename = await getNotOverlappedName(newDir, fileName, loginId);
-
-	return await Cloud.updateOne(
-		{
-			ownerId: loginId,
-			directory: curDir,
-			name: fileName,
-		},
-		{
-			directory: newDir,
-			name: notOverlappedFilename,
-		}
-	);
-};
-
 export const getFilesForUpdate = async (loginId: string, curDir: string) => {
 	const filesForUpdate = await Cloud.find(
 		{
