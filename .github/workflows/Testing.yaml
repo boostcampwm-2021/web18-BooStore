@@ -37,10 +37,14 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14.17'
-      - uses: supercharge/mongodb-github-action@1.7.0
+      - name: Mongo DB 설치
+        uses: supercharge/mongodb-github-action@1.7.0
         with:
           mongodb-version: '4.0'
           mongodb-port: 27017
       - run: |
           chmod +x ./script/mocha.sh
           ./script/mocha.sh
+        env:
+          TEST_MONGO_URI: ${{secrets.TEST_MONGO_URI}}
+          MAX_CAPACITY: ${{secrets.TEST_MAX_CAPACITY}}
