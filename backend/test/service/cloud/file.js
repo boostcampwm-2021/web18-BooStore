@@ -2,7 +2,11 @@ const assert = require('assert');
 require('dotenv').config();
 const mongoose = require('mongoose');
 const { createUser } = require('../../../src/service');
-const { getNotOverlappedName, createAncestorsFolderDocs } = require('../../../src/service/cloud');
+const {
+	getNotOverlappedName,
+	createAncestorsFolderDocs,
+	updateStarStatus,
+} = require('../../../src/service/cloud');
 const { Cloud, User } = require('../../../src/model');
 
 const loginId = 'testCodeUser@';
@@ -141,6 +145,55 @@ describe('service/cloud/file.ts', function () {
 			assert.equal(result.length, expectedLength);
 			assert.equal(!!nope1, expectedFind);
 			assert.equal(!!nope2, expectedFind);
+		});
+	});
+
+	describe('updateStarStatus', function () {
+		beforeEach('make documents', initCloudDocs);
+		afterEach('delete documents', async () => {
+			await Cloud.deleteMany({});
+		});
+
+		it('도큐먼트에 스타 추가', async () => {
+			// given
+			const file = await Cloud.findOne({ name: 'file1.txt' });
+			const input = {
+				userLoginId: loginId,
+				targetIds: [file._id],
+				state: true,
+			};
+			const expected = true;
+
+			// when
+			await updateStarStatus(input);
+			const result = await Cloud.findById(file._id);
+
+			// then
+			assert.equal(result.isStar, expected);
+		});
+		it('도큐먼트에 스타 제거', async () => {
+			// given
+			const file = await Cloud.findOneAndUpdate(
+				{ name: 'file1.txt' },
+				{
+					$set: {
+						isStar: true,
+					},
+				}
+			);
+			const input = {
+				userLoginId: loginId,
+				targetIds: [file._id],
+				state: false,
+			};
+			const expected = false;
+
+			// when
+			await updateStarStatus(input);
+			const result = await Cloud.findById(file._id);
+
+			// then
+			assert.equal(result.isStar, expected);
 		});
 	});
 });
