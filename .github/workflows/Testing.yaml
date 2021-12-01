@@ -38,5 +38,5 @@ jobs:
         with:
           node-version: '14.17'
       - run: |
-        chmod +x ./script/mocha.sh
-        ./script/mocha.sh
+          chmod +x ./script/mocha.sh
+          ./script/mocha.sh
