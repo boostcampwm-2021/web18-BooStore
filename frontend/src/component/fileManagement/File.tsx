@@ -5,6 +5,7 @@ import { FileDTO, FileEditAction } from '@DTO';
 import FileIcon from './FileIcon';
 import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
 import { useLocation } from 'react-router';
+import { handleFiles } from 'api';
 
 interface Props {
 	file: FileDTO;
@@ -64,14 +65,8 @@ const File: React.FC<Props> = ({
 			targetIds: file._id,
 			action: FileEditAction.removeStar,
 		};
-		fetch('/cloud/files', {
-			method: 'PATCH',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+
+		handleFiles('PATCH', body);
 	};
 
 	const changeCurrentDirectory = () => {
