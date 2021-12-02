@@ -7,7 +7,7 @@
     "prestart": "npm run build",
     "start": "node ./bin/www",
     "dev": "tsc-watch --onSuccess \"node ./bin/www\"",
-    "test": "mocha ./test/**/*.js -r ts-node/register"
+    "test": "mocha './test/**/*.js' -r ts-node/register"
   },
   "dependencies": {
     "adm-zip": "^0.5.9",
