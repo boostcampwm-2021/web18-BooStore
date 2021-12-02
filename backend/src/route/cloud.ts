@@ -174,7 +174,7 @@ router.delete('/files', isAuthenticated, async (req, res) => {
 	}
 });
 
-router.post('/newfolder', isAuthenticated, async (req, res) => {
+router.post('/folder', isAuthenticated, async (req, res) => {
 	const { loginId } = req.user;
 	const { name, curdir } = req.body;
 	const folderName = name.newFolderName;
