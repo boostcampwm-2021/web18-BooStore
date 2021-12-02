@@ -1,4 +1,5 @@
 # web18-BooStore
+
 ![부스트캠프 메인 GIF](https://user-images.githubusercontent.com/23000498/144479828-ba888e0b-3470-4a66-8bd4-51fe5e5a51ea.gif)
 
 ## 목차
@@ -33,10 +34,12 @@
 |                           [J010 권윤영](https://github.com/ChipmunkForLove)                            |                         [J022 김동환](https://github.com/gidskql6671)                          |                        [J041 김영화](https://github.com/K-moovie)                        |
 
 ## 💻 배포 링크
+
 [http://www.boostore.co.kr](http://www.boostore.co.kr)
 
 ## 📀 데모 링크
-[BooStore 최종 데모 링크]()
+
+[BooStore 최종 데모 링크](https://www.youtube.com/watch?v=D65okwbmxXQ)
 
 ## ⏰ Ground Rule
 
@@ -77,6 +80,7 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 [Project Desing Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%A7%B0-Project-Design)
 
 ## 📈 Performance Test
+
 [Performance Test Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/Performance-Test)
 
 ## 📖 회의록 목록
