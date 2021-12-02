@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { FileDTO, FileEditAction } from '@DTO';
+import { FileDTO } from '@DTO';
 import { Capacity } from '@model';
 import DropBox, { DropBoxItem } from '@component/common/DropBox';
-import ModalComponent, { ModalType } from '@component/common/ModalComponent';
+import ModalComponent, { ModalType } from '@component/common/modalComponent';
 import ProgressBar from '@component/common/ProgressBar';
 import Button from '@component/common/Button';
 
 import { ReactComponent as ToggleOffSvg } from '@asset/image/check_box_outline_blank.svg';
 import { ReactComponent as ToggleOnSvg } from '@asset/image/check_box_outline_selected.svg';
-import { moveFileToTrash } from '@api';
-import { getFiles, getNotOverlappedName } from '@util';
+import { moveFileToTrash, downloadFiles } from '@api';
+import { getNotOverlappedRelativePaths } from '@util';
 
 interface Props {
 	showShareButton?: boolean;
@@ -39,7 +39,7 @@ const FileMenuForMain: React.FC<Props> = ({
 	const [failureModalText, setFailureModalText] = useState('유효하지 않은 파일입니다.');
 	const [isOpenFailureModal, setOpenFailureModal] = useState(false);
 	const [isCompleteSend, setIsCompleteSend] = useState(true);
-	const [isOpenProgreeModal, setOpenProgreeModal] = useState(false);
+	const [isOpenProgressModal, setOpenProgressModal] = useState(false);
 	const [processedFileSize, setProcessedFileSize] = useState(0);
 	const [totalFileSize, setTotalFileSize] = useState(0);
 	const [progressModalText, setProgressModalText] = useState('Loading...');
@@ -72,7 +72,7 @@ const FileMenuForMain: React.FC<Props> = ({
 		setSelectedUploadFiles(event.target.files);
 	};
 
-	const onClickDownload = async () => {
+	const createDownloadQuery = (selectedFiles: Map<string, FileDTO>) => {
 		const targetIds = [...selectedFiles.values()]
 			.filter((file) => file.contentType !== 'folder')
 			.map((file) => file._id)
@@ -91,40 +91,18 @@ const FileMenuForMain: React.FC<Props> = ({
 			}, '');
 		const directoriesQuery =
 			directories === '' ? 'folders=' : directories.substr(0, directories.length - 1);
-
 		const queryString = `current_dir=${currentDir}&${filesQuery}${directoriesQuery}`;
-		fetch(`/cloud/download?${queryString}`, {
-			credentials: 'include',
-		})
-			.then((res) => {
-				if (res.ok) {
-					return res;
-				} else if (res.status === 401) {
-					throw new Error('올바른 사용자가 아닙니다. 로그인 후 사용해주십시오.');
-				} else {
-					throw new Error('올바른 요청이 아닙니다.');
-				}
-			})
-			.then(async (res) => {
-				const fileName = /attachment; filename="(?<fileName>[^"]+)"/.exec(
-					res.headers.get('Content-Disposition') as string
-				)?.groups?.fileName;
-				const blob = await res.blob();
-				return { fileName: fileName, blob: blob };
-			})
-			.then(({ fileName, blob }) => {
-				const url = window.URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = fileName as string;
-				document.body.appendChild(a);
-				a.click();
-				a.remove();
-			})
-			.catch((err) => {
-				setFailureModalText((err as Error).message);
-				setOpenFailureModal(true);
-			});
+		return queryString;
+	};
+
+	const onClickDownload = () => {
+		const queryString = createDownloadQuery(selectedFiles);
+		try {
+			downloadFiles(queryString);
+		} catch (err) {
+			setFailureModalText((err as Error).message);
+			setOpenFailureModal(true);
+		}
 	};
 
 	const onClickDelete = async () => {
@@ -146,46 +124,24 @@ const FileMenuForMain: React.FC<Props> = ({
 			credentials: 'include',
 		});
 
-		return res.ok;
+		if (res.ok) {
+			return true;
+		} else if (res.status === 403) {
+			return false;
+		} else {
+			throw new Error(res.status.toString());
+		}
 	};
 
 	const sendFiles = async (selectedUploadFiles: File[], totalSize: number) => {
 		const formData = new FormData();
-
-		const relativePaths: Map<string, string> = new Map();
-		if (selectedUploadFiles[0].webkitRelativePath != '') {
-			const relativePath = selectedUploadFiles[0].webkitRelativePath;
-			const createdFolderName = relativePath.split('/')[0];
-			const notOverlappedName = await getNotOverlappedName(currentDir, createdFolderName);
-
-			if (createdFolderName === notOverlappedName) {
-				selectedUploadFiles.forEach((file) => {
-					const { webkitRelativePath: wRP, name } = file;
-
-					relativePaths.set(name, wRP);
-				});
-			} else {
-				selectedUploadFiles.forEach((file) => {
-					const { webkitRelativePath: wRP, name } = file;
-
-					relativePaths.set(
-						name,
-						`${notOverlappedName}/${wRP.split('/').slice(1).join('/')}`
-					);
-				});
-			}
-		} else {
-			selectedUploadFiles.forEach((file) => {
-				const { webkitRelativePath: wRP, name } = file;
-
-				relativePaths.set(name, wRP);
-			});
-		}
-
 		formData.append('rootDirectory', currentDir);
+
+		const relativePaths = await getNotOverlappedRelativePaths(selectedUploadFiles, currentDir);
 		let metaData: any = {};
 		let sectionSize = 0;
 		let processedSize = 0;
+		const separateCap = 1024 * 1024; // 1MB 단위
 		for await (const file of selectedUploadFiles) {
 			const { size, name } = file;
 			processedSize += size;
@@ -196,8 +152,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			formData.append('uploadFiles', file, name);
 			metaData[name] = relativePaths.get(name);
 
-			// 1MB 단위로 보냄
-			if (sectionSize >= 1024 * 1024 || processedSize == totalSize) {
+			if (sectionSize >= separateCap || processedSize == totalSize) {
 				formData.append('relativePath', JSON.stringify(metaData));
 
 				const res = await fetch(`/cloud/upload`, {
@@ -234,7 +189,7 @@ const FileMenuForMain: React.FC<Props> = ({
 			setProcessedFileSize(0);
 			setProgressModalText('Loading...');
 			setIsCompleteSend(false);
-			setOpenProgreeModal(true);
+			setOpenProgressModal(true);
 
 			await sendFiles(uploadFiles, totalSize);
 			updateFiles();
@@ -242,7 +197,20 @@ const FileMenuForMain: React.FC<Props> = ({
 			setProgressModalText('Complete!');
 			setIsCompleteSend(true);
 		} catch (err) {
-			setFailureModalText((err as Error).message);
+			const message = (err as Error).message;
+			const status = Number(message);
+			if (isNaN(status)) {
+				setFailureModalText(message);
+			} else if (status === 400) {
+				setFailureModalText('잘못된 요청입니다. 다시 시도해주세요.');
+			} else if (status === 401) {
+				setFailureModalText('로그인이 되어있지 않습니다.');
+			} else if (status === 403) {
+				setFailureModalText('허용된 용량을 초과했습니다.');
+			} else {
+				setFailureModalText('서버에 장애가 발생하였습니다.');
+			}
+
 			setOpenFailureModal(true);
 		}
 
@@ -312,9 +280,9 @@ const FileMenuForMain: React.FC<Props> = ({
 				<p>{failureModalText}</p>
 			</FailureModal>
 			<ProgressModal
-				isOpen={isOpenProgreeModal}
+				isOpen={isOpenProgressModal}
 				onCloseButton={isCompleteSend}
-				setOpen={setOpenProgreeModal}
+				setOpen={setOpenProgressModal}
 				modalType={ModalType.Upload}
 			>
 				<span> {progressModalText} </span>
@@ -333,11 +301,11 @@ const Container = styled.div`
 
 const SelectAllBtn = styled.button`
 	cursor: pointer;
-	border: 1px solid ${(props)=> props.theme.color.Line};
+	border: 1px solid ${(props) => props.theme.color.Line};
 	border-radius: 4px;
 	padding: 0;
 	margin-right: 20px;
-	
+
 	display: flex;
 	justify-content: center;
 	align-items: center;

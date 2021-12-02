@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import styled, { ThemeConsumer } from 'styled-components';
-import { convertByteToUnitString, getDate, getFiles } from '@util';
+import styled from 'styled-components';
+import { convertByteToUnitString, getDate } from '@util';
 import { FileDTO, FileEditAction } from '@DTO';
 import FileIcon from './FileIcon';
 import { ReactComponent as Star } from '@asset/image/icons/icon_star.svg';
 import { useLocation } from 'react-router';
+import { handleFiles } from 'api';
 
 interface Props {
 	file: FileDTO;
@@ -36,7 +37,7 @@ const File: React.FC<Props> = ({
 		if (event.button !== 0) {
 			return;
 		}
-		
+
 		setSelectedFiles((selectedFiles) => {
 			const result = new Map(selectedFiles);
 			if (result.has(_id)) {
@@ -64,21 +65,13 @@ const File: React.FC<Props> = ({
 			targetIds: file._id,
 			action: FileEditAction.removeStar,
 		};
-		fetch('/cloud/files', {
-			method: 'PUT',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(body),
-		});
+
+		handleFiles('PATCH', body);
 	};
 
-	const changeCurrentDirectory = async () => {
+	const changeCurrentDirectory = () => {
 		if (isFolder) {
-			const childDir =
-				currentDirectory === '/' ? currentDirectory + name : currentDirectory + '/' + name;
-			setCurrentDir(childDir);
+			setCurrentDir(path);
 		}
 	};
 

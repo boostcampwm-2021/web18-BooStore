@@ -8,11 +8,12 @@
 - [📚 Naming Convention](#-naming-convention)
 - [📝 Git Convention](#-git-convention)
 - [📜 API 문서](#-api-문서)
-- [💾 Deploy Process](#-deploy-process)
+- [💾 Integration & Deploy Process](#-integration--deploy-process)
 - [📊 Upload Flow Chart](#-upload-flow-chart)
 - [📅 스케쥴러](#-스케쥴러)
 - [🎨 와이어프레임 및 기획서](#-와이어프레임-및-기획서)
 - [🧰 설계서](#-설계서)
+- [📈 Performance Test](#-performance-test)
 - [📖 회의록 목록](#-회의록-목록)
 
 ## ✨ 프로젝트 소개
@@ -51,9 +52,9 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 
 [PostMan Docs](https://documenter.getpostman.com/view/13315664/UVJZnHu8)
 
-## 💾 Deploy Process
+## 💾 Integration & Deploy Process
 
-[Deploy Process Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%92%BE-Deploy-Process)
+[Integration & Deploy Process Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%92%BE-Integration-&-Deploy-Process)
 
 ## 📊 Upload Flow Chart
 
@@ -71,6 +72,9 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 
 [Project Desing Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/%F0%9F%A7%B0-Project-Design)
 
+## 📈 Performance Test
+[Performance Test Wiki](https://github.com/boostcampwm-2021/web18-BooStore/wiki/Performance-Test)
+
 ## 📖 회의록 목록
 
 - [1주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/1%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
@@ -78,3 +82,4 @@ Git의 브렌치 전략과 PR 및 이슈 규칙을 정의하였다.
 - [3주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/3%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
 - [4주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/4%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
 - [5주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/5%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)
+- [6주차 회의록](https://github.com/boostcampwm-2021/web18-BooStore/wiki/6%EC%A3%BC%EC%B0%A8-%ED%9A%8C%EC%9D%98%EB%A1%9D)

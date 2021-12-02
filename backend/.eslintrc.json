@@ -20,5 +20,5 @@
     "@typescript-eslint/no-empty-function": "off",
     "no-prototype-builtins": "off"
   },
-  "ignorePatterns": ["node_modules/"]
+  "ignorePatterns": ["node_modules/", "test/"]
 }

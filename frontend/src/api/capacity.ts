@@ -1,5 +1,4 @@
-
-export const getCapacity = async () => {
+export const getCapacity = () => {
 	return fetch('/user/capacity', {
 		credentials: 'include',
 	})

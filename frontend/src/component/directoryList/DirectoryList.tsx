@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FileDTO } from '@DTO';
 
@@ -6,7 +6,6 @@ import Directory from './Directory';
 
 import { getDirectoryList } from 'api';
 import { makeTree, treeNode } from '@util';
-import { User } from '@model';
 import { useHistory } from 'react-router';
 
 const makeDirectoryTree = (directories: string[]) => {
@@ -74,6 +73,7 @@ const DirectoryList: React.FC<Props> = ({ className, files, setCurrentDir }) => 
 			</Directory>
 		);
 	};
+	
 	return <Container className={className}>{getFolderStructure(folderStructure)}</Container>;
 };
 
