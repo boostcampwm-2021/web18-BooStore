@@ -1,4 +1,5 @@
 # web18-BooStore
+![부스트캠프 메인 GIF](https://user-images.githubusercontent.com/23000498/144479828-ba888e0b-3470-4a66-8bd4-51fe5e5a51ea.gif)
 
 ## 목차
 
@@ -31,7 +32,6 @@
 |                           [J010 권윤영](https://github.com/ChipmunkForLove)                            |                         [J022 김동환](https://github.com/gidskql6671)                          |                        [J041 김영화](https://github.com/K-moovie)                        |
 
 ## 💻 배포 링크
-
 [http://www.boostore.co.kr](http://www.boostore.co.kr)
 
 ## ⏰ Ground Rule
