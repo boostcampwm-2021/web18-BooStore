@@ -39,7 +39,7 @@
 
 ## 📀 데모 링크
 
-[BooStore 최종 데모 링크](https://www.youtube.com/watch?v=D65okwbmxXQ)
+[BooStore 최종 데모 링크](https://youtu.be/e-2XRK0MUn8)
 
 ## ⏰ Ground Rule
 
